@@ -1,3 +1,5 @@
+require_relative 'application_job'
+
 class AppUninstalledJob < PR::Common::ApplicationJob
   def perform(params)
     # no need for a reconcile job for this webhook since shop_update will reconcile these (UnauthorizedAccess exception)

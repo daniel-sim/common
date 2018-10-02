@@ -1,3 +1,5 @@
+require_relative 'application_job'
+
 class ShopUpdateJob < PR::Common::ApplicationJob
   def perform(params)
     shop = Shop.find_by(shopify_domain: params[:shop_domain])

@@ -1,3 +1,5 @@
+require_relative 'application_job'
+
 class ShopUpdateReconcileJob < PR::Common::ApplicationJob
   queue_as :low_priority
 
