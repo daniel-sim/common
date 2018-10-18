@@ -12,6 +12,7 @@ group :development, :test do
   gem 'capistrano-sidekiq'
   gem 'vcr'
   gem 'webmock'
+  gem 'simplecov', require: false
 end
 
 gem 'devise'
