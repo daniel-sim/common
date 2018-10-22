@@ -9,6 +9,7 @@ require 'webmock/rspec'
 require 'vcr'
 require 'support/factory_bot'
 require 'sidekiq/testing'
+require 'support/helpers/webhook_helper'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -42,6 +43,7 @@ end
 
 RSpec.configure do |config|
   config.include Devise::TestHelpers, type: :controller
+  config.include WebhookHelper, type: :request
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

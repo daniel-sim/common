@@ -10,7 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_09_124306) do
+ActiveRecord::Schema.define(version: 2018_10_29_124833) do
+
+  create_table "customers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "email"
+  end
 
   create_table "shops", force: :cascade do |t|
     t.string "plan_name"
@@ -40,6 +46,8 @@ ActiveRecord::Schema.define(version: 2018_10_09_124306) do
     t.string "referrer"
     t.integer "provider"
     t.datetime "charged_at"
+    t.string "website", default: "https://pembertonrank.com", null: false
+    t.string "username", default: "username", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

@@ -9,6 +9,12 @@ module PR
         extend ActiveSupport::Concern
 
         included do
+          include PR::Common::Redactable
+
+          redactable :email, :email, unique: true
+          redactable :username, :string, unique: true
+          redactable :website, :custom, proc: :website_redactor
+
           enum provider: { shopify: 0, tictail: 1 }
 
           [:has_active_charge?, :active_charge?].each do |name|
@@ -18,6 +24,12 @@ module PR
           def subscription_length
             (DateTime.now - self.charged_at.to_datetime).to_i if self.charged_at
           end
+        end
+
+        private
+
+        def website_redactor
+          "https://pluginuseful.com/REDACTED-#{SecureRandom.uuid}"
         end
 
         class_methods do
