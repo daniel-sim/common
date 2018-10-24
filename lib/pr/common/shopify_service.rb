@@ -1,6 +1,12 @@
 module PR
   module Common
     class ShopifyService
+      # Define shops to
+      TEST_SHOPS = {
+        "plan-staff_business.myshopify.com" => "staff_business",
+        "plan-enterprise.myshopify.com" => "enterprise"
+      }.freeze
+
       def initialize(shop:)
         @shop = shop
         @user = User.shopify.find_by(shop_id: @shop.id)
@@ -11,14 +17,16 @@ module PR
       end
 
       def update_shop(plan_name:, uninstalled:)
-        if @shop.plan_name != plan_name && @shop.plan_name == 'affiliate'
+        plan_name = maybe_fake_plan_name(@shop, plan_name)
+
+        if @shop.plan_name != plan_name && @shop.plan_name == "affiliate"
           # development shop now on a paid plan
           @user.update(active_charge: false)
           Analytics.track({
                               user_id: @user.id,
-                              event: 'Shop Handed off',
+                              event: 'Shop Handed Off',
                               properties: {
-                                  planName: plan_name,
+                                  plan_name: plan_name,
                                   email: @user.email
                               }
                           })
@@ -76,6 +84,17 @@ module PR
         end
 
         return best_price
+      end
+
+      private
+
+      # Use this to fake different plans outside of production.
+      # This allows us to test under development stores free of charge.
+      # Normally, dev stores are always affiliates.
+      def maybe_fake_plan_name(shop, real_plan_name)
+        return real_plan_name if Rails.env.production?
+
+        TEST_SHOPS.fetch(shop.shopify_domain, 'affiliate')
       end
     end
   end
