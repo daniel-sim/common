@@ -5,35 +5,45 @@ module ActiveResource
   class RateLimitExceededError < ClientError # :nodoc:
   end
 
-  class Connection 
+  class Connection
     @@mutex = Mutex.new
 
     RATE_LIMIT_SLEEP_SECONDS = ENV["RATE_LIMIT_SLEEP_SECONDS"] || 20 # number of seconds to sleep (by sleeping 20 you reset the clock to get 40 fresh burst calls with the default 2 calls/sec)
     RATE_LIMIT_BUFFER = ENV["RATE_LIMIT_SLEEP_SECONDS"] || 10 # you don't want to drain the remaining count to 0 in case you need high priority calls
-    
+
     def self.rate_limit_timer
       @@mutex.synchronize {
         @rate_limit_timer
       }
     end
-    
+
     def self.rate_limit_timer=(value)
       @@mutex.synchronize {
         @rate_limit_timer = value
       }
     end
-    
+
     private
 
     # https://github.com/rails/activeresource/blob/82eb29ab023b3105b29bce31c9a00a3b9a9653aa/lib/active_resource/connection.rb#L117
     def request(method, path, *arguments)
+      request_uri = "#{site.scheme}://#{site.host}:#{site.port}#{path}"
+      Rollbar.scope!(
+        activeresource: {
+          method: method,
+          uri: request_uri,
+          arguments: arguments
+        }
+      )
+
       Rails.logger.debug("#{method} #{path} shopify request #{Rake.application.top_level_tasks.join(', ')}") if ENV["DEBUG_SHOPIFY_RATE_LIMITS"]
-      
+
       result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
         payload[:method]      = method
-        payload[:request_uri] = "#{site.scheme}://#{site.host}:#{site.port}#{path}"
+        payload[:request_uri] = request_uri
         payload[:result]      = http.send(method, path, *arguments)
       end
+
       handle_rate_limit_response(result)
       handle_rate_limits(result)
       handle_response(result)
@@ -85,11 +95,11 @@ module ActiveResource
       return false if rate_limit_elapsed_seconds > RATE_LIMIT_SLEEP_SECONDS
       true
     end
-    
+
     def current_rate_limit_call_count(response)
       response['x-shopify-shop-api-call-limit'].split('/').first
     end
-    
+
     def total_rate_limit_calls(response)
       response['x-shopify-shop-api-call-limit'].split('/').last
     end
