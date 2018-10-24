@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   post 'shops/callback'
 
   post 'webhooks', to: 'webhooks#receive'
+  post 'webhooks/:topic', to: 'webhooks#receive'
 
   resources :charges,      only: [:create] do
     collection do
