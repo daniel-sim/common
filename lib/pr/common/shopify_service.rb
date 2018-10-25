@@ -1,12 +1,6 @@
 module PR
   module Common
     class ShopifyService
-      # Define shops to
-      TEST_SHOPS = {
-        "plan-staff_business.myshopify.com" => "staff_business",
-        "plan-enterprise.myshopify.com" => "enterprise"
-      }.freeze
-
       def initialize(shop:)
         @shop = shop
         @user = User.shopify.find_by(shop_id: @shop.id)
@@ -91,10 +85,14 @@ module PR
       # Use this to fake different plans outside of production.
       # This allows us to test under development stores free of charge.
       # Normally, dev stores are always affiliates.
+      # To fake a plan, name your shop something ending with "_plan-#{the_plan_name}"
+      # e.g. "hello-ladies_plan-staff_business.myshopify.com"
       def maybe_fake_plan_name(shop, real_plan_name)
         return real_plan_name if Rails.env.production?
 
-        TEST_SHOPS.fetch(shop.shopify_domain, 'affiliate')
+        shop.shopify_domain.match(/\A.*_plan-(?<plan>\w+)\./) { |matches| return matches[:plan] }
+
+        real_plan_name
       end
     end
   end
