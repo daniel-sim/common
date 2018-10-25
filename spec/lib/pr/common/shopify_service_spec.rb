@@ -84,13 +84,7 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#update_shop" do
-    before do
-      # We have no Analytics in common, so for now we just need to allow
-      # it to be called.
-      class Analytics
-        def self.track(*args); end
-      end
-    end
+    before { allow(Analytics).to receive(:track) }
 
     context "when shop should not have a fake plan" do
       context "in staging" do
