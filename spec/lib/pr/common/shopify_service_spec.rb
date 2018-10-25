@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe PR::Common::ShopifyService do
-  let(:shop) { create(:shop, user: create(:user)) }
+  let(:shop) { create(:shop, user: build(:user)) }
   subject(:service) { described_class.new(shop: shop) }
 
   describe '#determine_price' do
