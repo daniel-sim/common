@@ -13,13 +13,19 @@ RSpec.describe Shop, type: :model do
   end
 
   describe '.with_active_plan' do
-    it 'includes only shops whose plan is not cancelled' do
+    it 'includes only shops whose plan is not cancelled, frozen, 🌲, or locked' do
       active_plan_shop = create(:shop)
       cancelled_plan_shop = create(:shop, plan_name: 'cancelled')
+      locked_plan_shop = create(:shop, plan_name: 'locked')
+      tree_plan_shop = create(:shop, plan_name: '🌲')
+      frozen_plan_shop = create(:shop, plan_name: 'frozen')
 
       shops = Shop.with_active_plan
       expect(shops).to include active_plan_shop
       expect(shops).not_to include cancelled_plan_shop
+      expect(shops).not_to include locked_plan_shop
+      expect(shops).not_to include tree_plan_shop
+      expect(shops).not_to include frozen_plan_shop
     end
   end
 

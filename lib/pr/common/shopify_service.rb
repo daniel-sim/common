@@ -49,9 +49,14 @@ module PR
             # we no longer have access to the shop- app uninstalled
             set_uninstalled
           rescue ActiveResource::ClientError => e
-            if e.response.code == '402'
-              # quick and very dirty handling of frozen charges:
-              # - we can't set active_charge = false on the user as we're not handling the unfrozen webhook so they'd never get picked up again
+            if e.response.code.to_s == '402'
+              update_shop(plan_name: 'frozen', uninstalled: false)
+            elsif e.response.code.to_s == '404'
+              update_shop(plan_name: 'cancelled', uninstalled: false)
+            elsif e.response.code.to_s == '420'
+              update_shop(plan_name: '🌲', uninstalled: false)
+            elsif e.response.code.to_s == '423'
+              update_shop(plan_name: 'locked', uninstalled: false)
             end
           end
         end

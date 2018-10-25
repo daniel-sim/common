@@ -37,4 +37,49 @@ describe PR::Common::ShopifyService do
       end
     end
   end
+
+  describe '#reconcile_with_shopify' do
+    context 'shop response errors' do
+      before :each do
+        allow(ShopifyAPI::Shop).to receive(:current).and_raise(ActiveResource::ClientError.new(OpenStruct.new(code: code)))
+        allow(Analytics).to receive(:track)
+      end
+
+      context 'with 402' do
+        let(:code) { 402 }
+        it 'sets plan_name to frozen' do
+          expect(shop.plan_name).to eq 'affiliate'
+          service.reconcile_with_shopify
+          expect(shop.reload.plan_name).to eq 'frozen'
+        end
+      end
+
+      context 'with 404' do
+        let(:code) { 404 }
+        it 'sets plan_name to cancelled' do
+          expect(shop.plan_name).to eq 'affiliate'
+          service.reconcile_with_shopify
+          expect(shop.reload.plan_name).to eq 'cancelled'
+        end
+      end
+
+      context 'with 420' do
+        let(:code) { 420 }
+        it 'sets plan_name to 🌲' do
+          expect(shop.plan_name).to eq 'affiliate'
+          service.reconcile_with_shopify
+          expect(shop.reload.plan_name).to eq '🌲'
+        end
+      end
+
+      context 'with 423' do
+        let(:code) { 423 }
+        it 'sets plan_name to locked' do
+          expect(shop.plan_name).to eq 'affiliate'
+          service.reconcile_with_shopify
+          expect(shop.reload.plan_name).to eq 'locked'
+        end
+      end
+    end
+  end
 end
