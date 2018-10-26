@@ -16,10 +16,10 @@ module PR
           @user.update(active_charge: false)
           Analytics.track({
                               user_id: @user.id,
-                              event: 'Shop Handed off',
+                              event: "Shop Handed Off",
                               properties: {
-                                  planName: plan_name,
-                                  email: @user.email
+                                plan_name: plan_name,
+                                email: @user.email
                               }
                           })
         end
