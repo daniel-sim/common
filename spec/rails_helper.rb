@@ -5,7 +5,10 @@ require File.expand_path('../dummy/config/environment', __FILE__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'spec_helper'
 require 'rspec/rails'
+require 'webmock/rspec'
+require 'vcr'
 require 'support/factory_bot'
+require 'sidekiq/testing'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -27,6 +30,15 @@ require 'support/factory_bot'
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
+
+WebMock.disable_net_connect!(allow_localhost: true)
+VCR.configure do |c|
+  c.default_cassette_options = { allow_playback_repeats: true, record: :once, erb: true }
+  c.ignore_localhost = true
+  c.cassette_library_dir = 'spec/cassettes'
+  c.hook_into :webmock
+  c.configure_rspec_metadata!
+end
 
 RSpec.configure do |config|
   config.include Devise::TestHelpers, type: :controller
@@ -56,4 +68,3 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
-

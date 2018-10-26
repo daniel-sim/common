@@ -1,0 +1,43 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.segment.io/v1/import
+    body:
+      encoding: UTF-8
+      string: '{"sentAt":"2018-10-26T15:38:26.267+03:00","batch":[{"event":"App Uninstalled","userId":1,"anonymousId":null,"context":{"library":{"name":"analytics-ruby","version":"2.0.13"}},"options":null,"integrations":null,"properties":{"activeCharge":false,"email":"user1@example.com","subscription_length":null},"timestamp":"2018-10-26T15:38:26.267+03:00","type":"track","messageId":"6718d7f0-bb3f-46c0-90ef-3692b4d61cd8"}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic aGVsbG8gc2VnbWVudDo=
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 26 Oct 2018 12:38:27 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '21'
+      Connection:
+      - keep-alive
+      Vary:
+      - Origin
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "success": true
+        }
+    http_version: 
+  recorded_at: Fri, 26 Oct 2018 12:38:27 GMT
+recorded_with: VCR 4.0.0
