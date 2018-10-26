@@ -82,4 +82,45 @@ describe PR::Common::ShopifyService do
       end
     end
   end
+
+  describe "#update_shop" do
+    before { allow(Analytics).to receive(:track) }
+
+    context "when shop should not have a fake plan" do
+      context "in staging" do
+        before do
+          allow(Rails.env).to receive(:production?).and_return(false)
+        end
+
+        it "does not fake the plan_name" do
+          service.update_shop(plan_name: "affiliate", uninstalled: true)
+          expect(shop.plan_name).to eq "affiliate"
+        end
+      end
+    end
+
+    context "when faked shop should be staff_business" do
+      before do
+        shop.update!(shopify_domain: "hello-ladies_plan-staff_business.myshopify.com")
+      end
+
+      context "in production" do
+        before { allow(Rails.env).to receive(:production?).and_return(true) }
+        it "does not fake the plan_name" do
+          service.update_shop(plan_name: "affiliate", uninstalled: true)
+          expect(shop.plan_name).to eq "affiliate"
+        end
+      end
+
+      context "in staging" do
+        before do
+          allow(Rails.env).to receive(:production?).and_return(false)
+        end
+        it "does fake the plan_name" do
+          service.update_shop(plan_name: "affiliate", uninstalled: true)
+          expect(shop.plan_name).to eq "staff_business"
+        end
+      end
+    end
+  end
 end

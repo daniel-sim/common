@@ -11,14 +11,16 @@ module PR
       end
 
       def update_shop(plan_name:, uninstalled:)
-        if @shop.plan_name != plan_name && @shop.plan_name == 'affiliate'
+        plan_name = maybe_fake_plan_name(@shop, plan_name)
+
+        if @shop.plan_name != plan_name && @shop.plan_name == "affiliate"
           # development shop now on a paid plan
           @user.update(active_charge: false)
           Analytics.track({
                               user_id: @user.id,
-                              event: 'Shop Handed off',
+                              event: 'Shop Handed Off',
                               properties: {
-                                  planName: plan_name,
+                                  plan_name: plan_name,
                                   email: @user.email
                               }
                           })
@@ -76,6 +78,21 @@ module PR
         end
 
         return best_price
+      end
+
+      private
+
+      # Use this to fake different plans outside of production.
+      # This allows us to test under development stores free of charge.
+      # Normally, dev stores are always affiliates.
+      # To fake a plan, name your shop something ending with "_plan-#{the_plan_name}"
+      # e.g. "hello-ladies_plan-staff_business.myshopify.com"
+      def maybe_fake_plan_name(shop, real_plan_name)
+        return real_plan_name if Rails.env.production?
+
+        shop.shopify_domain.match(/\A.*_plan-(?<plan>\w+)\./) { |matches| return matches[:plan] }
+
+        real_plan_name
       end
     end
   end
