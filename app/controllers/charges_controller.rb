@@ -18,7 +18,7 @@ class ChargesController < ApplicationController
         redirect_to "#{Settings.client_url}/charge/failed"
       end
     else
-      @user.update(active_charge: true, charged_at: DateTime.now)
+      activate_user_without_charge
       redirect_to "#{Settings.client_url}/charge/succeed"
     end
   end
@@ -37,6 +37,18 @@ class ChargesController < ApplicationController
   end
 
   private
+
+  def activate_user_without_charge
+    @user.update(active_charge: true, charged_at: DateTime.now)
+
+    Analytics.track({
+      user_id: @user.id,
+      event: "No Charge Activated",
+      properties: {
+        "email": @user.email
+      },
+    })
+  end
 
   def activate_user
     @charge.activate
