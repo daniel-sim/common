@@ -1,7 +1,7 @@
 module PR
   module Common
     class ApplicationJob < ActiveJob::Base
-      def with_analitics()
+      def with_analytics()
         yield
         Analytics.flush
       end
