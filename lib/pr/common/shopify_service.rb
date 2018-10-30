@@ -29,16 +29,19 @@ module PR
       end
 
       def set_uninstalled
-        Analytics.track({
-                            user_id: @user.id,
-                            event: 'App Uninstalled',
-                            properties: {
-                                activeCharge: @user.has_active_charge?,
-                                email: @user.email,
-                                subscription_length: @user.subscription_length
-                            }
-                        })
-        @user.update(active_charge: false)
+        if @user.present?
+          Analytics.track(
+            user_id: @user.id,
+            event: "App Uninstalled",
+            properties: {
+              activeCharge: @user.has_active_charge?,
+              email: @user.email,
+              subscription_length: @user.subscription_length
+            }
+          )
+          @user.update(active_charge: false)
+        end
+
         @shop.update(uninstalled: true)
       end
 
