@@ -8,8 +8,12 @@ module PR
 
         include ::ShopifyApp::Shop
         include ::ShopifyApp::SessionStorage
+        include ::PR::Common::Redactable
 
         included do
+          redactable :shopify_domain, :string, unique: true
+          after_redaction :redact_user
+
           # The 'tree' symbol plan name is a reference to the deprecated '420' Shopify response code
           # it shouldn't happen anymore but we decided to leave it just for fun
           # In 2018 420 code was changed to 423 and corresponding to the 'locked' status
@@ -21,6 +25,12 @@ module PR
 
         class_methods do
           # add class methods here
+        end
+
+        def redact_user
+          return unless respond_to?(:user)
+
+          user&.redact!
         end
       end
     end
