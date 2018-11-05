@@ -29,11 +29,7 @@ module ActiveResource
     def request(method, path, *arguments)
       request_uri = "#{site.scheme}://#{site.host}:#{site.port}#{path}"
       rollbar_scope = {
-        activeresource: {
-          method: method,
-          uri: request_uri,
-          arguments: arguments
-        }
+        activeresource: { method: method, uri: request_uri }
       }
 
       Rollbar.scoped(rollbar_scope) do

@@ -1,3 +1,7 @@
+### 5 November 2018 (9cb76ca9fc05643d4fe8f08788cabf11a0587849)
+- Fixed issue where each call to ActiveResource would add another set of arguments to Rollbar scope, resulting in a huge error if one ever occurs.
+- ! Apps require no changes.
+
 ### 31 Oct 2018 (20c0a4f33407f5a56b05c08a9ef1a438137e0719)
 - Added GDPR webhooks
 ! Apps should add any additional revokable fields if there are any.
