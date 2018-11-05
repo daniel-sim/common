@@ -28,33 +28,33 @@ module ActiveResource
     # https://github.com/rails/activeresource/blob/82eb29ab023b3105b29bce31c9a00a3b9a9653aa/lib/active_resource/connection.rb#L117
     def request(method, path, *arguments)
       request_uri = "#{site.scheme}://#{site.host}:#{site.port}#{path}"
-      Rollbar.scope!(
-        activeresource: {
-          method: method,
-          uri: request_uri,
-          arguments: arguments
-        }
-      )
+      rollbar_scope = {
+        activeresource: { method: method, uri: request_uri }
+      }
 
-      Rails.logger.debug("#{method} #{path} shopify request #{Rake.application.top_level_tasks.join(', ')}") if ENV["DEBUG_SHOPIFY_RATE_LIMITS"]
+      Rollbar.scoped(rollbar_scope) do
+        begin
+          Rails.logger.debug("#{method} #{path} shopify request #{Rake.application.top_level_tasks.join(', ')}") if ENV["DEBUG_SHOPIFY_RATE_LIMITS"]
 
-      result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
-        payload[:method]      = method
-        payload[:request_uri] = request_uri
-        payload[:result]      = http.send(method, path, *arguments)
+          result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
+            payload[:method]      = method
+            payload[:request_uri] = request_uri
+            payload[:result]      = http.send(method, path, *arguments)
+          end
+
+          handle_rate_limit_response(result)
+          handle_rate_limits(result)
+          handle_response(result)
+        rescue RateLimitExceededError => e
+          Rails.logger.warn "[Rate limit exceeded]" if ENV["DEBUG_SHOPIFY_RATE_LIMITS"]
+          rate_limit_sleep
+          retry
+        rescue Timeout::Error => e
+          raise TimeoutError.new(e.message)
+        rescue OpenSSL::SSL::SSLError => e
+          raise SSLError.new(e.message)
+        end
       end
-
-      handle_rate_limit_response(result)
-      handle_rate_limits(result)
-      handle_response(result)
-    rescue RateLimitExceededError => e
-      Rails.logger.warn "[Rate limit exceeded]" if ENV["DEBUG_SHOPIFY_RATE_LIMITS"]
-      rate_limit_sleep
-      retry
-    rescue Timeout::Error => e
-      raise TimeoutError.new(e.message)
-    rescue OpenSSL::SSL::SSLError => e
-      raise SSLError.new(e.message)
     end
 
     def handle_rate_limit_response(response)
