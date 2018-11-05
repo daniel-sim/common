@@ -41,6 +41,10 @@ module PR::Common::Redactable
       "#{base}-#{SecureRandom.uuid}"
     end
 
+    def redact_url(_obj, _options = {})
+      "https://pluginuseful.com/#{REDACTED_STRING}-#{SecureRandom.uuid}"
+    end
+
     def redact_nil(_obj, _options = {}); end
 
     # Custom redaction with a proc
