@@ -6,7 +6,8 @@ describe PR::Common::Redactable do
 
     CALL_PROC_AFTER_REDACTION = -> {}
 
-    attr_accessor :email, :unique_email, :name, :unique_name, :placeheld, :custom, :nullifiable
+    attr_accessor :email, :unique_email, :name, :unique_name, :placeheld, :custom, :url,
+                  :unique_url, :placeheld_url, :nullifiable
 
     after_redaction CALL_PROC_AFTER_REDACTION
     after_redaction :call_method_after_redaction
@@ -17,6 +18,9 @@ describe PR::Common::Redactable do
     redactable :unique_name, :string, unique: true
     redactable :placeheld, :string, placeholder: "placeholder"
     redactable :custom, :custom, proc: proc { "#{custom}-REDACTED" }
+    redactable :url, :url
+    redactable :unique_url, :url, unique: true
+    redactable :placeheld_url, :url, placeholder: "https://schembri.me"
     redactable :nullifiable, :nil
 
     def initialize(attributes = {})
@@ -38,7 +42,10 @@ describe PR::Common::Redactable do
       unique_name: "Jamie Schembri",
       placeheld: "This string should be redacted with a pre-defined placeholder",
       custom: "Custom",
-      nullifiable: "Foo"
+      nullifiable: "Foo",
+      url: "pluginuseful.com",
+      unique_url: "pluginuseful.com",
+      placeheld_url: "pluginuseful.com"
     )
   end
 
@@ -79,6 +86,26 @@ describe PR::Common::Redactable do
       dummy.redact!
 
       expect(dummy.nullifiable).to eq nil
+    end
+
+    it "changes url to a unique redacted url" do
+      dummy.redact!
+
+      expect(dummy.url).to eq "https://pluginuseful.com/REDACTED"
+    end
+
+    it "changes unique url to a unique redacted url" do
+      dummy.redact!
+
+      expect(dummy.unique_url).to match(
+        %r{\Ahttps://pluginuseful.com/REDACTED-\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\z}
+      )
+    end
+
+    it "changes placeheld url to a placeholder url" do
+      dummy.redact!
+
+      expect(dummy.placeheld_url).to eq "https://schembri.me"
     end
 
     it "changes procced to a value based on a given proc" do

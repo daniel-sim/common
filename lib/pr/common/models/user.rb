@@ -13,7 +13,7 @@ module PR
 
           redactable :email, :email, unique: true
           redactable :username, :string, unique: true
-          redactable :website, :custom, proc: :website_redactor
+          redactable :website, :url
 
           enum provider: { shopify: 0, tictail: 1 }
 
@@ -24,12 +24,6 @@ module PR
           def subscription_length
             (DateTime.now - self.charged_at.to_datetime).to_i if self.charged_at
           end
-        end
-
-        private
-
-        def website_redactor
-          "https://pluginuseful.com/REDACTED-#{SecureRandom.uuid}"
         end
 
         class_methods do

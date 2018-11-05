@@ -15,7 +15,7 @@ describe User do
     it "redacts website" do
       user.redact!
 
-      expect(user.website).to start_with("https://pluginuseful.com/")
+      expect(user.website).to eq "https://pluginuseful.com/REDACTED"
     end
   end
 end
