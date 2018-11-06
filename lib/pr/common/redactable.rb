@@ -41,8 +41,6 @@ module PR::Common::Redactable
       "#{base}-#{SecureRandom.uuid}"
     end
 
-    def redact_nil(_obj, _options = {}); end
-
     # Custom redaction with a proc
     def redact_custom(obj, options)
       the_proc = options[:proc].respond_to?(:call) ? options[:proc] : obj.method(options[:proc])

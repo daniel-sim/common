@@ -6,7 +6,7 @@ describe PR::Common::Redactable do
 
     CALL_PROC_AFTER_REDACTION = -> {}
 
-    attr_accessor :email, :unique_email, :name, :unique_name, :placeheld, :custom, :nullifiable
+    attr_accessor :email, :unique_email, :name, :unique_name, :placeheld, :custom
 
     after_redaction CALL_PROC_AFTER_REDACTION
     after_redaction :call_method_after_redaction
@@ -17,7 +17,6 @@ describe PR::Common::Redactable do
     redactable :unique_name, :string, unique: true
     redactable :placeheld, :string, placeholder: "placeholder"
     redactable :custom, :custom, proc: proc { "#{custom}-REDACTED" }
-    redactable :nullifiable, :nil
 
     def initialize(attributes = {})
       attributes.each { |attr, value| instance_variable_set(:"@#{attr}", value) }
@@ -37,8 +36,7 @@ describe PR::Common::Redactable do
       name: "Plug in Useful",
       unique_name: "Jamie Schembri",
       placeheld: "This string should be redacted with a pre-defined placeholder",
-      custom: "Custom",
-      nullifiable: "Foo"
+      custom: "Custom"
     )
   end
 
@@ -73,12 +71,6 @@ describe PR::Common::Redactable do
       dummy.redact!
 
       expect(dummy.placeheld).to eq "placeholder"
-    end
-
-    it "changes nullifiable to nil" do
-      dummy.redact!
-
-      expect(dummy.nullifiable).to eq nil
     end
 
     it "changes procced to a value based on a given proc" do
