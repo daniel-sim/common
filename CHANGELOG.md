@@ -2,10 +2,6 @@
 - Fixed issue where each call to ActiveResource would add another set of arguments to Rollbar scope, resulting in a huge error if one ever occurs.
 - ! Apps require no changes.
 
-### 31 Oct 2018 (20c0a4f33407f5a56b05c08a9ef1a438137e0719)
-- Added GDPR webhooks
-! Apps should add any additional revokable fields if there are any.
-
 ### 30 Oct 2018 (bc0c8c8763c8c251036a0ab5257dec30dfe6c8cf)
 - BUGFIX: Do not expect a shop to have a user when uninstalling via the reconcile job
 ! Does not require any action in apps
