@@ -1,6 +1,0 @@
-api_url:     'http://localhost:3000'
-webhook_url: 'https://ocalhost:3000'
-client_url:  'http://localhost:8080'
-www_url:     'http://localhost:3000'
-
-support_email: 'help@pluginuseful.com'

@@ -5,10 +5,6 @@ ShopifyApp.configure do |config|
   config.webhooks = [
       { topic: 'app/uninstalled', address: "#{Settings.webhook_url}/webhooks/app_uninstalled", format: 'json' },
       { topic: 'shop/update', address: "#{Settings.webhook_url}/webhooks/shop_update", format: 'json' },
-      # GDPR compliance
-      { topic: 'customers/redact', address: "#{Settings.webhook_url}/webhooks/customers_redact", format: 'json' },
-      { topic: 'shop/redact', address: "#{Settings.webhook_url}/webhooks/shop_redact", format: 'json' },
-      { topic: 'customers/data_request', address: "#{Settings.webhook_url}/webhooks/customers_data_request", format: 'json' },
   ]
   # This would be nice to organise the jobs:
   # config.webhook_jobs_namespace = 'shopify/webhooks'
