@@ -38,19 +38,7 @@ module PR::Common::Redactable
 
       return base unless options[:unique]
 
-      append_uuid(base)
-    end
-
-    def redact_url(_obj, options = {})
-      base = options.fetch(:placeholder, "https://pluginuseful.com/#{REDACTED_STRING}")
-
-      return base unless options[:unique]
-
-      append_uuid(base)
-    end
-
-    def append_uuid(string)
-      [string, SecureRandom.uuid].join("-")
+      "#{base}-#{SecureRandom.uuid}"
     end
 
     def redact_nil(_obj, _options = {}); end
