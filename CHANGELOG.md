@@ -1,3 +1,7 @@
+## 13 November 2018 (1f747c42ba4d31923f347ba2be253a29bda41f1e)
+- Properly fixed ActiveResource Rollbar scoping
+- ! Apps require no changes.
+
 ### 5 November 2018 (9cb76ca9fc05643d4fe8f08788cabf11a0587849)
 - Fixed issue where each call to ActiveResource would add another set of arguments to Rollbar scope, resulting in a huge error if one ever occurs.
 - ! Apps require no changes.
