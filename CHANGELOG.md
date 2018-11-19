@@ -1,3 +1,7 @@
+### 19 November 2018 (2f485701b932580bd4995fe4cab199caf8e23094)
+- Remove Rollbar scoping on Shopify requests as it altered global scope every time
+- ! Apps require no changes.
+
 ### 5 November 2018 (9cb76ca9fc05643d4fe8f08788cabf11a0587849)
 - Fixed issue where each call to ActiveResource would add another set of arguments to Rollbar scope, resulting in a huge error if one ever occurs.
 - ! Apps require no changes.
