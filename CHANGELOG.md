@@ -1,3 +1,7 @@
+### 4 December 2018 (f4b98f3537ba63932cb8594fd18d56db80c97087)
+- Add `reinstalled_at` to shops. This is automatically tracked when setting `uninstalled` to false.
+- ! Apps require no changes.
+
 ### 19 November 2018 (2f485701b932580bd4995fe4cab199caf8e23094)
 - Remove Rollbar scoping on Shopify requests as it altered global scope every time
 - ! Apps require no changes.
