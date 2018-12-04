@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_09_124306) do
+ActiveRecord::Schema.define(version: 2018_12_04_125450) do
 
   create_table "shops", force: :cascade do |t|
     t.string "plan_name"
     t.string "shopify_domain"
     t.string "shopify_token", null: false
     t.boolean "uninstalled", default: false, null: false
+    t.datetime "reinstalled_at"
   end
 
   create_table "users", force: :cascade do |t|

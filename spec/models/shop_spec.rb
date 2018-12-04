@@ -30,13 +30,29 @@ RSpec.describe Shop, type: :model do
   end
 
   describe '.installed' do
-    it 'includes only shows which are not uninstalled' do
+    it 'includes only shops which are not uninstalled' do
       installed_shop = create(:shop, uninstalled: false)
       uninstalled_shop = create(:shop, uninstalled: true)
 
       shops = Shop.installed
       expect(shops).to include installed_shop
       expect(shops).not_to include uninstalled_shop
+    end
+  end
+
+  describe "#reinstalled_at" do
+    let(:shop) { create(:shop, :uninstalled) }
+
+    context "when shop is reinstalled" do
+      it "is set to the current time" do
+        time = Time.current
+
+        Timecop.freeze(time)
+        expect { shop.update!(uninstalled: false) }
+          .to change { shop.reinstalled_at }
+          .from(nil)
+          .to(time)
+      end
     end
   end
 end

@@ -17,10 +17,19 @@ module PR
           scope :with_active_plan, -> { where.not(plan_name: %w[cancelled frozen 🌲 locked]) }
           scope :with_active_charge, -> { joins(:user).where(users: { active_charge: true }) }
           scope :installed, -> { where(uninstalled: false) }
+
+          before_update :reinstalled!, if: :just_reinstalled?
         end
 
-        class_methods do
-          # add class methods here
+        def reinstalled!
+          self.uninstalled = false
+          self.reinstalled_at = Time.current
+        end
+
+        private
+
+        def just_reinstalled?
+          uninstalled_changed? && !uninstalled
         end
       end
     end
