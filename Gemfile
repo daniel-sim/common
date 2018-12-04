@@ -15,6 +15,10 @@ group :development, :test do
   gem 'simplecov', require: false
 end
 
+group :test do
+  gem "timecop"
+end
+
 gem 'devise'
 gem 'rack-affiliates'
 gem 'sidekiq'
