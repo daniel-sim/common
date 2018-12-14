@@ -1,18 +1,30 @@
-# This is a sample build configuration for Ruby.
-# Check our guides at https://confluence.atlassian.com/x/8r-5Mw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
-image: ruby:2.5.1
+image: ruby:2.5.3
 
 pipelines:
   default:
     - step:
+        name: Run tests
         caches:
           - bundler
-        script: # Modify the commands below to build your repository.
-          - bundle install
+        script:
+          - apt-get update
+          - apt-get install unzip
+          - wget --quiet https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227-linux.zip
+          - unzip -qq sonar-scanner-cli*.zip
+          - bundle install --path vendor/bundle
+          - bundle exec rails db:test:prepare
+          - bundle exec rspec
+          - sonar-scanner-3.2.0.1227-linux/bin/sonar-scanner -Dsonar.projectKey=pr-common -Dsonar.organization=pemberton-rank -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=56ff25018f371a00af6d21b63c8f3fa2debfeffb -Dsonar.inclusions=app/**,lib/** -Dsonar.test.exclusions=spec/dummy/**,spec/cassettes/**
+        caches:
+          - bundler
+        services:
+          - postgres
 
 definitions:
+  services:
+    postgres:
+      image: postgres
+      environment:
+        POSTGRES_USER: root
   caches:
-    bundler: ./vendor
+    bundler: vendor/bundle
