@@ -6,13 +6,17 @@ gem 'activeresource'
 gem 'shopify_app', '~> 7.2.0'
 
 group :development, :test do
-  gem 'sqlite3'
+  gem 'pg'
   gem 'factory_bot_rails'
   gem 'pry-byebug', group: [:development, :test]
   gem 'capistrano-sidekiq'
   gem 'vcr'
   gem 'webmock'
   gem 'simplecov', require: false
+  gem 'pronto'
+  gem 'pronto-reek'
+  gem 'pronto-brakeman'
+  gem 'pronto-rubocop'
 end
 
 group :test do
