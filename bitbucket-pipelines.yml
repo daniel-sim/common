@@ -1,24 +1,19 @@
-image: ruby:2.5.3
+image: shkm/ruby-node:r2.5.3
 
 pipelines:
   default:
     - step:
-        name: Run tests
-        caches:
-          - bundler
-        script:
-          - apt-get update
-          - apt-get install unzip
-          - wget --quiet https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227-linux.zip
-          - unzip -qq sonar-scanner-cli*.zip
-          - bundle install --path vendor/bundle
-          - bundle exec rails db:test:prepare
-          - bundle exec rspec
-          - sonar-scanner-3.2.0.1227-linux/bin/sonar-scanner -Dsonar.projectKey=pr-common -Dsonar.organization=pemberton-rank -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=56ff25018f371a00af6d21b63c8f3fa2debfeffb -Dsonar.inclusions=app/**,lib/** -Dsonar.test.exclusions=spec/dummy/**,spec/cassettes/**
-        caches:
-          - bundler
-        services:
-          - postgres
+       name: Run tests
+       script:
+         - git remote set-url origin ${BITBUCKET_GIT_HTTP_ORIGIN}
+         - bundle install --path vendor/bundle
+         - bundle exec rails db:test:prepare
+         - bundle exec rspec
+         - git branch --no-track origin/master && PRONTO_BITBUCKET_SLUG=pembertonrank/common bundle exec pronto run -f bitbucket_pr -c origin/master
+       services:
+         - postgres
+       caches:
+         - bundler
 
 definitions:
   services:
