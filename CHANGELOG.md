@@ -1,3 +1,10 @@
+### 10 January 2019 (555d22b733e1f02c536fa0fe6dca1a5fbfd77133)
+- Remove BitBucket pipeline config
+- Add CircleCI config
+- Add CodeClimate config
+- Add RuboCop config
+- ! Apps require no changes.
+
 ### 4 December 2018 (f4b98f3537ba63932cb8594fd18d56db80c97087)
 - Add `reinstalled_at` to shops. This is automatically tracked when setting `uninstalled` to false.
 - ! Apps require no changes.
