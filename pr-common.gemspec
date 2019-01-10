@@ -24,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'config'
 
   s.add_development_dependency 'rspec-rails'
+  s.add_development_dependency 'rspec_junit_formatter'
 end

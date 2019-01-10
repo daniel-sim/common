@@ -13,10 +13,6 @@ group :development, :test do
   gem 'vcr'
   gem 'webmock'
   gem 'simplecov', require: false
-  gem 'pronto'
-  gem 'pronto-reek'
-  gem 'pronto-brakeman'
-  gem 'pronto-rubocop'
 end
 
 group :test do
