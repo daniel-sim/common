@@ -1,3 +1,22 @@
+### 11 January 2019 (2310b2e8bc091e1af6928a347d00f5904456f94b)
+- Fixed migration for adding charged_at to users
+- Added migration to add username to users; this should already be present in apps
+- Added migration to add website to users; this should already be present in apps
+- Made `Shop#just_reinstalled?` public, also accessible via `User` now
+- Set `has_one :user` on Shop
+- Added `shop` and `shop=` methods to User
+- Slightly refactored of `UserService`
+- Added "App Reinstalled" analytic to `UserService`
+- Added specs for `UserService`
+
+
+- ! Apps require no changes, but should do the following:
+
+- Ensure that migrations work fine after update
+- Ensure that getting and setting a shop on a user still works well
+- Remove `has_one :user` from `Shop` if present
+- Remove `shop` and `shop=` methods on `User` if present
+
 ### 10 January 2019 (555d22b733e1f02c536fa0fe6dca1a5fbfd77133)
 - Remove BitBucket pipeline config
 - Add CircleCI config
