@@ -9,6 +9,8 @@ module PR
         extend ActiveSupport::Concern
 
         included do
+          delegate :just_reinstalled?, to: :shop
+
           enum provider: { shopify: 0, tictail: 1 }
 
           [:has_active_charge?, :active_charge?].each do |name|
@@ -22,6 +24,25 @@ module PR
 
         class_methods do
           # add class methods here
+        end
+
+        # Legacy
+        # can't unfortunately put this as a has_one
+        # because ShopifyApp::SessionsController creates the Shop before a User
+        def shop
+          return unless shopify?
+
+          if shop_id.blank?
+            shop = ::Shop.find_by(shopify_domain: username.slice("shopify-"))
+            self.shop = shop
+          end
+
+          ::Shop.find_by(id: shop_id)
+        end
+
+        def shop=(shop)
+          self.shop_id = shop.id
+          save!
         end
       end
     end

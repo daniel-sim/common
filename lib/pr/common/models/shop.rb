@@ -19,14 +19,14 @@ module PR
           scope :installed, -> { where(uninstalled: false) }
 
           before_update :reinstalled!, if: :just_reinstalled?
+
+          has_one :user
         end
 
         def reinstalled!
           self.uninstalled = false
           self.reinstalled_at = Time.current
         end
-
-        private
 
         def just_reinstalled?
           uninstalled_changed? && !uninstalled
