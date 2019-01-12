@@ -1,5 +1,5 @@
-require 'shopify_app/shop'
-require 'shopify_app/session_storage'
+require "shopify_app/shop"
+require "shopify_app/session_storage"
 module PR
   module Common
     module Models
@@ -7,6 +7,8 @@ module PR
         PLAN_FROZEN = "frozen".freeze
         PLAN_CANCELLED = "cancelled".freeze
         PLAN_LOCKED = "locked".freeze
+        PLAN_AFFILIATE = "affiliate".freeze
+
         INACTIVE_PLANS = [PLAN_CANCELLED, PLAN_FROZEN, PLAN_LOCKED, "🌲"].freeze
 
         extend ActiveSupport::Concern
@@ -56,8 +58,16 @@ module PR
           plan_name == PLAN_FROZEN
         end
 
+        def just_cancelled?
+          cancelled? && !plan_name_was.in?([PLAN_FROZEN, PLAN_CANCELLED])
+        end
+
         def cancelled?
           plan_name == PLAN_CANCELLED
+        end
+
+        def cancelled_or_frozen?
+          cancelled? || frozen?
         end
       end
     end

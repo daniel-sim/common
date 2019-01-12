@@ -11,21 +11,21 @@ module PR
       end
 
       def update_shop(plan_name:, uninstalled:)
-        plan_name = maybe_fake_plan_name(@shop, plan_name)
+        return @shop.update(uninstalled: uninstalled) if @shop.plan_name == plan_name
 
-        if @shop.plan_name != plan_name && @shop.plan_name == "affiliate"
-          # development shop now on a paid plan
+        update_shop_with_new_plan(plan_name, uninstalled: uninstalled)
+      end
+
+      def update_shop_with_new_plan(new_shop_plan, uninstalled:)
+        if @shop.plan_name == Shop::PLAN_AFFILIATE
+          # development shop moved to another plan
           @user.update(active_charge: false)
-          Analytics.track({
-                              user_id: @user.id,
-                              event: 'Shop Handed Off',
-                              properties: {
-                                  plan_name: plan_name,
-                                  email: @user.email
-                              }
-                          })
+          track_handed_off(new_shop_plan)
+        elsif new_shop_plan == Shop::PLAN_CANCELLED && !@shop.cancelled_or_frozen?
+          track_cancelled
         end
-        @shop.update(plan_name: plan_name, uninstalled: uninstalled)
+
+        @shop.update(plan_name: new_shop_plan, uninstalled: uninstalled)
       end
 
       def set_uninstalled
@@ -45,6 +45,27 @@ module PR
         @shop.update(uninstalled: true)
       end
 
+      def track_handed_off(new_shop_plan)
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shop Handed Off",
+          properties: {
+            plan_name: new_shop_plan,
+            email: @user.email
+          }
+        )
+      end
+
+      def track_cancelled
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shop Closed",
+          properties: {
+            subscription_length: @user.subscription_length
+          }
+        )
+      end
+
       def reconcile_with_shopify
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           begin
@@ -55,17 +76,17 @@ module PR
             set_uninstalled
           rescue ActiveResource::ClientError => e
             if e.response.code.to_s == '402'
-              update_shop(plan_name: 'frozen', uninstalled: false)
+              update_shop(plan_name: Shop::PLAN_FROZEN, uninstalled: false)
             elsif e.response.code.to_s == '404'
-              update_shop(plan_name: 'cancelled', uninstalled: false)
+              update_shop(plan_name: Shop::PLAN_CANCELLED, uninstalled: false)
             elsif e.response.code.to_s == '420'
               update_shop(plan_name: '🌲', uninstalled: false)
             elsif e.response.code.to_s == '423'
-              update_shop(plan_name: 'locked', uninstalled: false)
+              update_shop(plan_name: Shop::PLAN_LOCKED, uninstalled: false)
             end
           end
+          ShopifyAPI::Base.clear_session
         end
-        ShopifyAPI::Base.clear_session
       end
 
       def determine_price(plan_name: @shop.plan_name)
@@ -75,27 +96,10 @@ module PR
         best_price = pricing.last
 
         pricing.each do |price|
-          if price[:plan_name] == plan_name
-            best_price = price
-          end
+          best_price = price if price[:plan_name] == plan_name
         end
 
-        return best_price
-      end
-
-      private
-
-      # Use this to fake different plans outside of production.
-      # This allows us to test under development stores free of charge.
-      # Normally, dev stores are always affiliates.
-      # To fake a plan, name your shop something ending with "_plan-#{the_plan_name}"
-      # e.g. "hello-ladies_plan-staff_business.myshopify.com"
-      def maybe_fake_plan_name(shop, real_plan_name)
-        return real_plan_name if Rails.env.production?
-
-        shop.shopify_domain.match(/\A.*_plan-(?<plan>\w+)\./) { |matches| return matches[:plan] }
-
-        real_plan_name
+        best_price
       end
     end
   end

@@ -14,14 +14,14 @@ module PR
 
           enum provider: { shopify: 0, tictail: 1 }
 
-          [:has_active_charge?, :active_charge?].each do |name|
-            send(:define_method, name, -> { self.active_charge })
+          %i[has_active_charge? active_charge?].each do |name|
+            send(:define_method, name, -> { active_charge })
           end
 
           def subscription_length
             return if charged_at.blank?
 
-            (DateTime.now - self.charged_at.to_datetime).to_i
+            (DateTime.now - charged_at.to_datetime).to_i
           end
         end
 
