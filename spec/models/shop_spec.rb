@@ -40,11 +40,11 @@ RSpec.describe Shop, type: :model do
     end
   end
 
-  describe "#reinstalled_at" do
-    let(:shop) { create(:shop, :uninstalled) }
-
+  describe "App gets reinstalled" do
     context "when shop is reinstalled" do
-      it "is set to the current time" do
+      let(:shop) { create(:shop, :uninstalled, user: build(:user, charged_at: Time.current)) }
+
+      it "sets reinstalled_at to the current time" do
         time = Time.current
 
         Timecop.freeze(time)
@@ -53,12 +53,18 @@ RSpec.describe Shop, type: :model do
           .from(nil)
           .to(time)
       end
+
+      it "clears charged_at" do
+        expect { shop.update!(uninstalled: false) }
+          .to change { shop.charged_at }
+          .to(nil)
+      end
     end
   end
 
-  describe "#reopened_at" do
+  describe "Shop gets reopened" do
     context "when shop is reopened from cancelled" do
-      let(:shop) { create(:shop, :cancelled) }
+      let(:shop) { create(:shop, :cancelled, user: build(:user, charged_at: Time.current)) }
 
       it "is set to the current time" do
         time = Time.current
@@ -68,11 +74,17 @@ RSpec.describe Shop, type: :model do
           .to change { shop.reopened_at }
           .from(nil)
           .to(time)
+      end
+
+      it "clears charged_at" do
+        expect { shop.update!(plan_name: "basic") }
+          .to change { shop.charged_at }
+          .to(nil)
       end
     end
 
     context "when shop is reopened from frozen" do
-      let(:shop) { create(:shop, :frozen) }
+      let(:shop) { create(:shop, :frozen, user: build(:user, charged_at: Time.current)) }
 
       it "is set to the current time" do
         time = Time.current
@@ -83,8 +95,16 @@ RSpec.describe Shop, type: :model do
           .from(nil)
           .to(time)
       end
-    end
 
+      it "clears charged_at" do
+        expect { shop.update!(plan_name: "basic") }
+          .to change { shop.charged_at }
+          .to(nil)
+      end
+    end
+  end
+
+  describe "Shop gets frozen" do
     context "when shop goes from cancelled to frozen" do
       let(:shop) { create(:shop, :cancelled) }
 
@@ -93,7 +113,9 @@ RSpec.describe Shop, type: :model do
           .not_to change { shop.reopened_at }
       end
     end
+  end
 
+  describe "Shop gets closed" do
     context "when shop goes from frozen to cancelled" do
       let(:shop) { create(:shop, :frozen) }
 

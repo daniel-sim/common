@@ -15,6 +15,8 @@ module PR
         include ::ShopifyApp::SessionStorage
 
         included do
+          delegate :charged_at, to: :user
+          delegate :charged_at=, to: :user
           # The 'tree' symbol plan name is a reference to the deprecated '420' Shopify response code
           # it shouldn't happen anymore but we decided to leave it just for fun
           # In 2018 420 code was changed to 423 and corresponding to the 'locked' status
@@ -32,6 +34,7 @@ module PR
         def reinstalled!
           self.uninstalled = false
           self.reinstalled_at = Time.current
+          user.charged_at = nil
         end
 
         def just_reinstalled?
@@ -40,6 +43,7 @@ module PR
 
         def reopened!
           self.reopened_at = Time.current
+          user.charged_at = nil
         end
 
         def just_reopened?

@@ -19,7 +19,9 @@ module PR
           end
 
           def subscription_length
-            (DateTime.now - self.charged_at.to_datetime).to_i if self.charged_at
+            return if charged_at.blank?
+
+            (DateTime.now - self.charged_at.to_datetime).to_i
           end
         end
 
