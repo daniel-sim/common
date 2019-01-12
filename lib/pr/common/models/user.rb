@@ -10,6 +10,7 @@ module PR
 
         included do
           delegate :just_reinstalled?, to: :shop
+          delegate :just_reopened?, to: :shop
 
           enum provider: { shopify: 0, tictail: 1 }
 

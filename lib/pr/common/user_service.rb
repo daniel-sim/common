@@ -3,6 +3,7 @@ module PR
     class UserService
       INSTALLED_EVENT = "App Installed".freeze
       REINSTALLED_EVENT = "App Reinstalled".freeze
+      REOPENED_EVENT = "Shop Reopened".freeze
 
       def find_or_create_user_by_shopify(email:, shop:, referrer: nil)
         if user = User.find_by(username: "shopify-#{shop.shopify_domain}", provider: "shopify")
@@ -17,7 +18,7 @@ module PR
             }
           )
 
-          maybe_track_user_reinstalled(user)
+          maybe_track_user_reinstalled(user) || maybe_track_user_reopened(user)
 
           user
         else
@@ -43,7 +44,7 @@ module PR
             }
           )
 
-          track_user_installed(created_user, INSTALLED_EVENT)
+          track_user_analytic(created_user, INSTALLED_EVENT)
 
           created_user
         end
@@ -54,10 +55,16 @@ module PR
       def maybe_track_user_reinstalled(user)
         return unless user.just_reinstalled?
 
-        track_user_installed(user, REINSTALLED_EVENT)
+        track_user_analytic(user, REINSTALLED_EVENT)
       end
 
-      def track_user_installed(user, event)
+      def maybe_track_user_reopened(user)
+        return unless user.just_reopened?
+
+        track_user_analytic(user, REOPENED_EVENT)
+      end
+
+      def track_user_analytic(user, event)
         Analytics.track(
           user_id: user.id,
           event: event,

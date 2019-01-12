@@ -26,7 +26,6 @@ describe PR::Common::UserService do
                   properties: {
                     "registration method": "shopify",
                     email: user.email
-
                   })
 
           returned_user
@@ -35,6 +34,31 @@ describe PR::Common::UserService do
 
       context "when user has not just reinstalled" do
         it "does not send a 'User Reinstalled' analytic" do
+          expect(Analytics).not_to receive(:track)
+
+          returned_user
+        end
+      end
+
+      context "when user has just reopened shop" do
+        before { allow_any_instance_of(User).to receive(:just_reopened?).and_return(true) }
+
+        it "sends an 'Shop Reopened' analytic" do
+          expect(Analytics)
+            .to receive(:track)
+            .with(user_id: user.id,
+                  event: "Shop Reopened",
+                  properties: {
+                    "registration method": "shopify",
+                    email: user.email
+                  })
+
+          returned_user
+        end
+      end
+
+      context "when user has not just reopened shop" do
+        it "does not send a 'User Reopened' analytic" do
           expect(Analytics).not_to receive(:track)
 
           returned_user

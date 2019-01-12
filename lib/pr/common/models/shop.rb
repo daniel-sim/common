@@ -4,6 +4,11 @@ module PR
   module Common
     module Models
       module Shop
+        PLAN_FROZEN = "frozen".freeze
+        PLAN_CANCELLED = "cancelled".freeze
+        PLAN_LOCKED = "locked".freeze
+        INACTIVE_PLANS = [PLAN_CANCELLED, PLAN_FROZEN, PLAN_LOCKED, "🌲"].freeze
+
         extend ActiveSupport::Concern
 
         include ::ShopifyApp::Shop
@@ -14,11 +19,12 @@ module PR
           # it shouldn't happen anymore but we decided to leave it just for fun
           # In 2018 420 code was changed to 423 and corresponding to the 'locked' status
           # https://ecommerce.shopify.com/c/api-announcements/t/upcoming-change-to-api-response-status-code-for-locked-stores-536419
-          scope :with_active_plan, -> { where.not(plan_name: %w[cancelled frozen 🌲 locked]) }
+          scope :with_active_plan, -> { where.not(plan_name: INACTIVE_PLANS) }
           scope :with_active_charge, -> { joins(:user).where(users: { active_charge: true }) }
           scope :installed, -> { where(uninstalled: false) }
 
           before_update :reinstalled!, if: :just_reinstalled?
+          before_update :reopened!, if: :just_reopened?
 
           has_one :user
         end
@@ -30,6 +36,24 @@ module PR
 
         def just_reinstalled?
           uninstalled_changed? && !uninstalled
+        end
+
+        def reopened!
+          self.reopened_at = Time.current
+        end
+
+        def just_reopened?
+          plan_name_changed? &&
+            plan_name_was.in?([PLAN_FROZEN, PLAN_CANCELLED]) &&
+            !frozen? && !cancelled?
+        end
+
+        def frozen?
+          plan_name == PLAN_FROZEN
+        end
+
+        def cancelled?
+          plan_name == PLAN_CANCELLED
         end
       end
     end
