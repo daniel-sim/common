@@ -1,4 +1,4 @@
-class AddWebsiteToUsers < ActiveRecord::Migration[5.0]
+class CommonAddWebsiteToUsers < ActiveRecord::Migration[5.0]
   def change
     return if column_exists? :users, :website
 

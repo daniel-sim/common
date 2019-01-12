@@ -56,10 +56,33 @@ describe PR::Common::ShopifyService do
 
       context 'with 404' do
         let(:code) { 404 }
-        it 'sets plan_name to cancelled' do
-          expect(shop.plan_name).to eq 'affiliate'
-          service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq 'cancelled'
+        context "when shop is an affiliate" do
+          it "sets plan_name to cancelled" do
+            expect(shop.plan_name).to eq "affiliate"
+            service.reconcile_with_shopify
+            expect(shop.reload.plan_name).to eq "cancelled"
+          end
+
+          it "does not call track_cancelled" do
+            expect(service).not_to receive(:track_cancelled)
+
+            service.reconcile_with_shopify
+          end
+        end
+
+        context "when shop is not an affiliate" do
+          before { shop.update!(plan_name: "basic") }
+
+          it "sets plan_name to cancelled" do
+            service.reconcile_with_shopify
+            expect(shop.reload.plan_name).to eq "cancelled"
+          end
+
+          it "calls track_cancelled" do
+            expect(service).to receive(:track_cancelled)
+
+            service.reconcile_with_shopify
+          end
         end
       end
 
@@ -83,44 +106,21 @@ describe PR::Common::ShopifyService do
     end
   end
 
-  describe "#update_shop" do
-    before { allow(Analytics).to receive(:track) }
-
-    context "when shop should not have a fake plan" do
-      context "in staging" do
-        before do
-          allow(Rails.env).to receive(:production?).and_return(false)
-        end
-
-        it "does not fake the plan_name" do
-          service.update_shop(plan_name: "affiliate", uninstalled: true)
-          expect(shop.plan_name).to eq "affiliate"
-        end
-      end
+  describe "#track_cancelled" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shop Closed",
+        properties: {
+          subscription_length: shop.user.subscription_length
+        }
+      }
     end
 
-    context "when faked shop should be staff_business" do
-      before do
-        shop.update!(shopify_domain: "hello-ladies_plan-staff_business.myshopify.com")
-      end
+    it "sends a 'Shop Closed' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
 
-      context "in production" do
-        before { allow(Rails.env).to receive(:production?).and_return(true) }
-        it "does not fake the plan_name" do
-          service.update_shop(plan_name: "affiliate", uninstalled: true)
-          expect(shop.plan_name).to eq "affiliate"
-        end
-      end
-
-      context "in staging" do
-        before do
-          allow(Rails.env).to receive(:production?).and_return(false)
-        end
-        it "does fake the plan_name" do
-          service.update_shop(plan_name: "affiliate", uninstalled: true)
-          expect(shop.plan_name).to eq "staff_business"
-        end
-      end
+      service.track_cancelled
     end
   end
 end

@@ -1,5 +1,5 @@
-require 'shopify_app/shop'
-require 'shopify_app/session_storage'
+require "shopify_app/shop"
+require "shopify_app/session_storage"
 module PR
   module Common
     module Models
@@ -7,6 +7,8 @@ module PR
         PLAN_FROZEN = "frozen".freeze
         PLAN_CANCELLED = "cancelled".freeze
         PLAN_LOCKED = "locked".freeze
+        PLAN_AFFILIATE = "affiliate".freeze
+
         INACTIVE_PLANS = [PLAN_CANCELLED, PLAN_FROZEN, PLAN_LOCKED, "🌲"].freeze
 
         extend ActiveSupport::Concern
@@ -15,6 +17,8 @@ module PR
         include ::ShopifyApp::SessionStorage
 
         included do
+          delegate :charged_at, to: :user
+          delegate :charged_at=, to: :user
           # The 'tree' symbol plan name is a reference to the deprecated '420' Shopify response code
           # it shouldn't happen anymore but we decided to leave it just for fun
           # In 2018 420 code was changed to 423 and corresponding to the 'locked' status
@@ -32,6 +36,7 @@ module PR
         def reinstalled!
           self.uninstalled = false
           self.reinstalled_at = Time.current
+          user.charged_at = nil
         end
 
         def just_reinstalled?
@@ -40,6 +45,7 @@ module PR
 
         def reopened!
           self.reopened_at = Time.current
+          user.charged_at = nil
         end
 
         def just_reopened?
@@ -52,8 +58,16 @@ module PR
           plan_name == PLAN_FROZEN
         end
 
+        def just_cancelled?
+          cancelled? && !plan_name_was.in?([PLAN_FROZEN, PLAN_CANCELLED])
+        end
+
         def cancelled?
           plan_name == PLAN_CANCELLED
+        end
+
+        def cancelled_or_frozen?
+          cancelled? || frozen?
         end
       end
     end
