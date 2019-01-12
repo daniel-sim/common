@@ -1,3 +1,10 @@
+### 12 January 2019 (7d216c97952dd3fe553ecafaac555741679dedf9)
+- `charged_at` will now be cleared upon reinstall of the app or reopening of the shop
+- `charged_at` and `charged_at=` are now delegated from shop -> user
+- "Shop Closed" analytic is sent when plan_name of a shop goes to "cancelled" from a plan name that is not "cancelled" or "frozen".
+- "Shop Closed" analytic is sent under both reconciliation and webhooks
+- ! Apps require no changes
+
 ### 12 January 2019 (d23dbcccb3ff863ca913f7c4751be19d5f21ff5f)
 - Added `reopened_at` to Shop
 - When Shop goes from `frozen` or `cancelled` to a different plan name, `reopened_at` is set
