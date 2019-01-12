@@ -55,4 +55,52 @@ RSpec.describe Shop, type: :model do
       end
     end
   end
+
+  describe "#reopened_at" do
+    context "when shop is reopened from cancelled" do
+      let(:shop) { create(:shop, :cancelled) }
+
+      it "is set to the current time" do
+        time = Time.current
+
+        Timecop.freeze(time)
+        expect { shop.update!(plan_name: "basic") }
+          .to change { shop.reopened_at }
+          .from(nil)
+          .to(time)
+      end
+    end
+
+    context "when shop is reopened from frozen" do
+      let(:shop) { create(:shop, :frozen) }
+
+      it "is set to the current time" do
+        time = Time.current
+
+        Timecop.freeze(time)
+        expect { shop.update!(plan_name: "basic") }
+          .to change { shop.reopened_at }
+          .from(nil)
+          .to(time)
+      end
+    end
+
+    context "when shop goes from cancelled to frozen" do
+      let(:shop) { create(:shop, :cancelled) }
+
+      it "does not change reopened_at" do
+        expect { shop.update!(plan_name: "frozen") }
+          .not_to change { shop.reopened_at }
+      end
+    end
+
+    context "when shop goes from frozen to cancelled" do
+      let(:shop) { create(:shop, :frozen) }
+
+      it "does not change reopened_at" do
+        expect { shop.update!(plan_name: "cancelled") }
+          .not_to change { shop.reopened_at }
+      end
+    end
+  end
 end

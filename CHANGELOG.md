@@ -1,3 +1,9 @@
+### 12 January 2019 (d23dbcccb3ff863ca913f7c4751be19d5f21ff5f)
+- Added `reopened_at` to Shop
+- When Shop goes from `frozen` or `cancelled` to a different plan name, `reopened_at` is set
+  to the current timestamp and an analytic is sent
+- ! Apps require no changes
+
 ### 11 January 2019 (2310b2e8bc091e1af6928a347d00f5904456f94b)
 - Fixed migration for adding charged_at to users
 - Added migration to add username to users; this should already be present in apps
