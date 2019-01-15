@@ -1,3 +1,8 @@
+### 15 January 2019 (12e8df17a0837144bd77f800ca3b5dda5ed040e3)
+- Fixes some previously defined analytics calls
+- Normalizes analytics calls to one place (ShopifyService)
+- ! Apps require no changes
+-
 ### 12 January 2019 (7d216c97952dd3fe553ecafaac555741679dedf9)
 - `charged_at` will now be cleared upon reinstall of the app or reopening of the shop
 - `charged_at` and `charged_at=` are now delegated from shop -> user

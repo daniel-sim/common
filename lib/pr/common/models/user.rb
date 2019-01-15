@@ -9,9 +9,6 @@ module PR
         extend ActiveSupport::Concern
 
         included do
-          delegate :just_reinstalled?, to: :shop
-          delegate :just_reopened?, to: :shop
-
           enum provider: { shopify: 0, tictail: 1 }
 
           %i[has_active_charge? active_charge?].each do |name|

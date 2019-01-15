@@ -15,6 +15,7 @@ class SessionsController < ApiBaseController
   end
 
   private
+
   def signin_params
     params.require(:signin).permit(:username, :email, :password)
   end

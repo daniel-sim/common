@@ -27,39 +27,11 @@ module PR
           scope :with_active_charge, -> { joins(:user).where(users: { active_charge: true }) }
           scope :installed, -> { where(uninstalled: false) }
 
-          before_update :reinstalled!, if: :just_reinstalled?
-          before_update :reopened!, if: :just_reopened?
-
           has_one :user
-        end
-
-        def reinstalled!
-          self.uninstalled = false
-          self.reinstalled_at = Time.current
-          user.charged_at = nil
-        end
-
-        def just_reinstalled?
-          uninstalled_changed? && !uninstalled
-        end
-
-        def reopened!
-          self.reopened_at = Time.current
-          user.charged_at = nil
-        end
-
-        def just_reopened?
-          plan_name_changed? &&
-            plan_name_was.in?([PLAN_FROZEN, PLAN_CANCELLED]) &&
-            !frozen? && !cancelled?
         end
 
         def frozen?
           plan_name == PLAN_FROZEN
-        end
-
-        def just_cancelled?
-          cancelled? && !plan_name_was.in?([PLAN_FROZEN, PLAN_CANCELLED])
         end
 
         def cancelled?
