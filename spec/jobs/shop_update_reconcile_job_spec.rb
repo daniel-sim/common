@@ -1,37 +1,40 @@
-require 'rails_helper'
+require "rails_helper"
 
 describe ShopUpdateReconcileJob do
   let(:shop) { create(:shop, user: build(:user)) }
 
-  context 'plan_name of the shop has changed' do
-    before :each do
-      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: 'enterprise'))
+  before { allow(Analytics).to receive(:flush) }
+
+  context "when plan_name changes from affiliate to something else" do
+    before do
+      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "enterprise"))
     end
-    it 'sends analytics request', vcr: { cassette_name: 'shop_update_reconcile_job' } do
+
+    it "sends a 'Shop Handed Off' analytic" do
+      analytic_params = {
+        event: "Shop Handed Off",
+        userId: shop.user.id,
+        properties: {
+          email: shop.user.email,
+          plan_name: "enterprise"
+        }
+      }
+
+      expect(Analytics).to receive(:track) { analytic_params }
+
       described_class.perform_now(shop)
-      expect(WebMock).to have_requested(:post, 'https://api.segment.io/v1/import').with(body: hash_including({
-        batch: array_including(hash_including(
-          {
-            "event" => "Shop Handed Off",
-            "userId" => shop.user.id,
-            "properties" => {
-              "email" => shop.user.email,
-              "plan_name" => 'enterprise',
-            }
-          }
-        ))
-      }))
     end
   end
 
-  context 'plan_name of the shop has not changed' do
-    before :each do
+  context "when plan_name does not change" do
+    before do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: shop.plan_name))
     end
 
-    it 'not sends analytics request', vcr: { cassette_name: 'shop_update_reconcile_job' } do
+    it "does not send an analytic" do
+      expect(Analytics).not_to receive(:track)
+
       described_class.perform_now(shop)
-      expect(WebMock).to_not have_requested(:post, 'https://api.segment.io/v1/import')
     end
   end
 end

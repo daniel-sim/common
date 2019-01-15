@@ -1,36 +1,36 @@
-require 'rails_helper'
+require "rails_helper"
 
 describe PR::Common::ShopifyService do
-  let(:shop) { create(:shop, user: build(:user)) }
   subject(:service) { described_class.new(shop: shop) }
 
-  describe '#determine_price' do
-    context 'shop has a plan whose pricing is defined' do
-      before { shop.update!(plan_name: 'affiliate') }
+  let(:shop) { create(:shop, user: build(:user)) }
 
-      it 'returns the defined price' do
+  describe "#determine_price" do
+    context "when shop has a plan whose pricing is defined" do
+      before { shop.update!(plan_name: "affiliate") }
+
+      it "returns the defined price" do
         expected_price = {
-          price:      0,
+          price: 0,
           trial_days: 0,
-          plan_name:  'affiliate',
-          name:       'Affiliate',
-          terms:      'Affiliate terms',
+          plan_name: "affiliate",
+          name: "Affiliate",
+          terms: "Affiliate terms"
         }
 
         expect(service.determine_price).to eq expected_price
       end
     end
 
-    context 'shop has no plan whose pricing is defined' do
-      before { shop.update!(plan_name: 'foobar') }
+    context "when shop has no plan whose pricing is defined" do
+      before { shop.update!(plan_name: "foobar") }
 
-      it 'returns the pricing plan without a plan name' do
-
+      it "returns the pricing plan without a plan name" do
         expected_price = {
-          price:      10.0,
+          price: 10.0,
           trial_days: 7,
-          name:       'Generic with trial',
-          terms:      'Generic terms',
+          name: "Generic with trial",
+          terms: "Generic terms"
         }
 
         expect(service.determine_price).to eq expected_price
@@ -38,24 +38,28 @@ describe PR::Common::ShopifyService do
     end
   end
 
-  describe '#reconcile_with_shopify' do
-    context 'shop response errors' do
-      before :each do
-        allow(ShopifyAPI::Shop).to receive(:current).and_raise(ActiveResource::ClientError.new(OpenStruct.new(code: code)))
+  describe "#reconcile_with_shopify" do
+    context "when shop response has an error" do
+      before do
+        allow(ShopifyAPI::Shop)
+          .to receive(:current)
+          .and_raise(ActiveResource::ClientError.new(OpenStruct.new(code: code)))
         allow(Analytics).to receive(:track)
       end
 
-      context 'with 402' do
+      context "where error is a 402" do
         let(:code) { 402 }
-        it 'sets plan_name to frozen' do
-          expect(shop.plan_name).to eq 'affiliate'
+
+        it "sets plan_name to frozen" do
+          expect(shop.plan_name).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq 'frozen'
+          expect(shop.reload.plan_name).to eq "frozen"
         end
       end
 
-      context 'with 404' do
+      context "where error is a 404" do
         let(:code) { 404 }
+
         context "when shop is an affiliate" do
           it "sets plan_name to cancelled" do
             expect(shop.plan_name).to eq "affiliate"
@@ -86,23 +90,102 @@ describe PR::Common::ShopifyService do
         end
       end
 
-      context 'with 420' do
+      context "when error is a 420" do
         let(:code) { 420 }
-        it 'sets plan_name to 🌲' do
-          expect(shop.plan_name).to eq 'affiliate'
+
+        it "sets plan_name to 🌲" do
+          expect(shop.plan_name).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq '🌲'
+          expect(shop.reload.plan_name).to eq "🌲"
         end
       end
 
-      context 'with 423' do
+      context "when error is a 423" do
         let(:code) { 423 }
-        it 'sets plan_name to locked' do
-          expect(shop.plan_name).to eq 'affiliate'
+
+        it "sets plan_name to locked" do
+          expect(shop.plan_name).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq 'locked'
+          expect(shop.reload.plan_name).to eq "locked"
         end
       end
+    end
+  end
+
+  describe "#track_reopened" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shop Reopened",
+        properties: {
+          "registration method": "shopify",
+          email: shop.user.email
+        }
+      }
+    end
+
+    it "sends an 'Shop Reopened' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
+
+      service.track_reopened
+    end
+  end
+
+  describe "#track_reinstalled" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "App Reinstalled",
+        properties: {
+          "registration method": "shopify",
+          email: shop.user.email
+        }
+      }
+    end
+
+    it "sends an 'App Reinstalled' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
+
+      service.track_reinstalled
+    end
+  end
+
+  describe "#track_uninstalled" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "App Uninstalled",
+        properties: {
+          email: shop.user.email,
+          activeCharge: false,
+          subscription_length: nil
+        }
+      }
+    end
+
+    it "sends an 'App Uninstalled' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
+
+      service.track_uninstalled
+    end
+  end
+
+  describe "#track_handed_off" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shop Handed Off",
+        properties: {
+          plan_name: "enterprise",
+          email: shop.user.email
+        }
+      }
+    end
+
+    it "sends an 'App Handed Off' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
+
+      service.track_handed_off("enterprise")
     end
   end
 
@@ -121,6 +204,25 @@ describe PR::Common::ShopifyService do
       expect(Analytics).to receive(:track) { analytic_params }
 
       service.track_cancelled
+    end
+  end
+
+  describe "#track_installed" do
+    let(:analytic_params) do
+      {
+        user_id: shop.user.id,
+        event: "App Installed",
+        properties: {
+          "registration method": "shopify",
+          email: shop.user.email
+        }
+      }
+    end
+
+    it "sends an 'App Reinstalled' analytic" do
+      expect(Analytics).to receive(:track) { analytic_params }
+
+      service.track_installed
     end
   end
 end

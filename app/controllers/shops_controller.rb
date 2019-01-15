@@ -1,11 +1,10 @@
 class ShopsController < ApplicationController
   def callback
     shop = Shop.find_by(shopify_domain: params[:myshopify_domain])
-    shop.update!(shop_params)
 
-    return unless shop.just_cancelled?
-
-    ShopifyService.new(shop: shop).track_cancelled
+    PR::Common::ShopifyService
+      .new(shop: shop)
+      .update_shop(plan_name: shop_params[:plan_name], uninstalled: shop.uninstalled)
   end
 
   private

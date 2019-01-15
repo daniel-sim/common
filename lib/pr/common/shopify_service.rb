@@ -11,46 +11,110 @@ module PR
       end
 
       def update_shop(plan_name:, uninstalled:)
-        return @shop.update(uninstalled: uninstalled) if @shop.plan_name == plan_name
+        maybe_reinstall_or_uninstall(uninstalled)
+        maybe_reopen(plan_name)
+        maybe_hand_off_or_cancel(plan_name)
 
-        update_shop_with_new_plan(plan_name, uninstalled: uninstalled)
+        @shop.assign_attributes(plan_name: plan_name, uninstalled: uninstalled)
+        @user.save! if @user.present?
+        @shop.save!
       end
 
-      def update_shop_with_new_plan(new_shop_plan, uninstalled:)
-        if @shop.plan_name == Shop::PLAN_AFFILIATE
-          # development shop moved to another plan
-          @user.update(active_charge: false)
-          track_handed_off(new_shop_plan)
-        elsif new_shop_plan == Shop::PLAN_CANCELLED && !@shop.cancelled_or_frozen?
+      def maybe_reinstall_or_uninstall(uninstall)
+        if newly_reinstalled?(uninstall)
+          track_reinstalled
+
+          @shop.reinstalled_at = Time.current
+          @user.charged_at = nil
+        elsif newly_uninstalled?(uninstall)
+          track_uninstalled
+
+          @user&.active_charge = false
+        end
+      end
+
+      def maybe_reopen(plan_name)
+        return unless newly_reopened?(plan_name)
+
+        track_reopened(plan_name)
+        @shop.reopened_at = Time.current
+        @user.charged_at = nil
+      end
+
+      def maybe_hand_off_or_cancel(plan_name)
+        if handed_off?(plan_name)
+          track_handed_off(plan_name)
+
+          @user.active_charge = true
+        elsif cancelled?(plan_name)
           track_cancelled
         end
-
-        @shop.update(plan_name: new_shop_plan, uninstalled: uninstalled)
       end
 
-      def set_uninstalled
-        if @user.present?
-          Analytics.track(
-            user_id: @user.id,
-            event: "App Uninstalled",
-            properties: {
-              activeCharge: @user.has_active_charge?,
-              email: @user.email,
-              subscription_length: @user.subscription_length
-            }
-          )
-          @user.update(active_charge: false)
-        end
-
-        @shop.update(uninstalled: true)
+      def newly_reinstalled?(uninstalled)
+        @shop.uninstalled? && !uninstalled
       end
 
-      def track_handed_off(new_shop_plan)
+      def newly_uninstalled?(uninstalled)
+        !@shop.uninstalled? && uninstalled
+      end
+
+      def newly_reopened?(plan_name)
+        @shop.cancelled_or_frozen? && !plan_name.in?([Shop::PLAN_FROZEN, Shop::PLAN_CANCELLED])
+      end
+
+      def handed_off?(plan_name)
+        current_plan_name = @shop.plan_name
+
+        current_plan_name == ::Shop::PLAN_AFFILIATE && plan_name != current_plan_name
+      end
+
+      def cancelled?(plan_name)
+        plan_name == ::Shop::PLAN_CANCELLED && !@shop.cancelled_or_frozen?
+      end
+
+      def track_reopened
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shop Reopened",
+          properties: {
+            "registration method": "shopify",
+            email: @user.email
+          }
+        )
+      end
+
+      def track_reinstalled
+        Analytics.track(
+          user_id: @user.id,
+          event: "App Reinstalled",
+          properties: {
+            "registration method": "shopify",
+            email: @user.email
+          }
+        )
+      end
+
+      def track_uninstalled
+        return if @user.blank?
+
+        Analytics.track(
+          user_id: @user.id,
+          event: "App Uninstalled",
+          properties: {
+            activeCharge: @user.has_active_charge?,
+            email: @user.email,
+            subscription_length: @user.subscription_length
+          }
+        )
+      end
+
+      def track_handed_off(plan_name)
         Analytics.track(
           user_id: @user.id,
           event: "Shop Handed Off",
           properties: {
-            plan_name: new_shop_plan,
+            plan_name: plan_name,
             email: @user.email
           }
         )
@@ -66,6 +130,17 @@ module PR
         )
       end
 
+      def track_installed
+        Analytics.track(
+          user_id: @user.id,
+          event: "App Installed",
+          properties: {
+            "registration method": "shopify",
+            email: @user.email
+          }
+        )
+      end
+
       def reconcile_with_shopify
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           begin
@@ -73,7 +148,7 @@ module PR
             update_shop(plan_name: shopify_shop.plan_name, uninstalled: false)
           rescue ActiveResource::UnauthorizedAccess => e
             # we no longer have access to the shop- app uninstalled
-            set_uninstalled
+            update_shop(plan_name: @shop.plan_name, uninstalled: true)
           rescue ActiveResource::ClientError => e
             if e.response.code.to_s == '402'
               update_shop(plan_name: Shop::PLAN_FROZEN, uninstalled: false)
