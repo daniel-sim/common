@@ -36,7 +36,7 @@ module PR
       def maybe_reopen(plan_name)
         return unless newly_reopened?(plan_name)
 
-        track_reopened(plan_name)
+        track_reopened
         @shop.reopened_at = Time.current
         @user.charged_at = nil
       end
