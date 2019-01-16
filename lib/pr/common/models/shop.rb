@@ -38,8 +38,8 @@ module PR
           plan_name == PLAN_CANCELLED
         end
 
-        def cancelled_or_frozen?
-          cancelled? || frozen?
+        def affiliate?
+          plan_name == PLAN_AFFILIATE
         end
       end
     end
