@@ -5,7 +5,11 @@ describe PR::Common::Models::TimePeriod do
 
   it do
     is_expected.to define_enum_for(:kind)
-      .with_values %i[installed reinstalled reopened]
+      .with_values %i[installed
+                      reinstalled
+                      reopened
+                      uninstalled
+                      closed]
   end
 
   context "when newly created" do
@@ -15,7 +19,7 @@ describe PR::Common::Models::TimePeriod do
       expect(time_period.reload.start_time).not_to be_nil
     end
 
-    it "defaults to a reinstalled kind" do
+    it "defaults to an installed kind" do
       expect(time_period).to be_installed
     end
   end

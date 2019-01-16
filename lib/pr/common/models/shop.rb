@@ -28,7 +28,9 @@ module PR
           scope :installed, -> { where(uninstalled: false) }
 
           has_one :user
-          has_many :time_periods, dependent: :destroy
+          has_many :time_periods, dependent: :destroy, class_name: "PR::Common::Models::TimePeriod"
+
+          before_validation :reconcile_time_periods
         end
 
         def frozen?
@@ -39,8 +41,81 @@ module PR
           plan_name == PLAN_CANCELLED
         end
 
+        alias closed? cancelled?
+
         def affiliate?
           plan_name == PLAN_AFFILIATE
+        end
+
+        def current_time_period
+          time_periods.not_yet_ended.order(:start_time).last
+        end
+
+        private
+
+        def reconcile_time_periods
+          maybe_build_uninstalled_time_period && return
+          maybe_build_closed_time_period && return
+          maybe_build_reinstalled_time_period && return
+          maybe_build_reopened_time_period && return
+          maybe_build_installed_time_period
+
+        end
+
+        def maybe_build_uninstalled_time_period
+          return unless uninstalled?
+          return true if current_time_period&.uninstalled? # current time period is already uninstalled
+
+          reconcile_time_period(:uninstalled)
+
+          true
+        end
+
+        def maybe_build_closed_time_period
+          return unless closed?
+          return true if current_time_period&.closed? # current time period is already closed
+
+          reconcile_time_period(:closed)
+
+          true
+        end
+
+        # When not uninstalled but current time period is uninstalled
+        def maybe_build_reinstalled_time_period
+          return if uninstalled?
+          return unless current_time_period&.uninstalled?
+
+          reconcile_time_period(:reinstalled)
+          true
+        end
+
+        # When not closed but current time period is closed
+        def maybe_build_reopened_time_period
+          return if closed?
+          return unless current_time_period&.closed?
+
+          reconcile_time_period(:reopened)
+
+          true
+        end
+
+        def maybe_build_installed_time_period
+          return if current_time_period&.installed?
+
+          build_new_time_period(:installed)
+          true
+        end
+
+        def reconcile_time_period(kind)
+          current_time = Time.current
+
+          current_time_period.update!(end_time: current_time) if current_time_period.present?
+
+          build_new_time_period(kind, start_time: current_time)
+        end
+
+        def build_new_time_period(kind, start_time: Time.current)
+          time_periods.build(start_time: start_time, kind: kind)
         end
       end
     end
