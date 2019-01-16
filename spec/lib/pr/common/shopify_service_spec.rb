@@ -66,12 +66,6 @@ describe PR::Common::ShopifyService do
             service.reconcile_with_shopify
             expect(shop.reload.plan_name).to eq "cancelled"
           end
-
-          it "does not call track_cancelled" do
-            expect(service).not_to receive(:track_cancelled)
-
-            service.reconcile_with_shopify
-          end
         end
 
         context "when shop is not an affiliate" do

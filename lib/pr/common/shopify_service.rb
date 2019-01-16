@@ -59,18 +59,19 @@ module PR
         !@shop.uninstalled? && uninstalled
       end
 
+      # Cancelled -> something else
       def newly_reopened?(plan_name)
-        @shop.cancelled_or_frozen? && !plan_name.in?([Shop::PLAN_FROZEN, Shop::PLAN_CANCELLED])
+        @shop.cancelled? && plan_name != ::Shop::PLAN_CANCELLED
       end
 
+      # Handoff means that the plan goes from "affiliate" to "frozen"
       def handed_off?(plan_name)
-        current_plan_name = @shop.plan_name
-
-        current_plan_name == ::Shop::PLAN_AFFILIATE && plan_name != current_plan_name
+        @shop.affiliate? && plan_name == ::Shop::PLAN_FROZEN
       end
 
+      # Shop was not previously cancelled but is now
       def cancelled?(plan_name)
-        plan_name == ::Shop::PLAN_CANCELLED && !@shop.cancelled_or_frozen?
+        !@shop.cancelled? && plan_name == ::Shop::PLAN_CANCELLED
       end
 
       def track_reopened

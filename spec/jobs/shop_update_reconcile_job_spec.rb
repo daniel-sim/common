@@ -5,9 +5,9 @@ describe ShopUpdateReconcileJob do
 
   before { allow(Analytics).to receive(:flush) }
 
-  context "when plan_name changes from affiliate to something else" do
+  context "when plan_name changes from affiliate to frozen" do
     before do
-      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "enterprise"))
+      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "frozen"))
     end
 
     it "sends a 'Shop Handed Off' analytic" do
@@ -15,8 +15,7 @@ describe ShopUpdateReconcileJob do
         event: "Shop Handed Off",
         userId: shop.user.id,
         properties: {
-          email: shop.user.email,
-          plan_name: "enterprise"
+          email: shop.user.email
         }
       }
 
@@ -25,6 +24,19 @@ describe ShopUpdateReconcileJob do
       described_class.perform_now(shop)
     end
   end
+
+  context "when plan_name changes from affiliate to something other than frozen" do
+    before do
+      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "enterprise"))
+    end
+
+    it "does not send an analytic" do
+      expect(Analytics).not_to receive(:track)
+
+      described_class.perform_now(shop)
+    end
+  end
+
 
   context "when plan_name does not change" do
     before do
