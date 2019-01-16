@@ -17,6 +17,7 @@ end
 
 group :test do
   gem "timecop"
+  gem "shoulda-matchers", "4.0.0.rc1" # recommended for Rails 5+
 end
 
 gem 'devise'

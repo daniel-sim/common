@@ -28,6 +28,7 @@ module PR
           scope :installed, -> { where(uninstalled: false) }
 
           has_one :user
+          has_many :time_periods, dependent: :destroy
         end
 
         def frozen?
