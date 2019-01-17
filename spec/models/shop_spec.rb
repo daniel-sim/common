@@ -49,7 +49,7 @@ RSpec.describe Shop, type: :model do
       it "creates a new time period of type `installed`" do
         expect(shop.time_periods.count).to eq 1
         expect(shop.time_periods.last).to be_installed
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
         expect(shop.time_periods.last.end_time).to be_nil
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe Shop, type: :model do
       it "creates a new time period of type `uninstalled`" do
         expect(shop.time_periods.count).to eq 1
         expect(shop.time_periods.last).to be_uninstalled
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
         expect(shop.time_periods.last.end_time).to be_nil
       end
     end
@@ -71,7 +71,7 @@ RSpec.describe Shop, type: :model do
       it "creates a new time period of type `closed`" do
         expect(shop.time_periods.count).to eq 1
         expect(shop.time_periods.last).to be_closed
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
         expect(shop.time_periods.last.end_time).to be_nil
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe Shop, type: :model do
       it "ends the current period" do
         operation
 
-        expect(shop.time_periods.first.end_time).to eq Time.current
+        expect(shop.time_periods.first.end_time).to eq DateTime.current
       end
 
       it "creates a new time period" do
@@ -96,7 +96,7 @@ RSpec.describe Shop, type: :model do
       it "starts now" do
         operation
 
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
       end
 
       it "has no end time" do
@@ -119,7 +119,7 @@ RSpec.describe Shop, type: :model do
       it "ends the current period" do
         operation
 
-        expect(shop.time_periods.first.end_time).to eq Time.current
+        expect(shop.time_periods.first.end_time).to eq DateTime.current
       end
 
       it "creates a new time period" do
@@ -132,7 +132,7 @@ RSpec.describe Shop, type: :model do
       it "starts now" do
         operation
 
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
       end
 
       it "has no end time" do
@@ -155,7 +155,7 @@ RSpec.describe Shop, type: :model do
       it "ends the current period" do
         operation
 
-        expect(shop.time_periods.first.end_time).to eq Time.current
+        expect(shop.time_periods.first.end_time).to eq DateTime.current
       end
 
       it "creates a new time period" do
@@ -168,7 +168,7 @@ RSpec.describe Shop, type: :model do
       it "starts now" do
         operation
 
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
       end
 
       it "has no end time" do
@@ -191,7 +191,7 @@ RSpec.describe Shop, type: :model do
       it "ends the current period" do
         operation
 
-        expect(shop.time_periods.first.end_time).to eq Time.current
+        expect(shop.time_periods.first.end_time).to eq DateTime.current
       end
 
       it "creates a new time period" do
@@ -204,7 +204,7 @@ RSpec.describe Shop, type: :model do
       it "starts now" do
         operation
 
-        expect(shop.time_periods.last.start_time).to eq Time.current
+        expect(shop.time_periods.last.start_time).to eq DateTime.current
       end
 
       it "has no end time" do

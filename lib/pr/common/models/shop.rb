@@ -107,14 +107,14 @@ module PR
         end
 
         def reconcile_time_period(kind)
-          current_time = Time.current
+          current_time = DateTime.current
 
           current_time_period.update!(end_time: current_time) if current_time_period.present?
 
           build_new_time_period(kind, start_time: current_time)
         end
 
-        def build_new_time_period(kind, start_time: Time.current)
+        def build_new_time_period(kind, start_time: DateTime.current)
           time_periods.build(start_time: start_time, kind: kind)
         end
       end
