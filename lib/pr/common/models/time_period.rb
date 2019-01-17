@@ -38,6 +38,12 @@ module PR
                      reopened: 2,
                      uninstalled: 3,
                      closed: 4 }
+
+        def lapsed_days
+          upper_bound = end_time || Time.current
+
+          ((upper_bound - start_time) / 1.day).ceil
+        end
       end
     end
   end
