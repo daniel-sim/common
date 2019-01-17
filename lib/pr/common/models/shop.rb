@@ -51,6 +51,10 @@ module PR
           time_periods.not_yet_ended.order(:start_time).last
         end
 
+        def total_days_installed
+          time_periods.whilst_in_use.sum(&:lapsed_days)
+        end
+
         private
 
         def reconcile_time_periods

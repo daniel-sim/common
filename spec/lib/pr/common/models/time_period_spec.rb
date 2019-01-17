@@ -24,6 +24,67 @@ describe PR::Common::Models::TimePeriod do
     end
   end
 
+  describe ".not_yet_ended" do
+    let(:current_time) { Time.zone.local(2017, 1, 2) }
+    around { |example| Timecop.freeze(current_time, &example.method(:run)) }
+
+    it "includes time periods that have an end time not set" do
+      time_period = create(:time_period)
+
+      expect(described_class.not_yet_ended.pluck(:id)).to include(time_period.id)
+    end
+
+    it "includes time periods that have an end time in the future" do
+      time_period = create(:time_period, end_time: Time.zone.local(2017, 1, 3))
+
+      expect(described_class.not_yet_ended.pluck(:id)).to include(time_period.id)
+    end
+
+    it "does not include periods that have an end time in the past" do
+      time_period = create(:time_period, end_time: Time.zone.local(2017, 1, 1))
+
+      expect(described_class.not_yet_ended.pluck(:id)).not_to include(time_period.id)
+    end
+
+    it "does not include periods that have an end time of now" do
+      time_period = create(:time_period, end_time: current_time)
+
+      expect(described_class.not_yet_ended.pluck(:id)).not_to include(time_period.id)
+    end
+  end
+
+  describe ".whilst_in_use" do
+    it "includes installed time period" do
+      time_period = create(:time_period, :installed)
+
+      expect(described_class.whilst_in_use.pluck(:id)).to include(time_period.id)
+    end
+
+    it "includes reinstalled time period" do
+      time_period = create(:time_period, :reinstalled)
+
+      expect(described_class.whilst_in_use.pluck(:id)).to include(time_period.id)
+    end
+
+    it "includes reopened time period" do
+      time_period = create(:time_period, :reopened)
+
+      expect(described_class.whilst_in_use.pluck(:id)).to include(time_period.id)
+    end
+
+    it "does not include uninstalled time period" do
+      time_period = create(:time_period, :uninstalled)
+
+      expect(described_class.whilst_in_use.pluck(:id)).not_to include(time_period.id)
+    end
+
+    it "does not include closed time period" do
+      time_period = create(:time_period, :closed)
+
+      expect(described_class.whilst_in_use.pluck(:id)).not_to include(time_period.id)
+    end
+  end
+
   describe "#lapsed_days" do
     subject(:time_period) { described_class.new(start_time: start_time, end_time: end_time) }
 

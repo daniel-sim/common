@@ -237,4 +237,36 @@ RSpec.describe Shop, type: :model do
       expect(shop.current_time_period).to be_reopened
     end
   end
+
+  describe "#total_days_installed" do
+    it "returns the total days whilst installed, reopened, and reinstalled" do
+      # new shop with installed time period
+      Timecop.freeze Time.zone.local(2018, 1, 1)
+      shop = create(:shop)
+
+      # 1 day effective, create uninstalled time period
+      Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 1)
+      shop.update!(uninstalled: true)
+
+      # 1 day effective, create reinstalled time period
+      Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 2)
+      shop.update!(uninstalled: "false")
+
+      # 1 day effective, create cancelled time period
+      Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 3)
+
+      shop.update!(plan_name: "cancelled")
+
+      # 1 day effective, create reopened time period
+      Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 4)
+      shop.update!(plan_name: "basic")
+
+      # 1 day effective
+      Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 5)
+
+      expect(shop.total_days_installed).to eq 3
+
+      Timecop.return
+    end
+  end
 end

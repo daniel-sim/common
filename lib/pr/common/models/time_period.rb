@@ -29,7 +29,8 @@ module PR
       class TimePeriod < ApplicationRecord
         self.table_name = "time_periods"
 
-        scope :not_yet_ended, -> { where("end_time IS NULL OR end_time >= NOW()") }
+        scope :not_yet_ended, -> { where("end_time IS NULL OR end_time > ?", Time.current) }
+        scope :whilst_in_use, -> { where(kind: %i[installed reinstalled reopened]) }
 
         belongs_to :shop
 
