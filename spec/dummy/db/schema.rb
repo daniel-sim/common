@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2019_01_16_102258) do
     t.datetime "start_time", default: -> { "now()" }, null: false
     t.datetime "end_time"
     t.integer "kind", default: 0, null: false
-    t.boolean "shop_retained_analytic_sent_at"
+    t.datetime "shop_retained_analytic_sent_at"
     t.bigint "shop_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
