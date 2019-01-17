@@ -45,6 +45,12 @@ module PR
 
           ((upper_bound - start_time) / 1.day).ceil
         end
+
+        def lapsed_days_since_last_shop_retained_analytic
+          last_shop_retained_analytic = shop_retained_analytic_sent_at || start_time
+
+          ((Time.current - last_shop_retained_analytic) / 1.day).ceil
+        end
       end
     end
   end

@@ -136,4 +136,32 @@ describe PR::Common::Models::TimePeriod do
       end
     end
   end
+
+  describe "#lapsed_days_since_last_shop_retained_analytic" do
+    let(:current_time) { Time.zone.local(2018, 1, 10, 0, 0, 1) }
+
+    around { |example| Timecop.freeze(current_time, &example.method(:run)) }
+
+    context "when shop_retained_analytic_sent_at is nil" do
+      subject(:time_period) do
+        described_class.new(start_time: Time.zone.local(2018, 1, 1),
+                            shop_retained_analytic_sent_at: nil)
+      end
+
+      it "is calculated from the `start_time`" do
+        expect(time_period.lapsed_days_since_last_shop_retained_analytic).to eq 10
+      end
+    end
+
+    context "when shop_retained_analytic_sent_at is set" do
+      subject(:time_period) do
+        described_class.new(start_time: Time.zone.local(2018, 1, 1),
+                            shop_retained_analytic_sent_at: Time.zone.local(2018, 1, 6))
+      end
+
+      it "is calculated from the `last_shop_retained_analytic_at`" do
+        expect(time_period.lapsed_days_since_last_shop_retained_analytic).to eq 5
+      end
+    end
+  end
 end
