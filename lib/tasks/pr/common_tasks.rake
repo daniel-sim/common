@@ -17,4 +17,11 @@ namespace 'common' do
       puts PR::Common::WebhookService.recreate_webhooks!(shops)
     end
   end
+
+  namespace "schedule" do
+    desc "Collect sustained analytics"
+    task sustained_analytics: :environment do
+      PR::Common::SustainedAnalyticsJob.perform_later
+    end
+  end
 end
