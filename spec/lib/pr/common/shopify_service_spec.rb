@@ -11,6 +11,7 @@ describe PR::Common::ShopifyService do
 
       it "returns the defined price" do
         expected_price = {
+          key: :affiliate_free,
           price: 0,
           trial_days: 0,
           plan_name: "affiliate",
@@ -27,6 +28,7 @@ describe PR::Common::ShopifyService do
 
       it "returns the pricing plan without a plan name" do
         expected_price = {
+          key: :generic,
           price: 10.0,
           trial_days: 7,
           name: "Generic with trial",
