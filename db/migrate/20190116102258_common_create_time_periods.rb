@@ -1,4 +1,4 @@
-class CommonCreateTimePeriods < ActiveRecord::Migration[5.2]
+class CommonCreateTimePeriods < ActiveRecord::Migration[5.0]
   def change
     create_table :time_periods do |t|
       t.column :start_time, :datetime, null: false, default: -> { "NOW()" }, index: true
