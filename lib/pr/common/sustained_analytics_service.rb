@@ -1,5 +1,5 @@
 class PR::Common::SustainedAnalyticsService
-  DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC = 7
+  DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC = Rails.env.staging? ? 1 : 7
 
   # TODO: optimise queries
   def self.perform
