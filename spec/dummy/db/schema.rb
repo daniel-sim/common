@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_12_113816) do
+ActiveRecord::Schema.define(version: 2019_01_16_102258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,11 +20,24 @@ ActiveRecord::Schema.define(version: 2019_01_12_113816) do
     t.string "shopify_domain"
     t.string "shopify_token", null: false
     t.boolean "uninstalled", default: false, null: false
-    t.datetime "reinstalled_at"
-    t.datetime "reopened_at"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "time_periods", force: :cascade do |t|
+    t.datetime "start_time", default: -> { "now()" }, null: false
+    t.datetime "end_time"
+    t.integer "kind", default: 0, null: false
+    t.datetime "shop_retained_analytic_sent_at"
+    t.bigint "shop_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["end_time"], name: "index_time_periods_on_end_time"
+    t.index ["kind"], name: "index_time_periods_on_kind"
+    t.index ["shop_id"], name: "index_time_periods_on_shop_id"
+    t.index ["shop_retained_analytic_sent_at"], name: "index_time_periods_on_shop_retained_analytic_sent_at"
+    t.index ["start_time"], name: "index_time_periods_on_start_time"
+  end
+
+  create_table "users", id: :serial, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"

@@ -43,6 +43,16 @@ VCR.configure do |c|
   c.configure_rspec_metadata!
 end
 
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    # Choose a test framework:
+    with.test_framework :rspec
+
+    # Choose one or more libraries:
+    with.library :rails
+  end
+end
+
 RSpec.configure do |config|
   config.include Devise::TestHelpers, type: :controller
 
@@ -65,6 +75,10 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  config.define_derived_metadata(file_path: Regexp.new("/spec/lib/pr/common/models/")) do |metadata|
+    metadata[:type] = :model
+  end
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!

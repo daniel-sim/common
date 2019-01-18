@@ -1,3 +1,36 @@
+## 18 January 2019 (8f4525294988a8042e420b63eb5249baaa667ca3)
+- Added `common:schedule:sustained_analytics` rake task. Task can be used to schedule `SustainedAnalyticsJob`.
+- ! Apps should add this task to their schedule, potentially daily. For testing, consider running more often on staging.
+
+## 18 January 2019 (9250966bbbd377cbe815e386a0548ae9be068e72)
+- Add `SustainedAnalyticsService` and the thin wrapper, `SustainedAnalyticsJob`.
+- Job currently runs through all shops with an in-use, not-yet-ended time period and may send a `"Shop Retained"` analytic.
+- ! Apps require no changes
+
+## 17 January 2019 (aa12c53046c9494db8533ac244d34ec8e4a5ed59)
+- Add the aptly-named `TimePeriod#lapsed_days_since_last_shop_retained_analytic`. If `shop_retained_analytic_sent_at`
+  is not set, it uses the time period's start time.
+- ! Apps require no changes
+
+## 17 January 2019 (45ced04d7dba4b9caa41eaba5d1320adec0bf282)
+- Add `Shop#total_days_installed` which sums the lapsed days of every "in use" time period. An in-use
+  time period is one in which the app is not uninstalled or closed, also scoped at `TimePeriod.whilst_in_use`
+- Fix `TimePeriod.not_yet_ended` to use `Time.current` rather than DB time
+- ! Apps require no changes
+
+## 17 January 2019 (197f57d7a0ef5a4c6cc9dfcfb02defd2491e9238)
+- Add `TimePeriod#lapsed_days` to determine number of days lapsed since a `TimePeriod` is created
+- ! Apps require no changes
+
+### 16 January 2019 (c2bc5b00adfc0bec93d124cdc6f2c3f4674fbe6b)
+- Add `TimePeriod` model
+- Every shop now has `TimePeriods`
+- `TimePeriods` will be reconciled (created/modified if necessary) when a Shop is saved
+- ! Apps should save each shop one time in order to ensure that each has a `TimePeriod`:
+  ```
+  Shop.find_each(&:save)
+  ```
+
 ### 15 January 2019 (12e8df17a0837144bd77f800ca3b5dda5ed040e3)
 - Fixes some previously defined analytics calls
 - Normalizes analytics calls to one place (ShopifyService)

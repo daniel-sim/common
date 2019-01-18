@@ -24,7 +24,8 @@ module PR
         if newly_reinstalled?(uninstall)
           track_reinstalled
 
-          @shop.reinstalled_at = Time.current
+          # TODO: convert to TimePeriod change
+          # @shop.reinstalled_at = Time.current
           @user.charged_at = nil
         elsif newly_uninstalled?(uninstall)
           track_uninstalled
@@ -37,7 +38,8 @@ module PR
         return unless newly_reopened?(plan_name)
 
         track_reopened
-        @shop.reopened_at = Time.current
+        # TODO: convert to TimePeriod change
+        # @shop.reopened_at = Time.current
         @user.charged_at = nil
       end
 
