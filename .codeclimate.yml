@@ -1,3 +1,7 @@
+prepare:
+  fetch:
+  - url: "https://raw.githubusercontent.com/pemberton-rank/configs/master/rubocop.yml"
+    path: ".rubocop.yml"
 plugins:
   rubocop:
     enabled: true
