@@ -16,5 +16,9 @@ FactoryBot.define do
     trait :frozen do
       plan_name { "frozen" }
     end
+
+    trait :with_user do
+      user
+    end
   end
 end
