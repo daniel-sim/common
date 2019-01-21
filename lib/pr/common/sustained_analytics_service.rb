@@ -1,33 +1,42 @@
 class PR::Common::SustainedAnalyticsService
   DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC = Rails.env.staging? ? 1 : 7
 
-  # TODO: optimise queries
-  def self.perform
-    shops = Shop
-            .joins(:time_periods)
-            .merge(PR::Common::Models::TimePeriod.whilst_in_use.not_yet_ended)
+  # Strictly speaking, this should depend on the trial_days of various
+  # prices. Potentially to be implemented in the future.
+  DAYS_UNTIL_CONVERTED_TO_PAID = Rails.env.staging? ? 1 : 7
 
-    shops.find_each(&method(:maybe_shop_retained))
+  def initialize(shop)
+    @shop = shop
+    @current_time_period = shop.current_time_period
+    @user = shop.user
   end
 
-  private_class_method def self.maybe_shop_retained(shop)
-    current_time_period = shop.current_time_period || return
+  def perform
+    return unless @current_time_period
+    return unless @current_time_period.in_use?
+    return if @current_time_period.ended?
 
-    return if DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC > current_time_period.lapsed_days_since_last_shop_retained_analytic
-
-    send_shop_retained_analytics(shop, current_time_period)
-
-    current_time_period.update!(shop_retained_analytic_sent_at: Time.current)
+    maybe_converted_to_paid
+    maybe_shop_retained
   end
 
-  private_class_method def self.send_shop_retained_analytics(shop, current_time_period)
-    user = shop.user
-    user_id = user.id
-    current_days_installed = current_time_period.lapsed_days
-    total_days_installed = shop.total_days_installed
+  private
+
+  def maybe_shop_retained
+    return if DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC >
+              @current_time_period.lapsed_days_since_last_shop_retained_analytic
+
+    send_shop_retained_analytics
+
+    @current_time_period.update!(shop_retained_analytic_sent_at: Time.current)
+  end
+
+  def send_shop_retained_analytics
+    current_days_installed = @current_time_period.lapsed_days
+    total_days_installed = @shop.total_days_installed
 
     Analytics.identify(
-      user_id: user_id,
+      user_id: @user.id,
       traits: {
         currentDaysInstalled: current_days_installed,
         totalDaysInstalled: total_days_installed
@@ -35,12 +44,46 @@ class PR::Common::SustainedAnalyticsService
     )
 
     Analytics.track(
-      user_id: user_id,
+      user_id: @user.id,
       event: "Shop Retained",
       properties: {
-        email: user.email,
+        email: @user.email,
         current_days_installed: current_days_installed,
         total_days_installed: total_days_installed
+      }
+    )
+  end
+
+  def maybe_converted_to_paid
+    return if @current_time_period.converted_to_paid?
+    return if @current_time_period.monthly_usd.zero?
+    return unless @shop.charged_at
+
+    current_time = Time.current
+
+    return if (@shop.charged_at + DAYS_UNTIL_CONVERTED_TO_PAID.days) > current_time
+
+    send_converted_to_paid_analytics
+
+    @current_time_period.update!(converted_to_paid_at: current_time)
+  end
+
+  def send_converted_to_paid_analytics
+    Analytics.identify(
+      user_id: @user.id,
+      traits: {
+        monthlyUsd: @current_time_period.monthly_usd,
+        appPlan: @shop.app_plan
+      }
+    )
+
+    Analytics.track(
+      user_id: @user.id,
+      event: "Converted to Paid",
+      properties: {
+        email: @user.email,
+        monthly_usd: @current_time_period.monthly_usd,
+        app_plan: @shop.app_plan
       }
     )
   end

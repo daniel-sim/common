@@ -5,11 +5,8 @@ describe PR::Common::Models::TimePeriod do
 
   it do
     is_expected.to define_enum_for(:kind)
-      .with_values %i[installed
-                      reinstalled
-                      reopened
-                      uninstalled
-                      closed]
+      .with_values %i[installed reinstalled reopened
+                      uninstalled closed]
   end
 
   context "when newly created" do
@@ -26,6 +23,7 @@ describe PR::Common::Models::TimePeriod do
 
   describe ".not_yet_ended" do
     let(:current_time) { Time.zone.local(2017, 1, 2) }
+
     around { |example| Timecop.freeze(current_time, &example.method(:run)) }
 
     it "includes time periods that have an end time not set" do
@@ -161,6 +159,64 @@ describe PR::Common::Models::TimePeriod do
 
       it "is calculated from the `last_shop_retained_analytic_at`" do
         expect(time_period.lapsed_days_since_last_shop_retained_analytic).to eq 5
+      end
+    end
+  end
+
+  describe "#in_use?" do
+    %i[installed reinstalled reopened].each do |kind|
+      context "when time period is #{kind}" do
+        subject(:time_period) { build(:time_period, kind) }
+
+        it "returns true" do
+          expect(time_period).to be_in_use
+        end
+      end
+    end
+
+    %i[uninstalled closed].each do |kind|
+      context "when time period is #{kind}" do
+        subject(:time_period) { build(:time_period, kind) }
+
+        it "returns false" do
+          expect(time_period).not_to be_in_use
+        end
+      end
+    end
+  end
+
+  describe "#converted_to_paid?" do
+    context "when converted_to_paid_at is set" do
+      subject(:time_period) { build(:time_period, converted_to_paid_at: Time.current) }
+
+      it "returns true" do
+        expect(time_period).to be_converted_to_paid
+      end
+    end
+
+    context "when converted_to_paid_at is not set" do
+      subject(:time_period) { build(:time_period) }
+
+      it "returns false" do
+        expect(time_period).not_to be_converted_to_paid
+      end
+    end
+  end
+
+  describe "#ended?" do
+    context "when end_time is set" do
+      subject(:time_period) { build(:time_period, end_time: Time.current) }
+
+      it "returns true" do
+        expect(time_period).to be_ended
+      end
+    end
+
+    context "when end_time is not set" do
+      subject(:time_period) { build(:time_period) }
+
+      it "returns false" do
+        expect(time_period).not_to be_ended
       end
     end
   end

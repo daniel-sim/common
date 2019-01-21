@@ -30,4 +30,3 @@ PR::Common.configure do |config|
     }
   ]
 end
-

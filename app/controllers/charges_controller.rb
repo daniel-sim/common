@@ -3,17 +3,17 @@ class ChargesController < ApplicationController
 
   before_action :login_again_if_different_shop
   around_action :shopify_session
+  before_action :load_user
 
   def create
-    price = params[:price]
+    price = charge_service.up_to_date_price[:price]
+    charge = charge_service.create_charge(price, request.base_url)
 
-    raise "Price is < 0: #{price}" if price.negative?
+    # price is free
+    return redirect_to charge_success_path if price.zero?
+    return fullpage_redirect_to(charge.confirmation_url) if charge
 
-    charge = ChargeService.new(@shop).create_charge(price)
-
-    return redirect_to(charge_success_path) if price.zero?
-    return fullpage_redirect_to(charge.confirmation_url) if charge_created
-
+    # charge failed
     redirect_to charge_failed_path
   end
 
@@ -22,7 +22,7 @@ class ChargesController < ApplicationController
 
     case @charge.status
     when "accepted"
-      ChargeService.new(@shop).activate_charge(charge)
+      charge_service.activate_charge(@charge)
       return redirect_to charge_success_path
     when "declined"
       return redirect_to charge_declined_path
@@ -32,6 +32,10 @@ class ChargesController < ApplicationController
   end
 
   private
+
+  def charge_service
+    @charge_service ||= PR::Common::ChargeService.new(@user.shop)
+  end
 
   def charge_success_path
     "#{Settings.client_url}/charge/succeed"
@@ -43,5 +47,9 @@ class ChargesController < ApplicationController
 
   def charge_failed_path
     "#{Settings.client_url}/charge/failed"
+  end
+
+  def load_user
+    @user = User.find_by!(access_token: params[:access_token])
   end
 end

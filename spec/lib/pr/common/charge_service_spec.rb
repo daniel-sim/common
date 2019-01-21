@@ -1,5 +1,7 @@
 require "rails_helper"
 
+# See spec/dummy/config/initializers/common_initializer.rb for
+# test pricing
 describe PR::Common::ChargeService do
   let(:user) { create(:user) }
   let(:shop) { create(:shop, user: user) }
@@ -7,14 +9,14 @@ describe PR::Common::ChargeService do
   let(:service) { described_class.new(shop) }
 
   shared_examples "post charge-activation" do
-    it "sets active charge to true on the shop's user" do
+    it "sets the user's active charge to true" do
       expect { subject }
         .to change(user, :active_charge)
         .from(false)
         .to(true)
     end
 
-    it "updates the charged_at time to now" do
+    it "updates the user's charged_at time to now" do
       Timecop.freeze do
         expect { subject }
           .to change(user, :charged_at)
@@ -23,13 +25,20 @@ describe PR::Common::ChargeService do
       end
     end
 
+    it "updates the shop's app_plan to the price key" do
+      expect { subject }
+        .to change(shop, :app_plan)
+        .from(nil)
+        .to(described_class.determine_app_plan_from_charge(charge).to_s)
+    end
+
     it "sends a 'Charge Activated' analytic" do
       expect(Analytics).to receive(:track)
         .with(
           user_id: user.id,
           event: "Charge Activated",
           properties: {
-            monthly_usd: price,
+            monthly_usd: charge.price,
             email: user.email
           }
         )
@@ -37,6 +46,25 @@ describe PR::Common::ChargeService do
       subject
     end
   end
+
+  describe ".determine_app_plan_from_charge" do
+    context "when the app plan exists" do
+      let(:charge) { ShopifyAPI::RecurringApplicationCharge.new(name: "Staff Business") }
+
+      it "returns the charge's key" do
+        expect(described_class.determine_app_plan_from_charge(charge)).to eq :staff_business_free
+      end
+    end
+
+    context "when the app plan does not exist" do
+      let(:charge) { ShopifyAPI::RecurringApplicationCharge.new(name: "foobar") }
+
+      it "returns nil" do
+        expect(described_class.determine_app_plan_from_charge(charge)).to be_nil
+      end
+    end
+  end
+
 
   describe "#create_charge" do
     subject { service.create_charge(price, base_url) }
@@ -70,7 +98,7 @@ describe PR::Common::ChargeService do
         end
       end
 
-      context "when there no existing charge" do
+      context "when there is no existing charge" do
         it "does not try to cancel it" do
           expect { subject }.not_to raise_error
         end
@@ -79,6 +107,7 @@ describe PR::Common::ChargeService do
 
     context "when price is 0" do
       let(:price) { 0 }
+      let(:charge) { ShopifyAPI::RecurringApplicationCharge.new(price: price, name: "Affiliate") }
 
       include_examples "cancels existing charge"
       include_examples "post charge-activation"
@@ -108,10 +137,11 @@ describe PR::Common::ChargeService do
 
   describe "#activate_charge" do
     subject { service.activate_charge(charge) }
+
     before { allow(charge).to receive(:activate) }
 
     let(:price) { 10.0 }
-    let(:charge) { ShopifyAPI::RecurringApplicationCharge.new(price: price) }
+    let(:charge) { ShopifyAPI::RecurringApplicationCharge.new(price: price, name: "Generic with trial") }
 
     include_examples "post charge-activation"
 
@@ -119,6 +149,28 @@ describe PR::Common::ChargeService do
       expect(charge).to receive(:activate)
 
       subject
+    end
+  end
+
+  describe "#up_to_date_price" do
+    it "calls out to 'PR::Common::ShopifyService#determine_price' with return from Shopify API" do
+      api_shop = ShopifyAPI::Shop.new(plan_name: "foo")
+      fake_service = PR::Common::ShopifyService.new(shop: shop)
+
+      allow(ShopifyAPI::Shop)
+        .to receive(:current)
+        .and_return(api_shop)
+
+      allow(PR::Common::ShopifyService)
+        .to receive(:new)
+        .with(shop: shop)
+        .and_return(fake_service)
+
+      expect(fake_service)
+        .to receive(:determine_price)
+        .with(plan_name: "foo")
+
+      described_class.new(shop).up_to_date_price
     end
   end
 end

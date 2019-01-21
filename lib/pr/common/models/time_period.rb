@@ -29,8 +29,10 @@ module PR
       class TimePeriod < ApplicationRecord
         self.table_name = "time_periods"
 
+        KINDS_IN_USE = %i[installed reinstalled reopened].freeze
+
         scope :not_yet_ended, -> { where("end_time IS NULL OR end_time > ?", Time.current) }
-        scope :whilst_in_use, -> { where(kind: %i[installed reinstalled reopened]) }
+        scope :whilst_in_use, -> { where(kind: KINDS_IN_USE) }
 
         belongs_to :shop
 
@@ -50,6 +52,18 @@ module PR
           last_shop_retained_analytic = shop_retained_analytic_sent_at || start_time
 
           ((Time.current - last_shop_retained_analytic) / 1.day).ceil
+        end
+
+        def converted_to_paid?
+          !!converted_to_paid_at
+        end
+
+        def ended?
+          !!end_time
+        end
+
+        def in_use?
+          kind.to_sym.in? KINDS_IN_USE
         end
       end
     end
