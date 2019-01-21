@@ -1,3 +1,21 @@
+## 21 January 2019 (35d34cb37553348c548f398d1bd59e1072c6846e)
+- Improved ChargesService
+- Fixed up ChargesController to work with ChargesService changes
+- Dropped `common:schedule:sustained_analytics` in favour of
+  `common:shops:reconcile`
+- Added logging and SustainedAnalyticsService call to
+  ShopUpdateReconcile job
+
+- ! Apps require changes:
+
+- Add a new symbol, `key` to each price in the common initializer. This is considered the "app_plan"
+- Ensure that the names of each price in the common initializer are unique
+- Remove `lib/tasks/shop_update_reconcile.rake`
+- Replace `shop_update_reconcile` in schedule with:
+  ```
+  rake_with_lock 'common:shops:reconcile', output: "#{log_root}common-shops-reconcile.log", lock: "#{log_root}common-shops-reconcile.lock"
+  ```
+
 ## 18 January 2019 (8f4525294988a8042e420b63eb5249baaa667ca3)
 - Added `common:schedule:sustained_analytics` rake task. Task can be used to schedule `SustainedAnalyticsJob`.
 - ! Apps should add this task to their schedule, potentially daily. For testing, consider running more often on staging.

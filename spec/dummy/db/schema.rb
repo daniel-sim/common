@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_16_102258) do
+ActiveRecord::Schema.define(version: 2019_01_18_122037) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,16 +20,21 @@ ActiveRecord::Schema.define(version: 2019_01_16_102258) do
     t.string "shopify_domain"
     t.string "shopify_token", null: false
     t.boolean "uninstalled", default: false, null: false
+    t.string "app_plan"
+    t.index ["app_plan"], name: "index_shops_on_app_plan"
   end
 
-  create_table "time_periods", force: :cascade do |t|
+  create_table "time_periods", id: :serial, force: :cascade do |t|
     t.datetime "start_time", default: -> { "now()" }, null: false
     t.datetime "end_time"
     t.integer "kind", default: 0, null: false
     t.datetime "shop_retained_analytic_sent_at"
-    t.bigint "shop_id"
+    t.integer "shop_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "converted_to_paid_at"
+    t.decimal "monthly_usd", default: "0.0", null: false
+    t.index ["converted_to_paid_at"], name: "index_time_periods_on_converted_to_paid_at"
     t.index ["end_time"], name: "index_time_periods_on_end_time"
     t.index ["kind"], name: "index_time_periods_on_kind"
     t.index ["shop_id"], name: "index_time_periods_on_shop_id"

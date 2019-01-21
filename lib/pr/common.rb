@@ -12,6 +12,7 @@ require "pr/common/user_service"
 require "pr/common/shopify_service"
 require "pr/common/webhook_service"
 require "pr/common/sustained_analytics_service"
+require "pr/common/charge_service"
 
 module PR
   module Common

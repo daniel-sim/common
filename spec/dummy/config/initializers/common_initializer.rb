@@ -6,25 +6,27 @@ PR::Common.configure do |config|
 
   config.pricing = [
     {
-      price:      0,
+      key: :staff_business_free,
+      price: 0,
       trial_days: 0,
-      plan_name:  'staff_business',
-      name:       'Staff Business',
-      terms:      'Staff Business terms',
+      plan_name: "staff_business",
+      name: "Staff Business",
+      terms: "Staff Business terms"
     },
     {
-      price:      0,
+      key: :affiliate_free,
+      price: 0,
       trial_days: 0,
-      plan_name:  'affiliate',
-      name:       'Affiliate',
-      terms:      'Affiliate terms',
+      plan_name: "affiliate",
+      name: "Affiliate",
+      terms: "Affiliate terms"
     },
     {
-      price:      10.0,
+      key: :generic,
+      price: 10.0,
       trial_days: 7,
-      name:       'Generic with trial',
-      terms:      'Generic terms',
+      name: "Generic with trial",
+      terms: "Generic terms"
     }
   ]
 end
-

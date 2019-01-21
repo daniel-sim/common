@@ -145,6 +145,8 @@ module PR
       end
 
       def reconcile_with_shopify
+        success = true
+
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           begin
             shopify_shop = ShopifyAPI::Shop.current
@@ -152,6 +154,7 @@ module PR
           rescue ActiveResource::UnauthorizedAccess => e
             # we no longer have access to the shop- app uninstalled
             update_shop(plan_name: @shop.plan_name, uninstalled: true)
+            success = false
           rescue ActiveResource::ClientError => e
             if e.response.code.to_s == '402'
               update_shop(plan_name: Shop::PLAN_FROZEN, uninstalled: false)
@@ -165,6 +168,8 @@ module PR
           end
           ShopifyAPI::Base.clear_session
         end
+
+        return success
       end
 
       def determine_price(plan_name: @shop.plan_name)

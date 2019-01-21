@@ -18,10 +18,10 @@ namespace 'common' do
     end
   end
 
-  namespace "schedule" do
-    desc "Collect sustained analytics"
-    task sustained_analytics: :environment do
-      PR::Common::SustainedAnalyticsJob.perform_later
+  namespace "shops" do
+    desc "Reconcile shops"
+    task reconcile: :environment do
+      PR::Common::ShopUpdateReconcileJob.enqueue
     end
   end
 end

@@ -2,8 +2,17 @@ require "rails_helper"
 
 describe ShopUpdateReconcileJob do
   let(:shop) { create(:shop, user: build(:user)) }
+  let(:sustained_analytics_service) { PR::Common::SustainedAnalyticsService.new(shop) }
 
-  before { allow(Analytics).to receive(:flush) }
+
+  before do
+    allow(Analytics).to receive(:flush)
+
+    allow(PR::Common::SustainedAnalyticsService)
+      .to receive(:new)
+      .with(shop)
+      .and_return(sustained_analytics_service)
+  end
 
   context "when plan_name changes from affiliate to frozen" do
     before do
@@ -21,7 +30,13 @@ describe ShopUpdateReconcileJob do
 
       expect(Analytics).to receive(:track) { analytic_params }
 
-      described_class.perform_now(shop)
+      described_class.perform_now(shop.id)
+    end
+
+    it "calls out to SustainedAnalyticsService" do
+      expect(sustained_analytics_service).to receive(:perform)
+
+      described_class.perform_now(shop.id)
     end
   end
 
@@ -33,7 +48,13 @@ describe ShopUpdateReconcileJob do
     it "does not send an analytic" do
       expect(Analytics).not_to receive(:track)
 
-      described_class.perform_now(shop)
+      described_class.perform_now(shop.id)
+    end
+
+    it "calls out to SustainedAnalyticsService" do
+      expect(sustained_analytics_service).to receive(:perform)
+
+      described_class.perform_now(shop.id)
     end
   end
 
@@ -46,7 +67,27 @@ describe ShopUpdateReconcileJob do
     it "does not send an analytic" do
       expect(Analytics).not_to receive(:track)
 
-      described_class.perform_now(shop)
+      described_class.perform_now(shop.id)
+    end
+
+    it "calls out to SustainedAnalyticsService" do
+      expect(sustained_analytics_service).to receive(:perform)
+
+      described_class.perform_now(shop.id)
+    end
+  end
+
+  context "when reconcilliation fails" do
+    before do
+      allow(ShopifyAPI::Shop)
+        .to receive(:current)
+        .and_raise(ActiveResource::ClientError, OpenStruct.new(code: '402'))
+    end
+
+    it "does not call out to SustainedAnalyticsService" do
+      expect(sustained_analytics_service).to receive(:perform)
+
+      described_class.perform_now(shop.id)
     end
   end
 end
