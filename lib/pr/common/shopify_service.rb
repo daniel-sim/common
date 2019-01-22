@@ -109,15 +109,14 @@ module PR
           user_id: @user.id,
           event: "App Uninstalled",
           properties: {
-            activeCharge: @user.has_active_charge?,
             email: @user.email,
-            shopify_plan: shop.shopify_plan,
             subscription_length: @user.subscription_length,
             current_days_installed: current_time_period.lapsed_days,
             total_days_installed: shop.total_days_installed,
             current_periods_paid: current_time_period.periods_paid,
             total_periods_paid: shop.total_periods_paid,
-            current_monthly_usd: current_time_period.monthly_usd.to_f,
+            monthly_usd: current_time_period.monthly_usd.to_f,
+            current_usd_paid: current_time_period.usd_paid.to_f,
             total_usd_paid: shop.total_usd_paid.to_f
           }
         )

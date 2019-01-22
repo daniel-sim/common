@@ -153,15 +153,14 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         event: "App Uninstalled",
         properties: {
-          activeCharge: shop.user.has_active_charge?,
           email: shop.user.email,
-          shopify_plan: "affiliate",
+          subscription_length: nil,
           current_days_installed: shop.current_time_period.lapsed_days,
-          subscription_length: shop.user.subscription_length,
           total_days_installed: shop.total_days_installed,
           current_periods_paid: shop.current_time_period.periods_paid,
           total_periods_paid: shop.total_periods_paid,
-          current_monthly_usd: shop.current_time_period.monthly_usd.to_f,
+          monthly_usd: shop.current_time_period.monthly_usd.to_f,
+          current_usd_paid: shop.current_time_period.usd_paid.to_f,
           total_usd_paid: shop.total_usd_paid.to_f
         }
       }

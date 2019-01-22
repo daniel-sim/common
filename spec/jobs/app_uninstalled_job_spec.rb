@@ -19,12 +19,18 @@ describe AppUninstalledJob do
         event: "App Uninstalled",
         properties: {
           email: shop.user.email,
-          activeCharge: false,
-          subscription_length: nil
+          subscription_length: nil,
+          current_days_installed: 1,
+          total_days_installed: 1,
+          current_periods_paid: 0,
+          total_periods_paid: 0,
+          monthly_usd: 0.0,
+          current_usd_paid: 0.0,
+          total_usd_paid: 0.0
         }
       }
 
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       described_class.perform_now(shop_domain: shop.shopify_domain)
     end
