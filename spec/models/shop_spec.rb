@@ -269,4 +269,33 @@ RSpec.describe Shop, type: :model do
       Timecop.return
     end
   end
+
+  # installed -> uninstalled -> reinstalled
+  # total periods paid: 7, 3 of which are at $100 and 4 of which are at $10
+  def create_paid_time_periods(shop)
+    shop.current_time_period.update!(periods_paid: 3, monthly_usd: 100.0)
+    shop.update!(uninstalled: true)
+    shop.update!(uninstalled: "false")
+    shop.current_time_period.update!(periods_paid: 4, monthly_usd: 10.0)
+  end
+
+  describe "#total_periods_paid" do
+    subject(:shop) { create(:shop) }
+
+    before { create_paid_time_periods(shop) }
+
+    it "returns the periods paid across all time periods" do
+      expect(shop.total_periods_paid).to eq 7
+    end
+  end
+
+  describe "#total_usd_paid" do
+    subject(:shop) { create(:shop) }
+
+    before { create_paid_time_periods(shop) }
+
+    it "returns the amount paid across all time periods" do
+      expect(shop.total_usd_paid).to eq BigDecimal("340.0")
+    end
+  end
 end

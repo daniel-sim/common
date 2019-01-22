@@ -65,6 +65,20 @@ module PR
         def in_use?
           kind.to_sym.in? KINDS_IN_USE
         end
+
+        def paid_now
+          assign_attributes(period_last_paid_at: Time.current,
+                            periods_paid: periods_paid.next)
+        end
+
+        def paid_now!
+          paid_now
+          save
+        end
+
+        def usd_paid
+          periods_paid * monthly_usd
+        end
       end
     end
   end
