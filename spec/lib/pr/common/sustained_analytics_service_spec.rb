@@ -1,20 +1,76 @@
 require "rails_helper"
 
 describe PR::Common::SustainedAnalyticsService do
+  subject(:service) { described_class.new(shop) }
+
+  let!(:shop) { create(:shop, :with_user, plan_name: "basic", charged_at: current_time) }
+  let(:current_time_period) { shop.current_time_period }
+  let(:current_time) { Time.zone.local(2018, 1, 14, 0, 0, 1) }
+
+  before do
+    current_time_period.update!(monthly_usd: 10) # this should be set from activating the charge
+  end
+
+  around { |example| Timecop.freeze(current_time, &example.method(:run)) }
+
   describe "#perform" do
-    context "when shop's current time period is installed" do
-      subject(:service) { described_class.new(shop) }
+    describe "payment charged" do
+      context "when shop was converted to paid 30 days ago" do
+        let(:current_time) { Time.zone.local(2018, 1, 31, 0, 0, 1) }
 
-      let!(:shop) { create(:shop, :with_user, plan_name: "basic", charged_at: current_time) }
-      let(:current_time_period) { shop.current_time_period }
-      let(:current_time) { Time.zone.local(2018, 1, 14, 0, 0, 1) }
+        before do
+          current_time_period.update!(converted_to_paid_at: Time.zone.local(2018, 1, 1))
+        end
 
-      before do
-        current_time_period.update!(monthly_usd: 10) # this should be set from activating the charge
+        it "updates period_last_paid_at to now" do
+          expect { service.perform }
+            .to change { current_time_period.reload.period_last_paid_at }
+            .from(nil)
+            .to(current_time)
+        end
+
+        it "increments periods_paid" do
+          expect { service.perform }
+            .to change { current_time_period.reload.periods_paid }
+            .from(0)
+            .to(1)
+        end
+
+        it "sends an identify analytic" do
+          expect(Analytics).to receive(:identify)
+            .with(
+              user_id: shop.user.id,
+              traits: {
+                currentPeriodsPaid: 1,
+                totalPeriodsPaid: 1,
+                currentMonthlyUsd: 10.0,
+                totalUsdPaid: 10.0
+              }
+            )
+
+          service.perform
+        end
+
+        it "sends a Payment Charged track analytic" do
+          expect(Analytics).to receive(:track)
+            .with(
+              user_id: shop.user.id,
+              event: "Payment Charged",
+              properties: {
+                email: shop.user.email,
+                current_periods_paid: 1,
+                total_periods_paid: 1,
+                current_monthly_usd: 10.0,
+                total_usd_paid: 10.0
+              }
+            )
+
+          service.perform
+        end
       end
+    end
 
-      around { |example| Timecop.freeze(current_time, &example.method(:run)) }
-
+    context "when shop's current time period is installed" do
       context "when time period started under 7 days ago and shop_retained_analytic_sent_at is nil" do
         before { current_time_period.update!(start_time: current_time) }
 

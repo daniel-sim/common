@@ -73,7 +73,7 @@ module PR
 
         def paid_now!
           paid_now
-          save
+          save!
         end
 
         def usd_paid
