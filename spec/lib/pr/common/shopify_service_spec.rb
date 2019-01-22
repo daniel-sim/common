@@ -152,15 +152,21 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         event: "App Uninstalled",
         properties: {
+          activeCharge: shop.user.has_active_charge?,
           email: shop.user.email,
-          activeCharge: false,
-          subscription_length: nil
+          current_days_installed: shop.current_time_period.lapsed_days,
+          subscription_length: shop.user.subscription_length,
+          total_days_installed: shop.total_days_installed,
+          current_periods_paid: shop.current_time_period.periods_paid,
+          total_periods_paid: shop.total_periods_paid,
+          current_monthly_usd: shop.current_time_period.monthly_usd.to_f,
+          total_usd_paid: shop.total_usd_paid.to_f
         }
       }
     end
 
     it "sends an 'App Uninstalled' analytic" do
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_uninstalled
     end
@@ -191,13 +197,20 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         event: "Shop Closed",
         properties: {
-          subscription_length: shop.user.subscription_length
+          email: shop.user.email,
+          current_days_installed: shop.current_time_period.lapsed_days,
+          subscription_length: shop.user.subscription_length,
+          total_days_installed: shop.total_days_installed,
+          current_periods_paid: shop.current_time_period.periods_paid,
+          total_periods_paid: shop.total_periods_paid,
+          current_monthly_usd: shop.current_time_period.monthly_usd.to_f,
+          total_usd_paid: shop.total_usd_paid.to_f
         }
       }
     end
 
     it "sends a 'Shop Closed' analytic" do
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_cancelled
     end

@@ -1,10 +1,14 @@
+## 22 January 2019 (9ae829c0ad21569728185fd4695e16c840c7062c)
+- Added properties to App Uninstalled analytic
+- Added properties to Shop Closed analytic
+- ! Apps require no changes
+
 ## 22 January 2019 (fe27bdaaa36223887e3f3098b1807a7b60bb716d)
 - Added `common:import:payment_history`
 - ! Apps should run the above task with a CSV to set `period_last_paid_at`
   and `periods_paid` on active time periods, based on the last payment date,
   and send relevant analytics.
 
-- ! Apps require no changes
 ## 22 January 2019 (dfe5695c608853c2f85758973decea1499ed7f7f)
 - Added `period_last_paid_at` and `periods_paid` to TimePeriod
 - Added "Payment Charged" analytic to `SustainedAnalyticsService`
