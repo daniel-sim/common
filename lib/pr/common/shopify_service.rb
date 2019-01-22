@@ -77,6 +77,14 @@ module PR
       end
 
       def track_reopened
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: @user.shop.shopify_plan
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "Shop Reopened",
@@ -88,6 +96,14 @@ module PR
       end
 
       def track_reinstalled
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: @user.shop.shopify_plan
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "App Reinstalled",
@@ -105,25 +121,46 @@ module PR
         shop = @user.shop
         current_time_period = shop.current_time_period
 
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :uninstalled,
+            subscriptionLength: @user.subscription_length,
+            currentDaysInstalled: current_time_period.lapsed_days,
+            totalDaysInstalled: shop.total_days_installed,
+            currentPeriodsPaid: current_time_period.periods_paid,
+            totalPeriodsPaid: shop.total_periods_paid,
+            monthlyUsd: current_time_period.monthly_usd.to_f,
+            currentUsdPaid: current_time_period.usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "App Uninstalled",
           properties: {
-            activeCharge: @user.has_active_charge?,
             email: @user.email,
-            shopify_plan: shop.shopify_plan,
             subscription_length: @user.subscription_length,
             current_days_installed: current_time_period.lapsed_days,
             total_days_installed: shop.total_days_installed,
             current_periods_paid: current_time_period.periods_paid,
             total_periods_paid: shop.total_periods_paid,
-            current_monthly_usd: current_time_period.monthly_usd.to_f,
+            monthly_usd: current_time_period.monthly_usd.to_f,
+            current_usd_paid: current_time_period.usd_paid.to_f,
             total_usd_paid: shop.total_usd_paid.to_f
           }
         )
       end
 
       def track_handed_off(shopify_plan)
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            shopifyPlan: shopify_plan
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "Shop Handed Off",
@@ -138,6 +175,21 @@ module PR
         shop = @user.shop
         current_time_period = shop.current_time_period
 
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :inactive,
+            subscriptionLength: @user.subscription_length,
+            currentDaysInstalled: current_time_period.lapsed_days,
+            totalDaysInstalled: shop.total_days_installed,
+            currentPeriodsPaid: current_time_period.periods_paid,
+            totalPeriodsPaid: shop.total_periods_paid,
+            monthlyUsd: current_time_period.monthly_usd.to_f,
+            currentUsdPaid: current_time_period.usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "Shop Closed",
@@ -148,13 +200,22 @@ module PR
             total_days_installed: shop.total_days_installed,
             current_periods_paid: current_time_period.periods_paid,
             total_periods_paid: shop.total_periods_paid,
-            current_monthly_usd: current_time_period.monthly_usd.to_f,
+            monthly_usd: current_time_period.monthly_usd.to_f,
+            current_usd_paid: current_time_period.usd_paid.to_f,
             total_usd_paid: shop.total_usd_paid.to_f
           }
         )
       end
 
       def track_installed
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: @user.shop.shopify_plan
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "App Installed",

@@ -32,14 +32,28 @@ describe PR::Common::ChargeService do
         .to(described_class.determine_app_plan_from_charge(charge).to_s)
     end
 
-    it "sends a 'Charge Activated' analytic" do
+    it "sends an identify analytic" do
+      expect(Analytics).to receive(:identify)
+        .with(
+          user_id: user.id,
+          traits: {
+            monthlyUsd: charge.price,
+            appPlan: described_class.determine_app_plan_from_charge(charge)
+          }
+        )
+
+      subject
+    end
+
+    it "sends a 'Charge Activated' track analytic" do
       expect(Analytics).to receive(:track)
         .with(
           user_id: user.id,
           event: "Charge Activated",
           properties: {
+            email: user.email,
             monthly_usd: charge.price,
-            email: user.email
+            app_plan: described_class.determine_app_plan_from_charge(charge)
           }
         )
 

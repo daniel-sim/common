@@ -66,16 +66,25 @@ module PR
         @shop.update(app_plan: app_plan)
         @shop.current_time_period.update(monthly_usd: charge&.price || 0)
 
-        send_charge_activated_analytic(charge&.price || 0)
+        send_charge_activated_analytics(app_plan, charge&.price || 0)
       end
 
-      def send_charge_activated_analytic(price)
+      def send_charge_activated_analytics(app_plan, price)
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            appPlan: app_plan,
+            monthlyUsd: price
+          }
+        )
+
         Analytics.track(
           user_id: @user.id,
           event: "Charge Activated",
           properties: {
+            email: @user.email,
             monthly_usd: price,
-            email: @user.email
+            app_plan: app_plan
           }
         )
       end

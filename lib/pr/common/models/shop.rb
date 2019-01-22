@@ -33,6 +33,17 @@ module PR
           before_validation :reconcile_time_periods
         end
 
+        def status
+          return :uninstalled if uninstalled
+
+          case shopify_plan
+          when PLAN_FROZEN, PLAN_CANCELLED then return :inactive
+          when PLAN_LOCKED then return :locked
+          end
+
+          :active
+        end
+
         def frozen?
           shopify_plan == PLAN_FROZEN
         end

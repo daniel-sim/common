@@ -106,7 +106,8 @@ class PR::Common::SustainedAnalyticsService
   def send_payment_charged_analytics
     current_periods_paid = @current_time_period.periods_paid
     total_periods_paid = @shop.total_periods_paid
-    current_monthly_usd = @current_time_period.monthly_usd.to_f
+    monthly_usd = @current_time_period.monthly_usd.to_f
+    current_usd_paid = @current_time_period.usd_paid.to_f
     total_usd_paid = @shop.total_usd_paid.to_f
 
     Analytics.identify(
@@ -114,7 +115,8 @@ class PR::Common::SustainedAnalyticsService
       traits: {
         currentPeriodsPaid: current_periods_paid,
         totalPeriodsPaid: total_periods_paid,
-        currentMonthlyUsd: current_monthly_usd,
+        monthlyUsd: monthly_usd,
+        currentUsdPaid: current_usd_paid,
         totalUsdPaid: total_usd_paid
       }
     )
@@ -126,7 +128,8 @@ class PR::Common::SustainedAnalyticsService
         email: @user.email,
         current_periods_paid: current_periods_paid,
         total_periods_paid: total_periods_paid,
-        current_monthly_usd: current_monthly_usd,
+        monthly_usd: monthly_usd,
+        current_usd_paid: current_usd_paid,
         total_usd_paid: total_usd_paid
       }
     )
