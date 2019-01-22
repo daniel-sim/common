@@ -1,3 +1,6 @@
+## 22 January 2019 (08962f586dec1396c5b2f68e34616fb856809090)
+- Clean up various analytics, add more identify traits
+- ! Apps require no changes
 ## 22 January 2019 (a9f0a80bc55d222256804efdc41ca4219a43ba21)
 - Renamed `plan_name` to `shopify_plan` everywhere.
 - ! Apps need to replace `plan_name` with `shopify_plan` in most references.
