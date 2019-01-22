@@ -15,10 +15,10 @@ RSpec.describe Shop, type: :model do
   describe ".with_active_plan" do
     it "includes only shops whose plan is not cancelled, frozen, 🌲, or locked" do
       active_plan_shop = create(:shop)
-      cancelled_plan_shop = create(:shop, plan_name: "cancelled")
-      locked_plan_shop = create(:shop, plan_name: "locked")
-      tree_plan_shop = create(:shop, plan_name: "🌲")
-      frozen_plan_shop = create(:shop, plan_name: "frozen")
+      cancelled_plan_shop = create(:shop, shopify_plan: "cancelled")
+      locked_plan_shop = create(:shop, shopify_plan: "locked")
+      tree_plan_shop = create(:shop, shopify_plan: "🌲")
+      frozen_plan_shop = create(:shop, shopify_plan: "frozen")
 
       shops = Shop.with_active_plan
       expect(shops).to include active_plan_shop
@@ -151,7 +151,7 @@ RSpec.describe Shop, type: :model do
 
     context "when transitioning from installed to closed" do
       let!(:shop) { create(:shop) }
-      let(:operation) { shop.update!(plan_name: "cancelled") }
+      let(:operation) { shop.update!(shopify_plan: "cancelled") }
 
       it "ends the current period" do
         operation
@@ -187,7 +187,7 @@ RSpec.describe Shop, type: :model do
 
     context "when transitioning from closed to reopened" do
       let!(:shop) { create(:shop, :cancelled) }
-      let(:operation) { shop.update!(plan_name: "affiliate") }
+      let(:operation) { shop.update!(shopify_plan: "affiliate") }
 
       it "ends the current period" do
         operation
@@ -229,8 +229,8 @@ RSpec.describe Shop, type: :model do
       # installed -> uninstalled -> reinstalled -> closed -> reopened
       shop.update!(uninstalled: true)
       shop.update!(uninstalled: "false")
-      shop.update!(plan_name: "cancelled")
-      shop.update!(plan_name: "basic")
+      shop.update!(shopify_plan: "cancelled")
+      shop.update!(shopify_plan: "basic")
     end
 
     it "returns the most recent time period" do
@@ -255,11 +255,11 @@ RSpec.describe Shop, type: :model do
       # 1 day effective, create cancelled time period
       Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 3)
 
-      shop.update!(plan_name: "cancelled")
+      shop.update!(shopify_plan: "cancelled")
 
       # 1 day effective, create reopened time period
       Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 4)
-      shop.update!(plan_name: "basic")
+      shop.update!(shopify_plan: "basic")
 
       # 1 day effective
       Timecop.freeze Time.zone.local(2018, 1, 1, 0, 0, 5)

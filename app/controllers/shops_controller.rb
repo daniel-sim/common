@@ -4,7 +4,7 @@ class ShopsController < ApplicationController
 
     PR::Common::ShopifyService
       .new(shop: shop)
-      .update_shop(plan_name: shop_params[:plan_name], uninstalled: shop.uninstalled)
+      .update_shop(shopify_plan: shop_params[:plan_name], uninstalled: shop.uninstalled)
   end
 
   private

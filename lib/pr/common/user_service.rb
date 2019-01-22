@@ -62,7 +62,7 @@ module PR
       end
 
       def maybe_reopen(user)
-        ShopifyService.new(shop: user.shop).maybe_reopen(user.shop.plan_name)
+        ShopifyService.new(shop: user.shop).maybe_reopen(user.shop.shopify_plan)
       end
     end
   end

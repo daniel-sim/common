@@ -6,17 +6,18 @@ describe ShopUpdateJob do
   before { allow(Analytics).to receive(:flush) }
 
   describe "#perform" do
-    context "when plan_name of the shop has changed to frozen" do
+    context "when shopify_plan of the shop has changed to frozen" do
       it "sends a 'Shop Handed Off' analytic" do
         analytic_params = {
+          user_id: shop.user.id,
           event: "Shop Handed Off",
-          userId: shop.user.id,
           properties: {
             email: shop.user.email,
+            shopify_plan: "frozen"
           }
         }
 
-        expect(Analytics).to receive(:track) { analytic_params }
+        expect(Analytics).to receive(:track).with(analytic_params)
 
         described_class.perform_now(
           shop_domain: shop.shopify_domain,
@@ -27,14 +28,14 @@ describe ShopUpdateJob do
       end
     end
 
-    context "when plan_name of the shop has not changed" do
+    context "when shopify_plan of the shop has not changed" do
       it "does not send an analytic" do
         expect(Analytics).not_to receive(:track)
 
         described_class.perform_now(
           shop_domain: shop.shopify_domain,
           webhook: {
-            plan_name: shop.plan_name
+            plan_name: shop.shopify_plan
           }
         )
       end

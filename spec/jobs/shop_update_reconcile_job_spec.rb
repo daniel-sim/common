@@ -14,21 +14,22 @@ describe ShopUpdateReconcileJob do
       .and_return(sustained_analytics_service)
   end
 
-  context "when plan_name changes from affiliate to frozen" do
+  context "when shopify_plan changes from affiliate to frozen" do
     before do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "frozen"))
     end
 
     it "sends a 'Shop Handed Off' analytic" do
       analytic_params = {
+        user_id: shop.user.id,
         event: "Shop Handed Off",
-        userId: shop.user.id,
         properties: {
-          email: shop.user.email
+          email: shop.user.email,
+          shopify_plan: "frozen"
         }
       }
 
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       described_class.perform_now(shop.id)
     end
@@ -40,7 +41,7 @@ describe ShopUpdateReconcileJob do
     end
   end
 
-  context "when plan_name changes from affiliate to something other than frozen" do
+  context "when shopify_plan changes from affiliate to something other than frozen" do
     before do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "enterprise"))
     end
@@ -59,9 +60,9 @@ describe ShopUpdateReconcileJob do
   end
 
 
-  context "when plan_name does not change" do
+  context "when shopify_plan does not change" do
     before do
-      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: shop.plan_name))
+      allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: shop.shopify_plan))
     end
 
     it "does not send an analytic" do

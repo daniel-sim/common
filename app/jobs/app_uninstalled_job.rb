@@ -5,7 +5,7 @@ class AppUninstalledJob < PR::Common::ApplicationJob
 
       PR::Common::ShopifyService
         .new(shop: shop)
-        .update_shop(plan_name: shop.plan_name, uninstalled: true)
+        .update_shop(shopify_plan: shop.shopify_plan, uninstalled: true)
     end
   end
 end
