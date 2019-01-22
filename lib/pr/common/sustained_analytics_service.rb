@@ -6,7 +6,6 @@ class PR::Common::SustainedAnalyticsService
   # prices. Potentially to be implemented in the future.
   DAYS_UNTIL_CONVERTED_TO_PAID = Rails.env.staging? ? 1 : 7
 
-
   def initialize(shop)
     @shop = shop
     @current_time_period = shop.current_time_period
