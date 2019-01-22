@@ -1,6 +1,13 @@
+## 22 January 2019 (768c1d3639eb0a2b73663edc17a5a1dd730c0a3f)
+- Add `Shop.status`
+- Add `appPlan` and `app_plan` to Charge Activated analytic
+- Send along `status` with various identify analytics
+- ! Apps require no changes
+
 ## 22 January 2019 (08962f586dec1396c5b2f68e34616fb856809090)
 - Clean up various analytics, add more identify traits
 - ! Apps require no changes
+
 ## 22 January 2019 (a9f0a80bc55d222256804efdc41ca4219a43ba21)
 - Renamed `plan_name` to `shopify_plan` everywhere.
 - ! Apps need to replace `plan_name` with `shopify_plan` in most references.
