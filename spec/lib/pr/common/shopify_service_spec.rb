@@ -109,8 +109,21 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_reopened" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        traits: {
+          shopifyPlan: "affiliate"
+        }
+      }
+
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_reopened
+    end
+
+    it "sends an 'Shop Reopened' track analytic" do
+      analytic_params = {
         user_id: shop.user.id,
         event: "Shop Reopened",
         properties: {
@@ -118,9 +131,7 @@ describe PR::Common::ShopifyService do
           email: shop.user.email
         }
       }
-    end
 
-    it "sends an 'Shop Reopened' analytic" do
       expect(Analytics).to receive(:track) { analytic_params }
 
       service.track_reopened
@@ -128,8 +139,21 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_reinstalled" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        traits: {
+          shopifyPlan: "affiliate"
+        }
+      }
+
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_reinstalled
+    end
+
+    it "sends an 'App Reinstalled' analytic" do
+      analytic_params = {
         user_id: shop.user.id,
         event: "App Reinstalled",
         properties: {
@@ -138,9 +162,7 @@ describe PR::Common::ShopifyService do
           shopify_plan: "affiliate"
         }
       }
-    end
 
-    it "sends an 'App Reinstalled' analytic" do
       expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_reinstalled
@@ -148,8 +170,27 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_uninstalled" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        traits: {
+          subscriptionLength: nil,
+          currentDaysInstalled: shop.current_time_period.lapsed_days,
+          totalDaysInstalled: shop.total_days_installed,
+          currentPeriodsPaid: shop.current_time_period.periods_paid,
+          totalPeriodsPaid: shop.total_periods_paid,
+          monthlyUsd: shop.current_time_period.monthly_usd.to_f,
+          currentUsdPaid: shop.current_time_period.usd_paid.to_f,
+          totalUsdPaid: shop.total_usd_paid.to_f
+        }
+      }
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_uninstalled
+    end
+
+    it "sends an 'App Uninstalled' analytic" do
+      analytic_params = {
         user_id: shop.user.id,
         event: "App Uninstalled",
         properties: {
@@ -164,9 +205,7 @@ describe PR::Common::ShopifyService do
           total_usd_paid: shop.total_usd_paid.to_f
         }
       }
-    end
 
-    it "sends an 'App Uninstalled' analytic" do
       expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_uninstalled
@@ -174,8 +213,21 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_handed_off" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        traits: {
+          shopifyPlan: "enterprise"
+        }
+      }
+
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_handed_off("enterprise")
+    end
+
+    it "sends an 'App Handed Off' track analytic" do
+      analytic_params = {
         user_id: shop.user.id,
         event: "Shop Handed Off",
         properties: {
@@ -183,9 +235,7 @@ describe PR::Common::ShopifyService do
           shopify_plan: "enterprise"
         }
       }
-    end
 
-    it "sends an 'App Handed Off' analytic" do
       expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_handed_off("enterprise")
@@ -193,8 +243,28 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_cancelled" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        traits: {
+          subscriptionLength: shop.user.subscription_length,
+          currentDaysInstalled: shop.current_time_period.lapsed_days,
+          totalDaysInstalled: shop.total_days_installed,
+          currentPeriodsPaid: shop.current_time_period.periods_paid,
+          totalPeriodsPaid: shop.total_periods_paid,
+          monthlyUsd: shop.current_time_period.monthly_usd.to_f,
+          currentUsdPaid: shop.current_time_period.usd_paid.to_f,
+          totalUsdPaid: shop.total_usd_paid.to_f
+        }
+      }
+
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_cancelled
+    end
+
+    it "sends a 'Shop Closed' track analytic" do
+      analytic_params = {
         user_id: shop.user.id,
         event: "Shop Closed",
         properties: {
@@ -209,9 +279,7 @@ describe PR::Common::ShopifyService do
           total_usd_paid: shop.total_usd_paid.to_f
         }
       }
-    end
 
-    it "sends a 'Shop Closed' analytic" do
       expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_cancelled
@@ -219,22 +287,33 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#track_installed" do
-    let(:analytic_params) do
-      {
+    it "sends an identify analytic" do
+      analytic_params = {
         user_id: shop.user.id,
-        event: "App Installed",
+        traits: {
+          shopifyPlan: "affiliate"
+        }
+      }
+
+      expect(Analytics).to receive(:identify).with(analytic_params)
+
+      service.track_reinstalled
+    end
+
+    it "sends an 'App Reinstalled' track analytic" do
+      analytic_params = {
+        user_id: shop.user.id,
+        event: "App Reinstalled",
         properties: {
           "registration method": "shopify",
           email: shop.user.email,
           shopify_plan: "affiliate"
         }
       }
-    end
 
-    it "sends an 'App Reinstalled' analytic" do
       expect(Analytics).to receive(:track).with(analytic_params)
 
-      service.track_installed
+      service.track_reinstalled
     end
   end
 end

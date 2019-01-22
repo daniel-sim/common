@@ -48,6 +48,7 @@ module PR
             product: "Shopify",
             username: user.username,
             activeCharge: user.active_charge,
+            shopifyPlan: user.shop.shopify_plan,
             referrer: referrer
           }
         )
