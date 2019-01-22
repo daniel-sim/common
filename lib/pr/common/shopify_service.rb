@@ -93,7 +93,8 @@ module PR
           event: "App Reinstalled",
           properties: {
             "registration method": "shopify",
-            email: @user.email
+            email: @user.email,
+            shopify_plan: @user.shop.plan_name
           }
         )
       end
@@ -110,6 +111,7 @@ module PR
           properties: {
             activeCharge: @user.has_active_charge?,
             email: @user.email,
+            shopify_plan: shop.plan_name,
             subscription_length: @user.subscription_length,
             current_days_installed: current_time_period.lapsed_days,
             total_days_installed: shop.total_days_installed,
@@ -158,7 +160,8 @@ module PR
           event: "App Installed",
           properties: {
             "registration method": "shopify",
-            email: @user.email
+            email: @user.email,
+            shopify_plan: @user.shop.plan_name
           }
         )
       end
