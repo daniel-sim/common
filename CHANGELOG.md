@@ -1,3 +1,9 @@
+## 22 January 2019 (a9f0a80bc55d222256804efdc41ca4219a43ba21)
+- Renamed `plan_name` to `shopify_plan` everywhere.
+- ! Apps need to replace `plan_name` with `shopify_plan` in most references.
+  ! Be very careful when dealing with webhook params and the Shopify API: these will
+    **still use `plan_name`**
+
 ## 22 January 2019 (795f9db36936017ca3302bd802865ce1f0958931)
 - Added `shopify_plan` to App Installed analytic
 - Added `shopify_plan` to App Reinstalled analytic
