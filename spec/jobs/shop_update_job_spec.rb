@@ -9,14 +9,15 @@ describe ShopUpdateJob do
     context "when shopify_plan of the shop has changed to frozen" do
       it "sends a 'Shop Handed Off' analytic" do
         analytic_params = {
+          user_id: shop.user.id,
           event: "Shop Handed Off",
-          userId: shop.user.id,
           properties: {
-            email: shop.user.email
+            email: shop.user.email,
+            shopify_plan: "frozen"
           }
         }
 
-        expect(Analytics).to receive(:track) { analytic_params }
+        expect(Analytics).to receive(:track).with(analytic_params)
 
         described_class.perform_now(
           shop_domain: shop.shopify_domain,

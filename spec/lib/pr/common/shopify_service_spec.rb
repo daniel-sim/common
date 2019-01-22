@@ -180,14 +180,14 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         event: "Shop Handed Off",
         properties: {
-          shopify_plan: "enterprise",
-          email: shop.user.email
+          email: shop.user.email,
+          shopify_plan: "enterprise"
         }
       }
     end
 
     it "sends an 'App Handed Off' analytic" do
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_handed_off("enterprise")
     end
