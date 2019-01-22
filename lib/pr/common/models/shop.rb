@@ -55,6 +55,14 @@ module PR
           time_periods.whilst_in_use.sum(&:lapsed_days)
         end
 
+        def total_periods_paid
+          time_periods.sum(:periods_paid)
+        end
+
+        def total_usd_paid
+          time_periods.sum(&:usd_paid)
+        end
+
         private
 
         def reconcile_time_periods

@@ -220,4 +220,66 @@ describe PR::Common::Models::TimePeriod do
       end
     end
   end
+
+  describe "#paid_now" do
+    subject(:time_period) { build(:time_period) }
+
+    let(:current_time) { Time.zone.local(2017, 1, 2) }
+
+    around { |example| Timecop.freeze(current_time, &example.method(:run)) }
+
+    it "sets period_last_paid_at to the current time" do
+      expect { time_period.paid_now }
+        .to change(time_period, :period_last_paid_at)
+        .from(nil)
+        .to(Time.current)
+    end
+
+    it "increments periods_paid" do
+      expect { time_period.paid_now }
+        .to change(time_period, :periods_paid)
+        .from(0)
+        .to(1)
+    end
+  end
+
+  describe "#paid_now!" do
+    subject(:time_period) { create(:time_period) }
+
+    let(:current_time) { Time.zone.local(2017, 1, 2) }
+
+    around { |example| Timecop.freeze(current_time, &example.method(:run)) }
+
+    it "persists period_last_paid_at to the current time" do
+      expect { time_period.paid_now! }
+        .to change { time_period.reload.period_last_paid_at }
+        .from(nil)
+        .to(Time.current)
+    end
+
+    it "increments and persists periods_paid" do
+      expect { time_period.paid_now! }
+        .to change { time_period.reload.periods_paid }
+        .from(0)
+        .to(1)
+    end
+  end
+
+  describe "#usd_paid" do
+    subject(:time_period) { build(:time_period, monthly_usd: 3.50) }
+
+    context "when no periods were paid" do
+      it "returns 0" do
+        expect(time_period.usd_paid).to eq 0
+      end
+    end
+
+    context "when periods were paid" do
+      before { time_period.periods_paid = 5 }
+
+      it "returns the number of payments multiplied by the monthly cost" do
+        expect(time_period.usd_paid).to eq 17.50
+      end
+    end
+  end
 end
