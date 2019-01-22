@@ -40,6 +40,28 @@ RSpec.describe Shop, type: :model do
     end
   end
 
+  describe "#status" do
+    it "is :inactive when shop is frozen" do
+      expect(build(:shop, shopify_plan: Shop::PLAN_FROZEN).status).to eq :inactive
+    end
+
+    it "is :inactive when shop is closed" do
+      expect(build(:shop, shopify_plan: Shop::PLAN_CANCELLED).status).to eq :inactive
+    end
+
+    it "is :locked when shop is locked" do
+      expect(build(:shop, shopify_plan: Shop::PLAN_LOCKED).status).to eq :locked
+    end
+
+    it "is :uninstalled if app is uninstalled" do
+      expect(build(:shop, uninstalled: true).status).to eq :uninstalled
+    end
+
+    it "is :active for any other shop" do
+      expect(build(:shop).status).to eq :active
+    end
+  end
+
   describe "#time_periods" do
     let(:current_time) { DateTime.new(2018, 1, 1) }
     around { |example| Timecop.freeze(current_time, &(example.method(:run))) }

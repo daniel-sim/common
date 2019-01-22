@@ -80,6 +80,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            status: :active,
             shopifyPlan: @user.shop.shopify_plan
           }
         )
@@ -98,6 +99,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            status: :active,
             shopifyPlan: @user.shop.shopify_plan
           }
         )
@@ -122,6 +124,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            status: :uninstalled,
             subscriptionLength: @user.subscription_length,
             currentDaysInstalled: current_time_period.lapsed_days,
             totalDaysInstalled: shop.total_days_installed,
@@ -175,6 +178,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            status: :inactive,
             subscriptionLength: @user.subscription_length,
             currentDaysInstalled: current_time_period.lapsed_days,
             totalDaysInstalled: shop.total_days_installed,
@@ -207,6 +211,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            status: :active,
             shopifyPlan: @user.shop.shopify_plan
           }
         )

@@ -113,6 +113,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          status: :active,
           shopifyPlan: "affiliate"
         }
       }
@@ -143,6 +144,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          status: :active,
           shopifyPlan: "affiliate"
         }
       }
@@ -174,6 +176,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          status: :uninstalled,
           subscriptionLength: nil,
           currentDaysInstalled: shop.current_time_period.lapsed_days,
           totalDaysInstalled: shop.total_days_installed,
@@ -247,6 +250,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          status: :inactive,
           subscriptionLength: shop.user.subscription_length,
           currentDaysInstalled: shop.current_time_period.lapsed_days,
           totalDaysInstalled: shop.total_days_installed,
@@ -291,6 +295,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          status: :active,
           shopifyPlan: "affiliate"
         }
       }
