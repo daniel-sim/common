@@ -37,7 +37,8 @@ describe PR::Common::ChargeService do
         .with(
           user_id: user.id,
           traits: {
-            monthlyUsd: charge.price
+            monthlyUsd: charge.price,
+            appPlan: described_class.determine_app_plan_from_charge(charge)
           }
         )
 
@@ -50,8 +51,9 @@ describe PR::Common::ChargeService do
           user_id: user.id,
           event: "Charge Activated",
           properties: {
+            email: user.email,
             monthly_usd: charge.price,
-            email: user.email
+            app_plan: described_class.determine_app_plan_from_charge(charge)
           }
         )
 
