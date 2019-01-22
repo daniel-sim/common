@@ -1,3 +1,15 @@
+## 22 January 2019 (fe27bdaaa36223887e3f3098b1807a7b60bb716d)
+- Added `common:import:payment_history`
+- ! Apps should run the above task with a CSV to set `period_last_paid_at`
+  and `periods_paid` on active time periods, based on the last payment date,
+  and send relevant analytics.
+
+- ! Apps require no changes
+## 22 January 2019 (dfe5695c608853c2f85758973decea1499ed7f7f)
+- Added `period_last_paid_at` and `periods_paid` to TimePeriod
+- Added "Payment Charged" analytic to `SustainedAnalyticsService`
+- ! Apps require no changes
+
 ## 21 January 2019 (35d34cb37553348c548f398d1bd59e1072c6846e)
 - Improved ChargesService
 - Fixed up ChargesController to work with ChargesService changes
