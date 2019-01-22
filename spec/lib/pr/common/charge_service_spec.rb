@@ -76,7 +76,7 @@ describe PR::Common::ChargeService do
 
       allow(ShopifyAPI::Shop)
         .to receive(:current)
-        .and_return(ShopifyAPI::Shop.new(plan_name: "basic"))
+        .and_return(ShopifyAPI::Shop.new(shopify_plan: "basic"))
 
       allow(ShopifyAPI::RecurringApplicationCharge)
         .to receive(:create)
@@ -154,7 +154,7 @@ describe PR::Common::ChargeService do
 
   describe "#up_to_date_price" do
     it "calls out to 'PR::Common::ShopifyService#determine_price' with return from Shopify API" do
-      api_shop = ShopifyAPI::Shop.new(plan_name: "foo")
+      api_shop = ShopifyAPI::Shop.new(shopify_plan: "foo")
       fake_service = PR::Common::ShopifyService.new(shop: shop)
 
       allow(ShopifyAPI::Shop)
@@ -168,7 +168,7 @@ describe PR::Common::ChargeService do
 
       expect(fake_service)
         .to receive(:determine_price)
-        .with(plan_name: "foo")
+        .with(shopify_plan: "foo")
 
       described_class.new(shop).up_to_date_price
     end

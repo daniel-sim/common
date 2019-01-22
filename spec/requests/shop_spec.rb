@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Shop', type: :request do
   describe 'POST shops/callback' do
-    let!(:shop) { create(:shop, plan_name: 'trial', shopify_domain: 'pluginbackup-dev.myshopify.com') }
+    let!(:shop) { create(:shop, shopify_plan: 'trial', shopify_domain: 'pluginbackup-dev.myshopify.com') }
 
     let(:url) { '/shops/callback' }
     let(:params) do
@@ -21,7 +21,7 @@ RSpec.describe 'Shop', type: :request do
 
     it 'updates user plan name' do
       post url, params: params
-      expect(shop.reload.plan_name).to eql 'affiliate'
+      expect(shop.reload.shopify_plan).to eql 'affiliate'
     end
   end
 end

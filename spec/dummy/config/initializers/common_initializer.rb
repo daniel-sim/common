@@ -9,7 +9,7 @@ PR::Common.configure do |config|
       key: :staff_business_free,
       price: 0,
       trial_days: 0,
-      plan_name: "staff_business",
+      shopify_plan: "staff_business",
       name: "Staff Business",
       terms: "Staff Business terms"
     },
@@ -17,7 +17,7 @@ PR::Common.configure do |config|
       key: :affiliate_free,
       price: 0,
       trial_days: 0,
-      plan_name: "affiliate",
+      shopify_plan: "affiliate",
       name: "Affiliate",
       terms: "Affiliate terms"
     },

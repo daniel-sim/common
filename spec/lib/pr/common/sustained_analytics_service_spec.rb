@@ -3,7 +3,7 @@ require "rails_helper"
 describe PR::Common::SustainedAnalyticsService do
   subject(:service) { described_class.new(shop) }
 
-  let!(:shop) { create(:shop, :with_user, plan_name: "basic", charged_at: current_time) }
+  let!(:shop) { create(:shop, :with_user, shopify_plan: "basic", charged_at: current_time) }
   let(:current_time_period) { shop.current_time_period }
   let(:current_time) { Time.zone.local(2018, 1, 14, 0, 0, 1) }
 

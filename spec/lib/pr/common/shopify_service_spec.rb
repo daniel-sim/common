@@ -7,14 +7,14 @@ describe PR::Common::ShopifyService do
 
   describe "#determine_price" do
     context "when shop has a plan whose pricing is defined" do
-      before { shop.update!(plan_name: "affiliate") }
+      before { shop.update!(shopify_plan: "affiliate") }
 
       it "returns the defined price" do
         expected_price = {
           key: :affiliate_free,
           price: 0,
           trial_days: 0,
-          plan_name: "affiliate",
+          shopify_plan: "affiliate",
           name: "Affiliate",
           terms: "Affiliate terms"
         }
@@ -24,7 +24,7 @@ describe PR::Common::ShopifyService do
     end
 
     context "when shop has no plan whose pricing is defined" do
-      before { shop.update!(plan_name: "foobar") }
+      before { shop.update!(shopify_plan: "foobar") }
 
       it "returns the pricing plan without a plan name" do
         expected_price = {
@@ -52,10 +52,10 @@ describe PR::Common::ShopifyService do
       context "where error is a 402" do
         let(:code) { 402 }
 
-        it "sets plan_name to frozen" do
-          expect(shop.plan_name).to eq "affiliate"
+        it "sets shopify_plan to frozen" do
+          expect(shop.shopify_plan).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq "frozen"
+          expect(shop.reload.shopify_plan).to eq "frozen"
         end
       end
 
@@ -63,19 +63,19 @@ describe PR::Common::ShopifyService do
         let(:code) { 404 }
 
         context "when shop is an affiliate" do
-          it "sets plan_name to cancelled" do
-            expect(shop.plan_name).to eq "affiliate"
+          it "sets shopify_plan to cancelled" do
+            expect(shop.shopify_plan).to eq "affiliate"
             service.reconcile_with_shopify
-            expect(shop.reload.plan_name).to eq "cancelled"
+            expect(shop.reload.shopify_plan).to eq "cancelled"
           end
         end
 
         context "when shop is not an affiliate" do
-          before { shop.update!(plan_name: "basic") }
+          before { shop.update!(shopify_plan: "basic") }
 
-          it "sets plan_name to cancelled" do
+          it "sets shopify_plan to cancelled" do
             service.reconcile_with_shopify
-            expect(shop.reload.plan_name).to eq "cancelled"
+            expect(shop.reload.shopify_plan).to eq "cancelled"
           end
 
           it "calls track_cancelled" do
@@ -89,20 +89,20 @@ describe PR::Common::ShopifyService do
       context "when error is a 420" do
         let(:code) { 420 }
 
-        it "sets plan_name to 🌲" do
-          expect(shop.plan_name).to eq "affiliate"
+        it "sets shopify_plan to 🌲" do
+          expect(shop.shopify_plan).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq "🌲"
+          expect(shop.reload.shopify_plan).to eq "🌲"
         end
       end
 
       context "when error is a 423" do
         let(:code) { 423 }
 
-        it "sets plan_name to locked" do
-          expect(shop.plan_name).to eq "affiliate"
+        it "sets shopify_plan to locked" do
+          expect(shop.shopify_plan).to eq "affiliate"
           service.reconcile_with_shopify
-          expect(shop.reload.plan_name).to eq "locked"
+          expect(shop.reload.shopify_plan).to eq "locked"
         end
       end
     end
@@ -180,7 +180,7 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         event: "Shop Handed Off",
         properties: {
-          plan_name: "enterprise",
+          shopify_plan: "enterprise",
           email: shop.user.email
         }
       }

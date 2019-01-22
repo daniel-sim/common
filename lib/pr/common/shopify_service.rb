@@ -10,12 +10,12 @@ module PR
         @user.update(email: email)
       end
 
-      def update_shop(plan_name:, uninstalled:)
+      def update_shop(shopify_plan:, uninstalled:)
         maybe_reinstall_or_uninstall(uninstalled)
-        maybe_reopen(plan_name)
-        maybe_hand_off_or_cancel(plan_name)
+        maybe_reopen(shopify_plan)
+        maybe_hand_off_or_cancel(shopify_plan)
 
-        @shop.assign_attributes(plan_name: plan_name, uninstalled: uninstalled)
+        @shop.assign_attributes(shopify_plan: shopify_plan, uninstalled: uninstalled)
         @user.save! if @user.present?
         @shop.save!
       end
@@ -34,8 +34,8 @@ module PR
         end
       end
 
-      def maybe_reopen(plan_name)
-        return unless newly_reopened?(plan_name)
+      def maybe_reopen(shopify_plan)
+        return unless newly_reopened?(shopify_plan)
 
         track_reopened
         # TODO: convert to TimePeriod change
@@ -43,12 +43,12 @@ module PR
         @user.charged_at = nil
       end
 
-      def maybe_hand_off_or_cancel(plan_name)
-        if handed_off?(plan_name)
-          track_handed_off(plan_name)
+      def maybe_hand_off_or_cancel(shopify_plan)
+        if handed_off?(shopify_plan)
+          track_handed_off(shopify_plan)
 
           @user.active_charge = true
-        elsif cancelled?(plan_name)
+        elsif cancelled?(shopify_plan)
           track_cancelled
         end
       end
@@ -62,18 +62,18 @@ module PR
       end
 
       # Cancelled -> something else
-      def newly_reopened?(plan_name)
-        @shop.cancelled? && plan_name != ::Shop::PLAN_CANCELLED
+      def newly_reopened?(shopify_plan)
+        @shop.cancelled? && shopify_plan != ::Shop::PLAN_CANCELLED
       end
 
       # Handoff means that the plan goes from "affiliate" to "frozen"
-      def handed_off?(plan_name)
-        @shop.affiliate? && plan_name == ::Shop::PLAN_FROZEN
+      def handed_off?(shopify_plan)
+        @shop.affiliate? && shopify_plan == ::Shop::PLAN_FROZEN
       end
 
       # Shop was not previously cancelled but is now
-      def cancelled?(plan_name)
-        !@shop.cancelled? && plan_name == ::Shop::PLAN_CANCELLED
+      def cancelled?(shopify_plan)
+        !@shop.cancelled? && shopify_plan == ::Shop::PLAN_CANCELLED
       end
 
       def track_reopened
@@ -94,7 +94,7 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: @user.shop.plan_name
+            shopify_plan: @user.shop.shopify_plan
           }
         )
       end
@@ -111,7 +111,7 @@ module PR
           properties: {
             activeCharge: @user.has_active_charge?,
             email: @user.email,
-            shopify_plan: shop.plan_name,
+            shopify_plan: shop.shopify_plan,
             subscription_length: @user.subscription_length,
             current_days_installed: current_time_period.lapsed_days,
             total_days_installed: shop.total_days_installed,
@@ -123,12 +123,12 @@ module PR
         )
       end
 
-      def track_handed_off(plan_name)
+      def track_handed_off(shopify_plan)
         Analytics.track(
           user_id: @user.id,
           event: "Shop Handed Off",
           properties: {
-            plan_name: plan_name,
+            shopify_plan: shopify_plan,
             email: @user.email
           }
         )
@@ -161,7 +161,7 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: @user.shop.plan_name
+            shopify_plan: @user.shop.shopify_plan
           }
         )
       end
@@ -172,20 +172,20 @@ module PR
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           begin
             shopify_shop = ShopifyAPI::Shop.current
-            update_shop(plan_name: shopify_shop.plan_name, uninstalled: false)
+            update_shop(shopify_plan: shopify_shop.plan_name, uninstalled: false)
           rescue ActiveResource::UnauthorizedAccess => e
             # we no longer have access to the shop- app uninstalled
-            update_shop(plan_name: @shop.plan_name, uninstalled: true)
+            update_shop(shopify_plan: @shop.shopify_plan, uninstalled: true)
             success = false
           rescue ActiveResource::ClientError => e
             if e.response.code.to_s == '402'
-              update_shop(plan_name: Shop::PLAN_FROZEN, uninstalled: false)
+              update_shop(shopify_plan: Shop::PLAN_FROZEN, uninstalled: false)
             elsif e.response.code.to_s == '404'
-              update_shop(plan_name: Shop::PLAN_CANCELLED, uninstalled: false)
+              update_shop(shopify_plan: Shop::PLAN_CANCELLED, uninstalled: false)
             elsif e.response.code.to_s == '420'
-              update_shop(plan_name: '🌲', uninstalled: false)
+              update_shop(shopify_plan: '🌲', uninstalled: false)
             elsif e.response.code.to_s == '423'
-              update_shop(plan_name: Shop::PLAN_LOCKED, uninstalled: false)
+              update_shop(shopify_plan: Shop::PLAN_LOCKED, uninstalled: false)
             end
           end
           ShopifyAPI::Base.clear_session
@@ -194,14 +194,14 @@ module PR
         return success
       end
 
-      def determine_price(plan_name: @shop.plan_name)
+      def determine_price(shopify_plan: @shop.shopify_plan)
         # List prices in ascending order in config
         pricing = PR::Common.config.pricing
 
         best_price = pricing.last
 
         pricing.each do |price|
-          best_price = price if price[:plan_name] == plan_name
+          best_price = price if price[:shopify_plan] == shopify_plan
         end
 
         best_price

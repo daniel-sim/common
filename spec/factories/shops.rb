@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :shop do
     sequence(:shopify_domain) { |n| "shop#{n}" }
     shopify_token { "MyString" }
-    plan_name { "affiliate" }
+    shopify_plan { "affiliate" }
     uninstalled { false }
 
     trait :uninstalled do
@@ -10,11 +10,11 @@ FactoryBot.define do
     end
 
     trait :cancelled do
-      plan_name { "cancelled" }
+      shopify_plan { "cancelled" }
     end
 
     trait :frozen do
-      plan_name { "frozen" }
+      shopify_plan { "frozen" }
     end
 
     trait :with_user do
