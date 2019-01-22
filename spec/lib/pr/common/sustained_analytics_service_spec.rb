@@ -43,7 +43,8 @@ describe PR::Common::SustainedAnalyticsService do
               traits: {
                 currentPeriodsPaid: 1,
                 totalPeriodsPaid: 1,
-                currentMonthlyUsd: 10.0,
+                monthlyUsd: 10.0,
+                currentUsdPaid: 10.0,
                 totalUsdPaid: 10.0
               }
             )
@@ -60,7 +61,8 @@ describe PR::Common::SustainedAnalyticsService do
                 email: shop.user.email,
                 current_periods_paid: 1,
                 total_periods_paid: 1,
-                current_monthly_usd: 10.0,
+                monthly_usd: 10.0,
+                current_usd_paid: 10.0,
                 total_usd_paid: 10.0
               }
             )
