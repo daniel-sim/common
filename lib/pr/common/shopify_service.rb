@@ -101,13 +101,22 @@ module PR
       def track_uninstalled
         return if @user.blank?
 
+        shop = @user.shop
+        current_time_period = shop.current_time_period
+
         Analytics.track(
           user_id: @user.id,
           event: "App Uninstalled",
           properties: {
             activeCharge: @user.has_active_charge?,
             email: @user.email,
-            subscription_length: @user.subscription_length
+            subscription_length: @user.subscription_length,
+            current_days_installed: current_time_period.lapsed_days,
+            total_days_installed: shop.total_days_installed,
+            current_periods_paid: current_time_period.periods_paid,
+            total_periods_paid: shop.total_periods_paid,
+            current_monthly_usd: current_time_period.monthly_usd.to_f,
+            total_usd_paid: shop.total_usd_paid.to_f
           }
         )
       end
@@ -124,11 +133,21 @@ module PR
       end
 
       def track_cancelled
+        shop = @user.shop
+        current_time_period = shop.current_time_period
+
         Analytics.track(
           user_id: @user.id,
           event: "Shop Closed",
           properties: {
-            subscription_length: @user.subscription_length
+            email: @user.email,
+            subscription_length: @user.subscription_length,
+            current_days_installed: current_time_period.lapsed_days,
+            total_days_installed: shop.total_days_installed,
+            current_periods_paid: current_time_period.periods_paid,
+            total_periods_paid: shop.total_periods_paid,
+            current_monthly_usd: current_time_period.monthly_usd.to_f,
+            total_usd_paid: shop.total_usd_paid.to_f
           }
         )
       end
