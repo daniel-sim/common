@@ -134,13 +134,14 @@ describe PR::Common::ShopifyService do
         event: "App Reinstalled",
         properties: {
           "registration method": "shopify",
-          email: shop.user.email
+          email: shop.user.email,
+          shopify_plan: "affiliate"
         }
       }
     end
 
     it "sends an 'App Reinstalled' analytic" do
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_reinstalled
     end
@@ -154,6 +155,7 @@ describe PR::Common::ShopifyService do
         properties: {
           activeCharge: shop.user.has_active_charge?,
           email: shop.user.email,
+          shopify_plan: "affiliate",
           current_days_installed: shop.current_time_period.lapsed_days,
           subscription_length: shop.user.subscription_length,
           total_days_installed: shop.total_days_installed,
@@ -223,13 +225,14 @@ describe PR::Common::ShopifyService do
         event: "App Installed",
         properties: {
           "registration method": "shopify",
-          email: shop.user.email
+          email: shop.user.email,
+          shopify_plan: "affiliate"
         }
       }
     end
 
     it "sends an 'App Reinstalled' analytic" do
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_installed
     end

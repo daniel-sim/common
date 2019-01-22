@@ -1,3 +1,9 @@
+## 22 January 2019 (795f9db36936017ca3302bd802865ce1f0958931)
+- Added `shopify_plan` to App Installed analytic
+- Added `shopify_plan` to App Reinstalled analytic
+- Added `shopify_plan` to Shop Reopened analytic
+- ! Apps require no changes
+
 ## 22 January 2019 (9ae829c0ad21569728185fd4695e16c840c7062c)
 - Added properties to App Uninstalled analytic
 - Added properties to Shop Closed analytic
