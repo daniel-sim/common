@@ -1,3 +1,7 @@
+## 23 January 2019 (d8b93623d6c5994dad2ef7de466564c1e8eff0b1)
+- Fix duplicate analytics, "App Reinstalled", "Shop Closed"
+- ! Apps require no changes
+
 ## 23 January 2019 (988e1fa554ccdd09ff4886baee11cec8d2cdf76d)
 - Add "Shopify Plan Updated" analytic which sends both an identify and a track from
   `ShopifyService#update_shop` when shopify plan changes. Will not send if shopify plan is not
