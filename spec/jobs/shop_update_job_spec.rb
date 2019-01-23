@@ -1,44 +1,49 @@
 require "rails_helper"
 
 describe ShopUpdateJob do
-  let(:shop) { create(:shop, user: build(:user)) }
+  let(:shopify_domain) { "the_domain" }
+  let(:shop) { create(:shop, shopify_domain: shopify_domain, user: build(:user)) }
+  let(:service) { PR::Common::ShopifyService.new(shop: shop) }
+  let(:plan) { "the_plan" }
+  let(:email) { "jamie@pluginuseful.com" }
 
-  before { allow(Analytics).to receive(:flush) }
+  before do
+    allow(Analytics).to receive(:flush)
+    allow(Shop)
+      .to receive(:find_by)
+      .with(shopify_domain: shopify_domain)
+      .and_return(shop)
+    allow(PR::Common::ShopifyService)
+      .to receive(:new)
+      .with(shop: shop)
+      .and_return(service)
+  end
 
   describe "#perform" do
-    context "when shopify_plan of the shop has changed to frozen" do
-      it "sends a 'Shop Handed Off' analytic" do
-        analytic_params = {
-          user_id: shop.user.id,
-          event: "Shop Handed Off",
-          properties: {
-            email: shop.user.email,
-            shopify_plan: "frozen"
-          }
+    it "calls out to PR::Common::ShopifyService#update_shop" do
+      expect(service)
+        .to receive(:update_shop)
+        .with(shopify_plan: plan, uninstalled: false)
+
+      described_class.perform_now(
+        shop_domain: shopify_domain,
+        webhook: {
+          plan_name: plan
         }
-
-        expect(Analytics).to receive(:track).with(analytic_params)
-
-        described_class.perform_now(
-          shop_domain: shop.shopify_domain,
-          webhook: {
-            plan_name: "frozen"
-          }
-        )
-      end
+      )
     end
 
-    context "when shopify_plan of the shop has not changed" do
-      it "does not send an analytic" do
-        expect(Analytics).not_to receive(:track)
+    it "calls out to PR::Common::ShopifyService#update_user" do
+      expect(service)
+        .to receive(:update_user)
+        .with(email: email)
 
-        described_class.perform_now(
-          shop_domain: shop.shopify_domain,
-          webhook: {
-            plan_name: shop.shopify_plan
-          }
-        )
-      end
+      described_class.perform_now(
+        shop_domain: shopify_domain,
+        webhook: {
+          email: email
+        }
+      )
     end
   end
 end
