@@ -106,7 +106,8 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
-                monthlyUsd: 10.0,
+                trial: false,
+               monthlyUsd: 10.0,
                 appPlan: "generic"
               }
             )

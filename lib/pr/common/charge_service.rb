@@ -70,11 +70,13 @@ module PR
       end
 
       def send_charge_activated_analytics(app_plan, price)
+        # This currently assumes that all paying users have a trial first.
         Analytics.identify(
           user_id: @user.id,
           traits: {
             appPlan: app_plan,
-            monthlyUsd: price
+            monthlyUsd: price,
+            trial: price.positive?
           }
         )
 

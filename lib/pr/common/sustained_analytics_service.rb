@@ -74,6 +74,7 @@ class PR::Common::SustainedAnalyticsService
     Analytics.identify(
       user_id: @user.id,
       traits: {
+        trial: false,
         monthlyUsd: @current_time_period.monthly_usd,
         appPlan: @shop.app_plan
       }

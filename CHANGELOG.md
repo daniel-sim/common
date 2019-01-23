@@ -1,3 +1,7 @@
+## 23 January 2019 (be512725f9b7cb4af2d31abbb4de476d33fcea8d)
+- Add `trial` to `identify` analytics when charge activated and converted to paid
+- ! Apps require no changes
+-
 ## 22 January 2019 (768c1d3639eb0a2b73663edc17a5a1dd730c0a3f)
 - Add `Shop.status`
 - Add `appPlan` and `app_plan` to Charge Activated analytic
