@@ -102,7 +102,8 @@ describe PR::Common::ChargeService do
         let(:fake_recurring_application_charge) { OpenStruct.new(cancel: true) }
 
         before do
-          allow(ShopifyAPI::RecurringApplicationCharge).to receive(:current)
+          allow(ShopifyAPI::RecurringApplicationCharge)
+            .to receive(:current)
             .and_return fake_recurring_application_charge
         end
 

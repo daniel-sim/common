@@ -32,6 +32,20 @@ describe PR::Common::UserService do
         expect(created_user.shop_id).to eq shop.id
         expect(created_user.email).to eq "jamie@pluginuseful.com"
       end
+
+      it "tracks installation via ShopifyService" do
+        shopify_service = PR::Common::ShopifyService.new(shop: shop)
+
+        allow(PR::Common::ShopifyService)
+          .to receive(:new)
+          .with(shop: shop)
+          .and_return(shopify_service)
+
+        expect(shopify_service)
+          .to receive(:track_installed)
+
+        created_user
+      end
     end
   end
 end

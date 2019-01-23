@@ -2,7 +2,7 @@ module PR
   module Common
     class UserService
       def find_or_create_user_by_shopify(email:, shop:, referrer: nil)
-        find_shopify_user(email: email, shop: shop, referrer: referrer) ||
+        find_shopify_user(shop: shop, referrer: referrer) ||
           create_shopify_user(email: email, shop: shop, referrer: referrer)
       end
 
@@ -20,21 +20,18 @@ module PR
         )
 
         identify(user, referrer)
-
         track_install(user)
 
         user
       end
 
-      def find_shopify_user(email:, shop:, referrer:)
+      def find_shopify_user(shop:, referrer:)
         user = User.find_by(username: "shopify-#{shop.shopify_domain}", provider: "shopify")
 
-        return if user.blank?
+        user || return
+        return unless user
 
         identify(user, referrer)
-
-        maybe_reinstall(user)
-        maybe_reopen(user)
 
         user
       end
@@ -56,14 +53,6 @@ module PR
 
       def track_install(user)
         ShopifyService.new(shop: user.shop).track_installed
-      end
-
-      def maybe_reinstall(user)
-        ShopifyService.new(shop: user.shop).maybe_reinstall_or_uninstall(false)
-      end
-
-      def maybe_reopen(user)
-        ShopifyService.new(shop: user.shop).maybe_reopen(user.shop.shopify_plan)
       end
     end
   end
