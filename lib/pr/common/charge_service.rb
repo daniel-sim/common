@@ -76,7 +76,7 @@ module PR
           traits: {
             appPlan: app_plan,
             monthlyUsd: price,
-            trial: price.positive?
+            trial: price.to_f.positive?
           }
         )
 
