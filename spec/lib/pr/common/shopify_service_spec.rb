@@ -108,6 +108,61 @@ describe PR::Common::ShopifyService do
     end
   end
 
+  describe "#maybe_update_shopify_plan" do
+    context "when shopify plan is unchanged" do
+      it "does not track shopify plan updated" do
+        expect(service).not_to receive(:track_shopify_plan_updated)
+
+        service.maybe_update_shopify_plan(shop.shopify_plan)
+      end
+    end
+
+    context "when existing shopify plan is not set" do
+      it "does not track shopify plan updated" do
+        shop.update!(shopify_plan: nil)
+
+        expect(service).not_to receive(:track_shopify_plan_updated)
+
+        service.maybe_update_shopify_plan("foo")
+      end
+    end
+
+    context "when existing shopify plan differs" do
+      it "tracks shopify plan updated" do
+        shop.update!(shopify_plan: "foo")
+
+        expect(service).to receive(:track_shopify_plan_updated).with("bar")
+
+        service.maybe_update_shopify_plan("bar")
+      end
+    end
+  end
+
+  describe "#track_shopify_plan_updated" do
+    it "sends an identify analytic" do
+      expect(Analytics).to receive(:identify).with(
+        user_id: shop.user.id,
+        traits: {
+          shopifyPlan: "foo"
+        }
+      )
+      service.track_shopify_plan_updated("foo")
+    end
+
+    it "sends an track analytic" do
+      expect(Analytics).to receive(:track).with(
+        user_id: shop.user.id,
+        event: "Shopify Plan Updated",
+        properties: {
+          email: shop.user.email,
+          pre_shopify_plan: shop.shopify_plan,
+          post_shopify_plan: "foo"
+        }
+      )
+      service.track_shopify_plan_updated("foo")
+    end
+  end
+
   describe "#track_reopened" do
     it "sends an identify analytic" do
       analytic_params = {

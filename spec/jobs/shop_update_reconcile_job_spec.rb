@@ -17,10 +17,24 @@ describe ShopUpdateReconcileJob do
   context "when shopify_plan changes from affiliate to frozen" do
     before do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "frozen"))
+      allow(Analytics).to receive(:track).with(updated_plan_params)
+      allow(Analytics).to receive(:track).with(handed_off_params)
     end
 
-    it "sends a 'Shop Handed Off' analytic" do
-      analytic_params = {
+    let(:updated_plan_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shopify Plan Updated",
+        properties: {
+          email: shop.user.email,
+          pre_shopify_plan: "affiliate",
+          post_shopify_plan: "frozen"
+        }
+      }
+    end
+
+    let(:handed_off_params) do
+      {
         user_id: shop.user.id,
         event: "Shop Handed Off",
         properties: {
@@ -28,8 +42,16 @@ describe ShopUpdateReconcileJob do
           shopify_plan: "frozen"
         }
       }
+    end
 
-      expect(Analytics).to receive(:track).with(analytic_params)
+    it "sends a 'Shopify Plan Updated' analytic" do
+      expect(Analytics).to receive(:track).with(updated_plan_params)
+
+      described_class.perform_now(shop.id)
+    end
+
+    it "sends a 'Shop Handed Off' analytic" do
+      expect(Analytics).to receive(:track).with(handed_off_params)
 
       described_class.perform_now(shop.id)
     end
@@ -44,13 +66,45 @@ describe ShopUpdateReconcileJob do
   context "when shopify_plan changes from affiliate to something other than frozen" do
     before do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: "enterprise"))
+      allow(Analytics).to receive(:track).with(updated_plan_params)
+      allow(Analytics).to receive(:track).with(handed_off_params)
     end
 
-    it "does not send an analytic" do
-      expect(Analytics).not_to receive(:track)
+    let(:updated_plan_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shopify Plan Updated",
+        properties: {
+          email: shop.user.email,
+          pre_shopify_plan: "affiliate",
+          post_shopify_plan: "enterprise"
+        }
+      }
+    end
+
+    let(:handed_off_params) do
+      {
+        user_id: shop.user.id,
+        event: "Shop Handed Off",
+        properties: {
+          email: shop.user.email,
+          shopify_plan: "enterprise"
+        }
+      }
+    end
+
+    it "sends a 'Shopify Plan Updated' analytic" do
+      expect(Analytics).to receive(:track).with(updated_plan_params)
 
       described_class.perform_now(shop.id)
     end
+
+    it "does not send a 'Shop Handed Off' analytic" do
+      expect(Analytics).not_to receive(:track).with(handed_off_params)
+
+      described_class.perform_now(shop.id)
+    end
+
 
     it "calls out to SustainedAnalyticsService" do
       expect(sustained_analytics_service).to receive(:perform)
@@ -65,7 +119,7 @@ describe ShopUpdateReconcileJob do
       allow(ShopifyAPI::Shop).to receive(:current).and_return(OpenStruct.new(plan_name: shop.shopify_plan))
     end
 
-    it "does not send an analytic" do
+    it "does not send any analytics" do
       expect(Analytics).not_to receive(:track)
 
       described_class.perform_now(shop.id)

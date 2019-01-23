@@ -11,6 +11,7 @@ module PR
       end
 
       def update_shop(shopify_plan:, uninstalled:)
+        maybe_update_shopify_plan(shopify_plan)
         maybe_reinstall_or_uninstall(uninstalled)
         maybe_reopen(shopify_plan)
         maybe_hand_off_or_cancel(shopify_plan)
@@ -41,6 +42,32 @@ module PR
         # TODO: convert to TimePeriod change
         # @shop.reopened_at = Time.current
         @user.charged_at = nil
+      end
+
+      def maybe_update_shopify_plan(shopify_plan)
+        return unless @shop.shopify_plan
+        return unless shopify_plan_differs?(shopify_plan)
+
+        track_shopify_plan_updated(shopify_plan)
+      end
+
+      def track_shopify_plan_updated(shopify_plan)
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            shopifyPlan: shopify_plan
+          }
+        )
+
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shopify Plan Updated",
+          properties: {
+            email: @user.email,
+            pre_shopify_plan: @shop.shopify_plan,
+            post_shopify_plan: shopify_plan
+          }
+        )
       end
 
       def maybe_hand_off_or_cancel(shopify_plan)
@@ -267,6 +294,13 @@ module PR
 
         best_price
       end
+
+      private
+
+      def shopify_plan_differs?(shopify_plan)
+        shopify_plan.to_s != @shop.shopify_plan.to_s
+      end
+
     end
   end
 end

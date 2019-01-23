@@ -1,7 +1,13 @@
+## 23 January 2019 (988e1fa554ccdd09ff4886baee11cec8d2cdf76d)
+- Add "Shopify Plan Updated" analytic which sends both an identify and a track from
+  `ShopifyService#update_shop` when shopify plan changes. Will not send if shopify plan is not
+  already set to something.
+- ! Apps require no changes
+
 ## 23 January 2019 (be512725f9b7cb4af2d31abbb4de476d33fcea8d)
 - Add `trial` to `identify` analytics when charge activated and converted to paid
 - ! Apps require no changes
--
+
 ## 22 January 2019 (768c1d3639eb0a2b73663edc17a5a1dd730c0a3f)
 - Add `Shop.status`
 - Add `appPlan` and `app_plan` to Charge Activated analytic

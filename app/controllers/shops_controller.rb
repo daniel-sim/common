@@ -1,6 +1,6 @@
 class ShopsController < ApplicationController
   def callback
-    shop = Shop.find_by(shopify_domain: params[:myshopify_domain])
+    shop = Shop.find_by(shopify_domain: shop_params[:myshopify_domain])
 
     PR::Common::ShopifyService
       .new(shop: shop)
@@ -10,6 +10,6 @@ class ShopsController < ApplicationController
   private
 
   def shop_params
-    params.permit(:plan_name)
+    params.permit(:myshopify_domain, :plan_name)
   end
 end
