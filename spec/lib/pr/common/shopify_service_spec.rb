@@ -123,13 +123,13 @@ describe PR::Common::ShopifyService do
 
         expect(service).not_to receive(:track_shopify_plan_updated)
 
-        service.maybe_update_shopify_plan("foo")
+        service.maybe_update_shopify_plan("enterprise")
       end
     end
 
     context "when existing shopify plan differs" do
       it "tracks shopify plan updated" do
-        shop.update!(shopify_plan: "foo")
+        shop.update!(shopify_plan: "enterprise")
 
         expect(service).to receive(:track_shopify_plan_updated).with("bar")
 
@@ -143,10 +143,10 @@ describe PR::Common::ShopifyService do
       expect(Analytics).to receive(:identify).with(
         user_id: shop.user.id,
         traits: {
-          shopifyPlan: "foo"
+          shopifyPlan: "enterprise"
         }
       )
-      service.track_shopify_plan_updated("foo")
+      service.track_shopify_plan_updated("enterprise")
     end
 
     it "sends an track analytic" do
@@ -156,10 +156,10 @@ describe PR::Common::ShopifyService do
         properties: {
           email: shop.user.email,
           pre_shopify_plan: shop.shopify_plan,
-          post_shopify_plan: "foo"
+          post_shopify_plan: "enterprise"
         }
       )
-      service.track_shopify_plan_updated("foo")
+      service.track_shopify_plan_updated("enterprise")
     end
   end
 
@@ -169,13 +169,13 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         traits: {
           status: :active,
-          shopifyPlan: "affiliate"
+          shopifyPlan: "enterprise"
         }
       }
 
       expect(Analytics).to receive(:identify).with(analytic_params)
 
-      service.track_reopened
+      service.track_reopened("enterprise")
     end
 
     it "sends an 'Shop Reopened' track analytic" do
@@ -184,13 +184,14 @@ describe PR::Common::ShopifyService do
         event: "Shop Reopened",
         properties: {
           "registration method": "shopify",
-          email: shop.user.email
+          email: shop.user.email,
+          shopify_plan: "enterprise"
         }
       }
 
-      expect(Analytics).to receive(:track) { analytic_params }
+      expect(Analytics).to receive(:track).with(analytic_params)
 
-      service.track_reopened
+      service.track_reopened("enterprise")
     end
   end
 
@@ -200,13 +201,13 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         traits: {
           status: :active,
-          shopifyPlan: "affiliate"
+          shopifyPlan: "enterprise"
         }
       }
 
       expect(Analytics).to receive(:identify).with(analytic_params)
 
-      service.track_reinstalled
+      service.track_reinstalled("enterprise")
     end
 
     it "sends an 'App Reinstalled' analytic" do
@@ -216,13 +217,13 @@ describe PR::Common::ShopifyService do
         properties: {
           "registration method": "shopify",
           email: shop.user.email,
-          shopify_plan: "affiliate"
+          shopify_plan: "enterprise"
         }
       }
 
       expect(Analytics).to receive(:track).with(analytic_params)
 
-      service.track_reinstalled
+      service.track_reinstalled("enterprise")
     end
   end
 
@@ -357,13 +358,13 @@ describe PR::Common::ShopifyService do
 
       expect(Analytics).to receive(:identify).with(analytic_params)
 
-      service.track_reinstalled
+      service.track_installed
     end
 
-    it "sends an 'App Reinstalled' track analytic" do
+    it "sends an 'App Installed' track analytic" do
       analytic_params = {
         user_id: shop.user.id,
-        event: "App Reinstalled",
+        event: "App Installed",
         properties: {
           "registration method": "shopify",
           email: shop.user.email,
@@ -373,7 +374,7 @@ describe PR::Common::ShopifyService do
 
       expect(Analytics).to receive(:track).with(analytic_params)
 
-      service.track_reinstalled
+      service.track_installed
     end
   end
 end

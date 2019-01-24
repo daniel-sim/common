@@ -12,7 +12,7 @@ module PR
 
       def update_shop(shopify_plan:, uninstalled:)
         maybe_update_shopify_plan(shopify_plan)
-        maybe_reinstall_or_uninstall(uninstalled)
+        maybe_reinstall_or_uninstall(shopify_plan, uninstalled)
         maybe_reopen(shopify_plan)
         maybe_hand_off_or_cancel(shopify_plan)
 
@@ -21,9 +21,9 @@ module PR
         @shop.save!
       end
 
-      def maybe_reinstall_or_uninstall(uninstall)
+      def maybe_reinstall_or_uninstall(shopify_plan, uninstall)
         if newly_reinstalled?(uninstall)
-          track_reinstalled
+          track_reinstalled(shopify_plan)
 
           # TODO: convert to TimePeriod change
           # @shop.reinstalled_at = Time.current
@@ -38,7 +38,7 @@ module PR
       def maybe_reopen(shopify_plan)
         return unless newly_reopened?(shopify_plan)
 
-        track_reopened
+        track_reopened(shopify_plan)
         # TODO: convert to TimePeriod change
         # @shop.reopened_at = Time.current
         @user.charged_at = nil
@@ -103,12 +103,12 @@ module PR
         !@shop.cancelled? && shopify_plan == ::Shop::PLAN_CANCELLED
       end
 
-      def track_reopened
+      def track_reopened(shopify_plan)
         Analytics.identify(
           user_id: @user.id,
           traits: {
             status: :active,
-            shopifyPlan: @user.shop.shopify_plan
+            shopifyPlan: shopify_plan
           }
         )
 
@@ -117,17 +117,18 @@ module PR
           event: "Shop Reopened",
           properties: {
             "registration method": "shopify",
-            email: @user.email
+            email: @user.email,
+            shopify_plan: shopify_plan
           }
         )
       end
 
-      def track_reinstalled
+      def track_reinstalled(shopify_plan)
         Analytics.identify(
           user_id: @user.id,
           traits: {
             status: :active,
-            shopifyPlan: @user.shop.shopify_plan
+            shopifyPlan: shopify_plan
           }
         )
 
@@ -137,7 +138,7 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: @user.shop.shopify_plan
+            shopify_plan: shopify_plan
           }
         )
       end
