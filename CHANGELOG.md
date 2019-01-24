@@ -1,3 +1,7 @@
+# 24 January 2019 (66543d0b69d4d52e4200e1676b43b198012e66d2)
+- Add `shopify_plan` to various installation analytics
+- ! Apps require no changes
+
 ## 23 January 2019 (d8b93623d6c5994dad2ef7de466564c1e8eff0b1)
 - Fix duplicate analytics, "App Reinstalled", "Shop Closed"
 - ! Apps require no changes
@@ -27,6 +31,18 @@
 - ! Apps need to replace `plan_name` with `shopify_plan` in most references.
   ! Be very careful when dealing with webhook params and the Shopify API: these will
     **still use `plan_name`**
+- ! Apps need to *ensure* that in `shopify_app/sessions_controller.rb`, the `callback`
+    method calls this:
+    ```
+    shopify_service = PR::Common::ShopifyService.new(shop: model_shop)
+    shopify_service.update_shop(shopify_plan: api_shop.plan_name, uninstalled: false)
+    ```
+    BEFORE this:
+    ```
+    user_service = PR::Common::UserService.new
+    @user = user_service.find_or_create_user_by_shopify(email: api_shop.email, shop: model_shop, referrer: request.env['affiliate.tag'])
+    ```
+    Otherwise, `shopify_plan` is not set when the user service sends an installed analytic
 
 ## 22 January 2019 (795f9db36936017ca3302bd802865ce1f0958931)
 - Added `shopify_plan` to App Installed analytic
