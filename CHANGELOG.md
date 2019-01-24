@@ -1,4 +1,8 @@
-# 24 January 2019 (66543d0b69d4d52e4200e1676b43b198012e66d2)
+## 24 January 2019 (86ab3300f4cd899674b1c481e2d5242058e65580)
+- Add `appPlan` to identify analytics on install and reinstall
+- ! Apps require no changes
+
+## 24 January 2019 (66543d0b69d4d52e4200e1676b43b198012e66d2)
 - Add `shopify_plan` to various installation analytics
 - ! Apps require no changes
 
