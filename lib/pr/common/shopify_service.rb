@@ -128,7 +128,8 @@ module PR
           user_id: @user.id,
           traits: {
             status: :active,
-            shopifyPlan: shopify_plan
+            shopifyPlan: shopify_plan,
+            appPlan: @shop.app_plan
           }
         )
 
@@ -160,7 +161,7 @@ module PR
             totalPeriodsPaid: shop.total_periods_paid,
             monthlyUsd: current_time_period.monthly_usd.to_f,
             currentUsdPaid: current_time_period.usd_paid.to_f,
-            totalUsdPaid: shop.total_usd_paid.to_f
+            totalUsdPaid: shop.total_usd_paid.to_f,
           }
         )
 
@@ -240,7 +241,8 @@ module PR
           user_id: @user.id,
           traits: {
             status: :active,
-            shopifyPlan: @user.shop.shopify_plan
+            shopifyPlan: @shop.shopify_plan,
+            appPlan: @shop.app_plan
           }
         )
 
