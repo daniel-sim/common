@@ -3,7 +3,7 @@ require "rails_helper"
 describe PR::Common::ShopifyService do
   subject(:service) { described_class.new(shop: shop) }
 
-  let(:shop) { create(:shop, user: build(:user)) }
+  let(:shop) { create(:shop, app_plan: "foobar", user: build(:user)) }
 
   describe "#determine_price" do
     context "when shop has a plan whose pricing is defined" do
@@ -201,7 +201,8 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         traits: {
           status: :active,
-          shopifyPlan: "enterprise"
+          shopifyPlan: "enterprise",
+          appPlan: "foobar"
         }
       }
 
@@ -352,7 +353,8 @@ describe PR::Common::ShopifyService do
         user_id: shop.user.id,
         traits: {
           status: :active,
-          shopifyPlan: "affiliate"
+          shopifyPlan: "affiliate",
+          appPlan: "foobar"
         }
       }
 
