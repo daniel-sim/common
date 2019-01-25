@@ -40,6 +40,28 @@ RSpec.describe Shop, type: :model do
     end
   end
 
+  describe "#app_plan" do
+    context "when it is not set to anything" do
+      it "returns nil" do
+        expect(build(:shop).app_plan).to be_nil
+      end
+    end
+
+    context "when it is not set to anything but a default is set" do
+      before { allow(PR::Common.config).to receive(:default_app_plan).and_return("something") }
+
+      it "returns the default" do
+        expect(build(:shop).app_plan).to eq "something"
+      end
+    end
+
+    context "when it is set" do
+      it "returns the set app_plan" do
+        expect(build(:shop, app_plan: "foo").app_plan).to eq "foo"
+      end
+    end
+  end
+
   describe "#status" do
     it "is :inactive when shop is frozen" do
       expect(build(:shop, shopify_plan: Shop::PLAN_FROZEN).status).to eq :inactive

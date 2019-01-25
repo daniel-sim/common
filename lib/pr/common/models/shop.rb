@@ -74,6 +74,10 @@ module PR
           time_periods.sum(&:usd_paid)
         end
 
+        def app_plan
+          super || PR::Common.config.default_app_plan
+        end
+
         private
 
         def reconcile_time_periods
