@@ -1,3 +1,8 @@
+## 25 January 2019 (4f8b8f4c6b30bb81c2eef8faa89914875b61f8c5)
+- Add a `default_app_plan` setting to config
+- ! Shops that have a default plan with no pricing should set the `default_app_plan`
+  in the common initializer
+
 ## 24 January 2019 (86ab3300f4cd899674b1c481e2d5242058e65580)
 - Add `appPlan` to identify analytics on install and reinstall
 - ! Apps require no changes
