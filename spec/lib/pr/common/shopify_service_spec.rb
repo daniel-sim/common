@@ -207,39 +207,95 @@ describe PR::Common::ShopifyService do
     end
   end
 
-  describe "#track_reinstalled" do
-    it "sends an identify analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        traits: {
-          status: :active,
-          shopifyPlan: "enterprise",
-          appPlan: "foobar"
+  describe "#maybe_reinstall_or_uninstall" do
+    context "when reinstalling" do
+      before { shop.update!(uninstalled: true) }
+
+      it "sends an identify analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: "enterprise",
+            appPlan: nil # this gets reset to default
+          }
         }
-      }
 
-      expect(Analytics).to receive(:identify).with(analytic_params)
+        expect(Analytics).to receive(:identify).with(analytic_params)
 
-      service.track_reinstalled("enterprise")
+        service.maybe_reinstall_or_uninstall("enterprise", false)
+      end
+
+      it "sends an 'App Reinstalled' analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          event: "App Reinstalled",
+          properties: {
+            "registration method": "shopify",
+            email: shop.user.email,
+            shopify_plan: "enterprise"
+          }
+        }
+
+        expect(Analytics).to receive(:track).with(analytic_params)
+
+        service.maybe_reinstall_or_uninstall("enterprise", false)
+      end
     end
 
-    it "sends an 'App Reinstalled' analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        event: "App Reinstalled",
-        properties: {
-          "registration method": "shopify",
-          email: shop.user.email,
-          shopify_plan: "enterprise"
+    context "when uninstalling" do
+      it "sends an identify analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          traits: {
+            status: :uninstalled,
+            subscriptionLength: nil,
+            currentDaysInstalled: shop.current_time_period.lapsed_days,
+            totalDaysInstalled: shop.total_days_installed,
+            currentPeriodsPaid: shop.current_time_period.periods_paid,
+            totalPeriodsPaid: shop.total_periods_paid,
+            monthlyUsd: shop.current_time_period.monthly_usd.to_f,
+            currentUsdPaid: shop.current_time_period.usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
+          }
         }
-      }
+        expect(Analytics).to receive(:identify).with(analytic_params)
 
-      expect(Analytics).to receive(:track).with(analytic_params)
+        service.maybe_reinstall_or_uninstall("enterprise", true)
+      end
 
-      service.track_reinstalled("enterprise")
+      it "sends an 'App Uninstalled' analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          event: "App Uninstalled",
+          properties: {
+            email: shop.user.email,
+            subscription_length: nil,
+            current_days_installed: shop.current_time_period.lapsed_days,
+            total_days_installed: shop.total_days_installed,
+            current_periods_paid: shop.current_time_period.periods_paid,
+            total_periods_paid: shop.total_periods_paid,
+            monthly_usd: shop.current_time_period.monthly_usd.to_f,
+            current_usd_paid: shop.current_time_period.usd_paid.to_f,
+            total_usd_paid: shop.total_usd_paid.to_f
+          }
+        }
+
+        expect(Analytics).to receive(:track).with(analytic_params)
+
+        service.maybe_reinstall_or_uninstall("enterprise", true)
+      end
+    end
+
+    context "when neither uninstalling or reinstalling" do
+      it "does not send any analytics" do
+        expect(Analytics).not_to receive(:track)
+        expect(Analytics).not_to receive(:identify)
+
+        service.maybe_reinstall_or_uninstall("enterprise", false)
+      end
     end
   end
-
 
   describe "#track_shopify_plan_updated" do
     it "sends an identify analytic" do
@@ -263,50 +319,6 @@ describe PR::Common::ShopifyService do
         }
       )
       service.track_shopify_plan_updated("enterprise")
-    end
-  end
-
-  describe "#track_uninstalled" do
-    it "sends an identify analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        traits: {
-          status: :uninstalled,
-          subscriptionLength: nil,
-          currentDaysInstalled: shop.current_time_period.lapsed_days,
-          totalDaysInstalled: shop.total_days_installed,
-          currentPeriodsPaid: shop.current_time_period.periods_paid,
-          totalPeriodsPaid: shop.total_periods_paid,
-          monthlyUsd: shop.current_time_period.monthly_usd.to_f,
-          currentUsdPaid: shop.current_time_period.usd_paid.to_f,
-          totalUsdPaid: shop.total_usd_paid.to_f
-        }
-      }
-      expect(Analytics).to receive(:identify).with(analytic_params)
-
-      service.track_uninstalled
-    end
-
-    it "sends an 'App Uninstalled' analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        event: "App Uninstalled",
-        properties: {
-          email: shop.user.email,
-          subscription_length: nil,
-          current_days_installed: shop.current_time_period.lapsed_days,
-          total_days_installed: shop.total_days_installed,
-          current_periods_paid: shop.current_time_period.periods_paid,
-          total_periods_paid: shop.total_periods_paid,
-          monthly_usd: shop.current_time_period.monthly_usd.to_f,
-          current_usd_paid: shop.current_time_period.usd_paid.to_f,
-          total_usd_paid: shop.total_usd_paid.to_f
-        }
-      }
-
-      expect(Analytics).to receive(:track).with(analytic_params)
-
-      service.track_uninstalled
     end
   end
 
