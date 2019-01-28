@@ -3,7 +3,8 @@ require "rails_helper"
 describe PR::Common::ShopifyService do
   subject(:service) { described_class.new(shop: shop) }
 
-  let(:shop) { create(:shop, app_plan: "foobar", user: build(:user)) }
+  let(:user) { build(:user) }
+  let(:shop) { create(:shop, app_plan: "foobar", user: user) }
 
   describe "#determine_price" do
     context "when shop has a plan whose pricing is defined" do
@@ -138,60 +139,71 @@ describe PR::Common::ShopifyService do
     end
   end
 
-  describe "#track_shopify_plan_updated" do
-    it "sends an identify analytic" do
-      expect(Analytics).to receive(:identify).with(
-        user_id: shop.user.id,
-        traits: {
-          shopifyPlan: "enterprise"
+  describe "#maybe_reopen" do
+    context "when shop goes from cancelled to another plan" do
+      before { shop.update!(shopify_plan: Shop::PLAN_CANCELLED) }
+
+      it "resets charged_at to current time" do
+        # This is a smelly test as we don't want to actually update the charged_at, but
+        # only set it, as `update_shop` should handle saving.
+        # Consider refactoring to test using `update_shop`.
+        allow(User).to receive_message_chain("shopify.find_by").and_return(user)
+
+        Timecop.freeze do
+          expect(user).to receive(:charged_at=).with(Time.current)
+
+          service.maybe_reopen("business")
+        end
+      end
+
+      it "sends an identify analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: "enterprise"
+          }
         }
-      )
-      service.track_shopify_plan_updated("enterprise")
+
+        expect(Analytics).to receive(:identify).with(analytic_params)
+
+        service.maybe_reopen("enterprise")
+      end
+
+      it "sends an 'Shop Reopened' track analytic" do
+        analytic_params = {
+          user_id: shop.user.id,
+          event: "Shop Reopened",
+          properties: {
+            "registration method": "shopify",
+            email: shop.user.email,
+            shopify_plan: "enterprise"
+          }
+        }
+
+        expect(Analytics).to receive(:track).with(analytic_params)
+
+        service.maybe_reopen("enterprise")
+      end
     end
 
-    it "sends an track analytic" do
-      expect(Analytics).to receive(:track).with(
-        user_id: shop.user.id,
-        event: "Shopify Plan Updated",
-        properties: {
-          email: shop.user.email,
-          pre_shopify_plan: shop.shopify_plan,
-          post_shopify_plan: "enterprise"
-        }
-      )
-      service.track_shopify_plan_updated("enterprise")
-    end
-  end
+    context "when shop is not cancelled" do
+      it "does not change charged_at" do
+        # This is a smelly test as we don't want to actually update the charged_at, but
+        # only set it, as `update_shop` should handle saving.
+        # Consider refactoring to test using `update_shop`.
+        allow(User).to receive_message_chain("shopify.find_by").and_return(user)
 
-  describe "#track_reopened" do
-    it "sends an identify analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        traits: {
-          status: :active,
-          shopifyPlan: "enterprise"
-        }
-      }
+        expect(user).not_to receive(:charged_at=)
+        service.maybe_reopen("business")
+      end
 
-      expect(Analytics).to receive(:identify).with(analytic_params)
+      it "does not send any analytics" do
+        expect(Analytics).not_to receive(:track)
+        expect(Analytics).not_to receive(:identify)
 
-      service.track_reopened("enterprise")
-    end
-
-    it "sends an 'Shop Reopened' track analytic" do
-      analytic_params = {
-        user_id: shop.user.id,
-        event: "Shop Reopened",
-        properties: {
-          "registration method": "shopify",
-          email: shop.user.email,
-          shopify_plan: "enterprise"
-        }
-      }
-
-      expect(Analytics).to receive(:track).with(analytic_params)
-
-      service.track_reopened("enterprise")
+        service.maybe_reopen("enterprise")
+      end
     end
   end
 
@@ -225,6 +237,32 @@ describe PR::Common::ShopifyService do
       expect(Analytics).to receive(:track).with(analytic_params)
 
       service.track_reinstalled("enterprise")
+    end
+  end
+
+
+  describe "#track_shopify_plan_updated" do
+    it "sends an identify analytic" do
+      expect(Analytics).to receive(:identify).with(
+        user_id: shop.user.id,
+        traits: {
+          shopifyPlan: "enterprise"
+        }
+      )
+      service.track_shopify_plan_updated("enterprise")
+    end
+
+    it "sends an track analytic" do
+      expect(Analytics).to receive(:track).with(
+        user_id: shop.user.id,
+        event: "Shopify Plan Updated",
+        properties: {
+          email: shop.user.email,
+          pre_shopify_plan: shop.shopify_plan,
+          post_shopify_plan: "enterprise"
+        }
+      )
+      service.track_shopify_plan_updated("enterprise")
     end
   end
 

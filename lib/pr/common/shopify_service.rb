@@ -25,8 +25,6 @@ module PR
         if newly_reinstalled?(uninstall)
           track_reinstalled(shopify_plan)
 
-          # TODO: convert to TimePeriod change
-          # @shop.reinstalled_at = Time.current
           @user.charged_at = nil
         elsif newly_uninstalled?(uninstall)
           track_uninstalled
@@ -39,9 +37,7 @@ module PR
         return unless newly_reopened?(shopify_plan)
 
         track_reopened(shopify_plan)
-        # TODO: convert to TimePeriod change
-        # @shop.reopened_at = Time.current
-        @user.charged_at = nil
+        @user.charged_at = Time.current
       end
 
       def maybe_update_shopify_plan(shopify_plan)
