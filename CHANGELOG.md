@@ -1,3 +1,7 @@
+## 28 January 2019 (8d387a6b5acba401405d8e934d67c244ea5883c1)
+- `charged_at` of user is now set to the current time when shop is reopened
+- ! Apps require no changes
+
 ## 25 January 2019 (4f8b8f4c6b30bb81c2eef8faa89914875b61f8c5)
 - Add a `default_app_plan` setting to config
 - ! Shops that have a default plan with no pricing should set the `default_app_plan`
