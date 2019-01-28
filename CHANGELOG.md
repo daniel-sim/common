@@ -1,3 +1,8 @@
+## 28 January 2019 (f0239b5fdb4bc6f30532e4296b485e0b10f3a8a6)
+- Reset shop `app_plan` when reinstalling
+- Made various ShopifyService methods private
+- ! Apps require no changes
+
 ## 28 January 2019 (8d387a6b5acba401405d8e934d67c244ea5883c1)
 - `charged_at` of user is now set to the current time when shop is reopened
 - ! Apps require no changes

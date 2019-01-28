@@ -23,6 +23,7 @@ module PR
 
       def maybe_reinstall_or_uninstall(shopify_plan, uninstall)
         if newly_reinstalled?(uninstall)
+          @shop.app_plan = nil
           track_reinstalled(shopify_plan)
 
           @user.charged_at = nil
@@ -98,6 +99,124 @@ module PR
       def cancelled?(shopify_plan)
         !@shop.cancelled? && shopify_plan == ::Shop::PLAN_CANCELLED
       end
+
+      def track_cancelled
+        shop = @user.shop
+        current_time_period = shop.current_time_period
+
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :inactive,
+            subscriptionLength: @user.subscription_length,
+            currentDaysInstalled: current_time_period.lapsed_days,
+            totalDaysInstalled: shop.total_days_installed,
+            currentPeriodsPaid: current_time_period.periods_paid,
+            totalPeriodsPaid: shop.total_periods_paid,
+            monthlyUsd: current_time_period.monthly_usd.to_f,
+            currentUsdPaid: current_time_period.usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
+          }
+        )
+
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shop Closed",
+          properties: {
+            email: @user.email,
+            subscription_length: @user.subscription_length,
+            current_days_installed: current_time_period.lapsed_days,
+            total_days_installed: shop.total_days_installed,
+            current_periods_paid: current_time_period.periods_paid,
+            total_periods_paid: shop.total_periods_paid,
+            monthly_usd: current_time_period.monthly_usd.to_f,
+            current_usd_paid: current_time_period.usd_paid.to_f,
+            total_usd_paid: shop.total_usd_paid.to_f
+          }
+        )
+      end
+
+      def track_installed
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            status: :active,
+            shopifyPlan: @shop.shopify_plan,
+            appPlan: @shop.app_plan
+          }
+        )
+
+        Analytics.track(
+          user_id: @user.id,
+          event: "App Installed",
+          properties: {
+            "registration method": "shopify",
+            email: @user.email,
+            shopify_plan: @user.shop.shopify_plan
+          }
+        )
+      end
+
+      def determine_price(shopify_plan: @shop.shopify_plan)
+        # List prices in ascending order in config
+        pricing = PR::Common.config.pricing
+
+        best_price = pricing.last
+
+        pricing.each do |price|
+          best_price = price if price[:shopify_plan] == shopify_plan
+        end
+
+        best_price
+      end
+
+      def reconcile_with_shopify
+        success = true
+
+        ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
+          begin
+            shopify_shop = ShopifyAPI::Shop.current
+            update_shop(shopify_plan: shopify_shop.plan_name, uninstalled: false)
+          rescue ActiveResource::UnauthorizedAccess => e
+            # we no longer have access to the shop- app uninstalled
+            update_shop(shopify_plan: @shop.shopify_plan, uninstalled: true)
+            success = false
+          rescue ActiveResource::ClientError => e
+            if e.response.code.to_s == '402'
+              update_shop(shopify_plan: Shop::PLAN_FROZEN, uninstalled: false)
+            elsif e.response.code.to_s == '404'
+              update_shop(shopify_plan: Shop::PLAN_CANCELLED, uninstalled: false)
+            elsif e.response.code.to_s == '420'
+              update_shop(shopify_plan: '🌲', uninstalled: false)
+            elsif e.response.code.to_s == '423'
+              update_shop(shopify_plan: Shop::PLAN_LOCKED, uninstalled: false)
+            end
+          end
+          ShopifyAPI::Base.clear_session
+        end
+
+        return success
+      end
+
+      def track_handed_off(shopify_plan)
+        Analytics.identify(
+          user_id: @user.id,
+          traits: {
+            shopifyPlan: shopify_plan
+          }
+        )
+
+        Analytics.track(
+          user_id: @user.id,
+          event: "Shop Handed Off",
+          properties: {
+            shopify_plan: shopify_plan,
+            email: @user.email
+          }
+        )
+      end
+
+      private
 
       def track_reopened(shopify_plan)
         Analytics.identify(
@@ -178,128 +297,9 @@ module PR
         )
       end
 
-      def track_handed_off(shopify_plan)
-        Analytics.identify(
-          user_id: @user.id,
-          traits: {
-            shopifyPlan: shopify_plan
-          }
-        )
-
-        Analytics.track(
-          user_id: @user.id,
-          event: "Shop Handed Off",
-          properties: {
-            shopify_plan: shopify_plan,
-            email: @user.email
-          }
-        )
-      end
-
-      def track_cancelled
-        shop = @user.shop
-        current_time_period = shop.current_time_period
-
-        Analytics.identify(
-          user_id: @user.id,
-          traits: {
-            status: :inactive,
-            subscriptionLength: @user.subscription_length,
-            currentDaysInstalled: current_time_period.lapsed_days,
-            totalDaysInstalled: shop.total_days_installed,
-            currentPeriodsPaid: current_time_period.periods_paid,
-            totalPeriodsPaid: shop.total_periods_paid,
-            monthlyUsd: current_time_period.monthly_usd.to_f,
-            currentUsdPaid: current_time_period.usd_paid.to_f,
-            totalUsdPaid: shop.total_usd_paid.to_f
-          }
-        )
-
-        Analytics.track(
-          user_id: @user.id,
-          event: "Shop Closed",
-          properties: {
-            email: @user.email,
-            subscription_length: @user.subscription_length,
-            current_days_installed: current_time_period.lapsed_days,
-            total_days_installed: shop.total_days_installed,
-            current_periods_paid: current_time_period.periods_paid,
-            total_periods_paid: shop.total_periods_paid,
-            monthly_usd: current_time_period.monthly_usd.to_f,
-            current_usd_paid: current_time_period.usd_paid.to_f,
-            total_usd_paid: shop.total_usd_paid.to_f
-          }
-        )
-      end
-
-      def track_installed
-        Analytics.identify(
-          user_id: @user.id,
-          traits: {
-            status: :active,
-            shopifyPlan: @shop.shopify_plan,
-            appPlan: @shop.app_plan
-          }
-        )
-
-        Analytics.track(
-          user_id: @user.id,
-          event: "App Installed",
-          properties: {
-            "registration method": "shopify",
-            email: @user.email,
-            shopify_plan: @user.shop.shopify_plan
-          }
-        )
-      end
-
-      def reconcile_with_shopify
-        success = true
-
-        ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
-          begin
-            shopify_shop = ShopifyAPI::Shop.current
-            update_shop(shopify_plan: shopify_shop.plan_name, uninstalled: false)
-          rescue ActiveResource::UnauthorizedAccess => e
-            # we no longer have access to the shop- app uninstalled
-            update_shop(shopify_plan: @shop.shopify_plan, uninstalled: true)
-            success = false
-          rescue ActiveResource::ClientError => e
-            if e.response.code.to_s == '402'
-              update_shop(shopify_plan: Shop::PLAN_FROZEN, uninstalled: false)
-            elsif e.response.code.to_s == '404'
-              update_shop(shopify_plan: Shop::PLAN_CANCELLED, uninstalled: false)
-            elsif e.response.code.to_s == '420'
-              update_shop(shopify_plan: '🌲', uninstalled: false)
-            elsif e.response.code.to_s == '423'
-              update_shop(shopify_plan: Shop::PLAN_LOCKED, uninstalled: false)
-            end
-          end
-          ShopifyAPI::Base.clear_session
-        end
-
-        return success
-      end
-
-      def determine_price(shopify_plan: @shop.shopify_plan)
-        # List prices in ascending order in config
-        pricing = PR::Common.config.pricing
-
-        best_price = pricing.last
-
-        pricing.each do |price|
-          best_price = price if price[:shopify_plan] == shopify_plan
-        end
-
-        best_price
-      end
-
-      private
-
       def shopify_plan_differs?(shopify_plan)
         shopify_plan.to_s != @shop.shopify_plan.to_s
       end
-
     end
   end
 end
