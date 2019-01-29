@@ -24,6 +24,7 @@ class PR::Common::SustainedAnalyticsService
 
   private
 
+
   def maybe_shop_retained
     return if DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC >
               @current_time_period.lapsed_days_since_last_shop_retained_analytic
@@ -65,9 +66,13 @@ class PR::Common::SustainedAnalyticsService
 
     return if (@shop.charged_at + DAYS_UNTIL_CONVERTED_TO_PAID.days) > current_time
 
+    convert_to_paid && payment_charged
+  end
+
+  def convert_to_paid
     send_converted_to_paid_analytics
 
-    @current_time_period.update!(converted_to_paid_at: current_time)
+    @current_time_period.update!(converted_to_paid_at: Time.current)
   end
 
   def send_converted_to_paid_analytics
@@ -99,6 +104,10 @@ class PR::Common::SustainedAnalyticsService
 
     return if (last_payment_charged + DAYS_UNTIL_PAYMENT_CHARGED.days) > Time.current
 
+    payment_charged
+  end
+
+  def payment_charged
     @current_time_period.paid_now!
 
     send_payment_charged_analytics
