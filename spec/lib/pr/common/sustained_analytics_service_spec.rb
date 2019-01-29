@@ -116,6 +116,18 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                monthlyUsd: 10.0,
+                currentPeriodsPaid: 1,
+                currentUsdPaid: 10.0,
+                totalPeriodsPaid: 1,
+                totalUsdPaid: 10.0
+              }
+            )
+
+          expect(Analytics).to receive(:identify)
+            .with(
+              user_id: shop.user.id,
+              traits: {
                 currentDaysInstalled: 8,
                 totalDaysInstalled: 8
               }
@@ -135,6 +147,21 @@ describe PR::Common::SustainedAnalyticsService do
                 app_plan: "generic"
               }
             )
+
+          expect(Analytics).to receive(:track)
+            .with(
+              user_id: shop.user.id,
+              event: "Payment Charged",
+              properties: {
+                email: shop.user.email,
+                monthly_usd: 10.0,
+                current_periods_paid: 1,
+                current_usd_paid: 10.0,
+                total_periods_paid: 1,
+                total_usd_paid: 10.0
+              }
+            )
+
 
           expect(Analytics).to receive(:track)
             .with(
