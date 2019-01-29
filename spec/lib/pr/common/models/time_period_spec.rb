@@ -228,18 +228,39 @@ describe PR::Common::Models::TimePeriod do
 
     around { |example| Timecop.freeze(current_time, &example.method(:run)) }
 
-    it "sets period_last_paid_at to the current time" do
-      expect { time_period.paid_now }
-        .to change(time_period, :period_last_paid_at)
-        .from(nil)
-        .to(Time.current)
+    context "when passed a time" do
+      let(:time) { Time.zone.local(2017, 1, 1) }
+
+      it "sets period_last_paid_at to the current time" do
+
+        expect { time_period.paid_now(time) }
+          .to change(time_period, :period_last_paid_at)
+          .from(nil)
+          .to(time)
+      end
+
+      it "increments periods_paid" do
+        expect { time_period.paid_now(time) }
+          .to change(time_period, :periods_paid)
+          .from(0)
+          .to(1)
+      end
     end
 
-    it "increments periods_paid" do
-      expect { time_period.paid_now }
-        .to change(time_period, :periods_paid)
-        .from(0)
-        .to(1)
+    context "when not passed a time" do
+      it "sets period_last_paid_at to the current time" do
+        expect { time_period.paid_now }
+          .to change(time_period, :period_last_paid_at)
+          .from(nil)
+          .to(Time.current)
+      end
+
+      it "increments periods_paid" do
+        expect { time_period.paid_now }
+          .to change(time_period, :periods_paid)
+          .from(0)
+          .to(1)
+      end
     end
   end
 
@@ -250,18 +271,38 @@ describe PR::Common::Models::TimePeriod do
 
     around { |example| Timecop.freeze(current_time, &example.method(:run)) }
 
-    it "persists period_last_paid_at to the current time" do
-      expect { time_period.paid_now! }
-        .to change { time_period.reload.period_last_paid_at }
-        .from(nil)
-        .to(Time.current)
+    context "when passed a time" do
+      let(:time) { Time.zone.local(2017, 1, 1) }
+
+      it "persists period_last_paid_at to passed" do
+        expect { time_period.paid_now!(time) }
+          .to change { time_period.reload.period_last_paid_at }
+          .from(nil)
+          .to(time)
+      end
+
+      it "increments periods_paid" do
+        expect { time_period.paid_now!(time) }
+          .to change { time_period.reload.periods_paid }
+          .from(0)
+          .to(1)
+      end
     end
 
-    it "increments and persists periods_paid" do
-      expect { time_period.paid_now! }
-        .to change { time_period.reload.periods_paid }
-        .from(0)
-        .to(1)
+    context "when not passed a time" do
+      it "sets period_last_paid_at to the current time" do
+        expect { time_period.paid_now! }
+          .to change { time_period.reload.period_last_paid_at }
+          .from(nil)
+          .to(Time.current)
+      end
+
+      it "increments periods_paid" do
+        expect { time_period.paid_now! }
+          .to change { time_period.reload.periods_paid }
+          .from(0)
+          .to(1)
+      end
     end
   end
 

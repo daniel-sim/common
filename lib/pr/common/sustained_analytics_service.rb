@@ -6,10 +6,14 @@ class PR::Common::SustainedAnalyticsService
   # prices. Potentially to be implemented in the future.
   DAYS_UNTIL_CONVERTED_TO_PAID = Rails.env.staging? ? 1 : 7
 
-  def initialize(shop)
+  # We allow passing in a current_time so that any comparisons / updates are done
+  # with that time in mind. When run on a schedule, this job may differ slightly from day to day
+  # so passing a normalized current time helps.
+  def initialize(shop, options = {})
     @shop = shop
     @current_time_period = shop.current_time_period
     @user = shop.user
+    @current_time = options.fetch(:current_time, Time.current)
   end
 
   def perform
@@ -24,14 +28,13 @@ class PR::Common::SustainedAnalyticsService
 
   private
 
-
   def maybe_shop_retained
     return if DAYS_BETWEEN_SHOP_RETAINED_ANALYTIC >
-              @current_time_period.lapsed_days_since_last_shop_retained_analytic
+              @current_time_period.lapsed_days_since_last_shop_retained_analytic(@current_time)
 
     send_shop_retained_analytics
 
-    @current_time_period.update!(shop_retained_analytic_sent_at: Time.current)
+    @current_time_period.update!(shop_retained_analytic_sent_at: @current_time)
   end
 
   def send_shop_retained_analytics
@@ -62,9 +65,7 @@ class PR::Common::SustainedAnalyticsService
     return if @current_time_period.monthly_usd.zero?
     return unless @shop.charged_at
 
-    current_time = Time.current
-
-    return if (@shop.charged_at + DAYS_UNTIL_CONVERTED_TO_PAID.days) > current_time
+    return if (@shop.charged_at + DAYS_UNTIL_CONVERTED_TO_PAID.days) > @current_time
 
     convert_to_paid && payment_charged
   end
@@ -72,7 +73,7 @@ class PR::Common::SustainedAnalyticsService
   def convert_to_paid
     send_converted_to_paid_analytics
 
-    @current_time_period.update!(converted_to_paid_at: Time.current)
+    @current_time_period.update!(converted_to_paid_at: @current_time)
   end
 
   def send_converted_to_paid_analytics
@@ -102,13 +103,13 @@ class PR::Common::SustainedAnalyticsService
     last_payment_charged = @current_time_period.period_last_paid_at ||
                            @current_time_period.converted_to_paid_at
 
-    return if (last_payment_charged + DAYS_UNTIL_PAYMENT_CHARGED.days) > Time.current
+    return if (last_payment_charged + DAYS_UNTIL_PAYMENT_CHARGED.days) > @current_time
 
     payment_charged
   end
 
   def payment_charged
-    @current_time_period.paid_now!
+    @current_time_period.paid_now!(@current_time)
 
     send_payment_charged_analytics
   end

@@ -4,13 +4,16 @@ describe ShopUpdateReconcileJob do
   let(:shop) { create(:shop, user: build(:user)) }
   let(:sustained_analytics_service) { PR::Common::SustainedAnalyticsService.new(shop) }
 
+  around do |example|
+    Timecop.freeze(Time.new(2019, 1, 1, 5, 28, 31).in_time_zone) { example.run }
+  end
 
   before do
     allow(Analytics).to receive(:flush)
 
     allow(PR::Common::SustainedAnalyticsService)
       .to receive(:new)
-      .with(shop)
+      .with(shop, current_time: Time.new(2019, 1, 1, 5).in_time_zone) # time at start of the hour
       .and_return(sustained_analytics_service)
   end
 
