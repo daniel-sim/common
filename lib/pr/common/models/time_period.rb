@@ -42,16 +42,16 @@ module PR
                      uninstalled: 3,
                      closed: 4 }
 
-        def lapsed_days
-          upper_bound = end_time || Time.current
+        def lapsed_days(current_time = Time.current)
+          upper_bound = end_time || current_time
 
           ((upper_bound - start_time) / 1.day).ceil
         end
 
-        def lapsed_days_since_last_shop_retained_analytic
+        def lapsed_days_since_last_shop_retained_analytic(current_time = Time.current)
           last_shop_retained_analytic = shop_retained_analytic_sent_at || start_time
 
-          ((Time.current - last_shop_retained_analytic) / 1.day).ceil
+          ((current_time - last_shop_retained_analytic) / 1.day).ceil
         end
 
         def converted_to_paid?
@@ -66,13 +66,13 @@ module PR
           kind.to_sym.in? KINDS_IN_USE
         end
 
-        def paid_now
-          assign_attributes(period_last_paid_at: Time.current,
+        def paid_now(current_time = Time.current)
+          assign_attributes(period_last_paid_at: current_time,
                             periods_paid: periods_paid.next)
         end
 
-        def paid_now!
-          paid_now
+        def paid_now!(current_time = Time.current)
+          paid_now(current_time)
           save!
         end
 

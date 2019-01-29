@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe PR::Common::SustainedAnalyticsService do
-  subject(:service) { described_class.new(shop) }
+  subject(:service) { described_class.new(shop, current_time: current_time) }
 
   let!(:shop) { create(:shop, :with_user, shopify_plan: "basic", charged_at: current_time) }
   let(:current_time_period) { shop.current_time_period }
@@ -16,7 +16,7 @@ describe PR::Common::SustainedAnalyticsService do
   describe "#perform" do
     describe "payment charged" do
       context "when shop was converted to paid 30 days ago" do
-        let(:current_time) { Time.zone.local(2018, 1, 31, 0, 0, 1) }
+        let(:current_time) { Time.zone.local(2018, 1, 31) }
 
         before do
           current_time_period.update!(converted_to_paid_at: Time.zone.local(2018, 1, 1))
@@ -107,7 +107,7 @@ describe PR::Common::SustainedAnalyticsService do
               user_id: shop.user.id,
               traits: {
                 trial: false,
-               monthlyUsd: 10.0,
+                monthlyUsd: 10.0,
                 appPlan: "generic"
               }
             )

@@ -6,6 +6,10 @@ class ShopUpdateReconcileJob < PR::Common::ApplicationJob
   end
 
   def perform(shop_id)
+    # Set this back to the beginning of the hour to ensure that scheduled jobs
+    # run at "exactly" the same time each day.
+    current_time = Time.current.beginning_of_hour
+
     with_analytics do
       shop = Shop.find(shop_id)
 
@@ -24,7 +28,7 @@ class ShopUpdateReconcileJob < PR::Common::ApplicationJob
 
       logger.info "Recording sustained analytics for shop #{shop.shopify_domain}"
 
-      PR::Common::SustainedAnalyticsService.new(shop).perform
+      PR::Common::SustainedAnalyticsService.new(shop, current_time: current_time).perform
     end
   end
 end
