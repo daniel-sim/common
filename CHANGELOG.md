@@ -1,3 +1,10 @@
+## 29 January 2019 (c98ca261942e3478de838feaa22ecd8c1a967c70)
+- `SustainedAnalyticsService` now takes an optional `current_time` which
+  will be used as the "current time" across the service.
+- Various other methods take a `current_time` now.
+- ! Apps require no changes, but `SustainedAnalyticsJob` should not be scheduled
+  more frequently than hourly.
+
 ## 28 January 2019 (f0239b5fdb4bc6f30532e4296b485e0b10f3a8a6)
 - Reset shop `app_plan` when reinstalling
 - Made various ShopifyService methods private
