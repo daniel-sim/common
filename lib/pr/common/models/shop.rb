@@ -86,7 +86,6 @@ module PR
           maybe_build_reinstalled_time_period && return
           maybe_build_reopened_time_period && return
           maybe_build_installed_time_period
-
         end
 
         def maybe_build_uninstalled_time_period
@@ -142,7 +141,22 @@ module PR
         end
 
         def build_new_time_period(kind, start_time: DateTime.current)
-          time_periods.build(start_time: start_time, kind: kind)
+          time_periods.reload
+
+          new_params = {
+            start_time: start_time,
+            kind: kind
+          }
+
+          if (time_period = time_periods.last).present? && kind != :reinstalled
+            new_params.merge!(
+              converted_to_paid_at: time_period.converted_to_paid_at,
+              monthly_usd: time_period.monthly_usd,
+              period_last_paid_at: time_period.period_last_paid_at
+            )
+          end
+
+          time_periods.build(new_params)
         end
       end
     end

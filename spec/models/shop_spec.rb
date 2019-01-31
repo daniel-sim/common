@@ -121,6 +121,24 @@ RSpec.describe Shop, type: :model do
       end
     end
 
+    shared_examples "inherits attributes from previous time period" do
+      it "copies converted_to_paid_at, monthly_usd, and period_last_paid_at from the previous time period" do
+        converted_to_paid_at = Time.zone.local(2018, 1, 1)
+        period_last_paid_at = Time.zone.local(2018, 1, 1)
+        monthly_usd = 20.0
+
+        shop.current_time_period.update!(monthly_usd: monthly_usd,
+                                         period_last_paid_at: period_last_paid_at,
+                                         converted_to_paid_at: converted_to_paid_at)
+
+        operation
+
+        expect(shop.time_periods.last.monthly_usd).to eq monthly_usd
+        expect(shop.time_periods.last.period_last_paid_at).to eq period_last_paid_at
+        expect(shop.time_periods.last.converted_to_paid_at).to eq converted_to_paid_at
+      end
+    end
+
     context "when transitioning from installed to uninstalled" do
       let!(:shop) { create(:shop) }
       let(:operation) { shop.update!(uninstalled: true) }
@@ -155,6 +173,8 @@ RSpec.describe Shop, type: :model do
 
         expect(shop.time_periods.last).to be_uninstalled
       end
+
+      include_examples "inherits attributes from previous time period"
     end
 
     context "when transitioning from uninstalled to reinstalled" do
@@ -190,6 +210,22 @@ RSpec.describe Shop, type: :model do
         operation
 
         expect(shop.time_periods.last).to be_reinstalled
+      end
+
+      it "does not copy over converted_to_paid_at, monthly_usd, and period_last_paid_at from the previous time period" do
+        converted_to_paid_at = Time.zone.local(2018, 1, 1)
+        period_last_paid_at = Time.zone.local(2018, 1, 1)
+        monthly_usd = 20.0
+
+        shop.current_time_period.update!(monthly_usd: monthly_usd,
+                                         period_last_paid_at: period_last_paid_at,
+                                         converted_to_paid_at: converted_to_paid_at)
+
+        operation
+
+        expect(shop.time_periods.last.monthly_usd).to eq 0
+        expect(shop.time_periods.last.period_last_paid_at).to eq nil
+        expect(shop.time_periods.last.converted_to_paid_at).to eq nil
       end
     end
 
@@ -227,6 +263,8 @@ RSpec.describe Shop, type: :model do
 
         expect(shop.time_periods.last).to be_closed
       end
+
+      include_examples "inherits attributes from previous time period"
     end
 
     context "when transitioning from closed to reopened" do
@@ -263,6 +301,8 @@ RSpec.describe Shop, type: :model do
 
         expect(shop.time_periods.last).to be_reopened
       end
+
+      include_examples "inherits attributes from previous time period"
     end
   end
 
@@ -326,7 +366,10 @@ RSpec.describe Shop, type: :model do
   describe "#total_periods_paid" do
     subject(:shop) { create(:shop) }
 
-    before { create_paid_time_periods(shop) }
+    before do
+      create_paid_time_periods(shop)
+      shop.reload
+    end
 
     it "returns the periods paid across all time periods" do
       expect(shop.total_periods_paid).to eq 7
@@ -336,7 +379,10 @@ RSpec.describe Shop, type: :model do
   describe "#total_usd_paid" do
     subject(:shop) { create(:shop) }
 
-    before { create_paid_time_periods(shop) }
+    before do
+      create_paid_time_periods(shop)
+      shop.reload
+    end
 
     it "returns the amount paid across all time periods" do
       expect(shop.total_usd_paid).to eq BigDecimal("340.0")

@@ -110,6 +110,7 @@ class PR::Common::SustainedAnalyticsService
 
   def payment_charged
     @current_time_period.paid_now!(@current_time)
+    @shop.reload
 
     send_payment_charged_analytics
   end
