@@ -20,6 +20,7 @@ describe PR::Common::SustainedAnalyticsService do
 
         before do
           current_time_period.update!(converted_to_paid_at: Time.zone.local(2018, 1, 1))
+          shop.time_periods.reload
         end
 
         it "updates period_last_paid_at to now" do
