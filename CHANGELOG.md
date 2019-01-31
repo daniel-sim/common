@@ -1,3 +1,8 @@
+## 29 January 2019 (9387396b1692d49eb4f499e9fabf9a3734bc15ce)
+- When a new time period is created automatically in a shop,
+  copy over some attributes of the previous one conditionally.
+- ! Apps require no changes
+
 ## 29 January 2019 (c98ca261942e3478de838feaa22ecd8c1a967c70)
 - `SustainedAnalyticsService` now takes an optional `current_time` which
   will be used as the "current time" across the service.
