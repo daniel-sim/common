@@ -209,7 +209,10 @@ describe PR::Common::ShopifyService do
 
   describe "#maybe_reinstall_or_uninstall" do
     context "when reinstalling" do
-      before { shop.update!(uninstalled: true) }
+      before do
+        shop.update!(uninstalled: true)
+        shop.current_time_period.update!(monthly_usd: 50.0)
+      end
 
       it "sends an identify analytic" do
         analytic_params = {
@@ -217,7 +220,8 @@ describe PR::Common::ShopifyService do
           traits: {
             status: :active,
             shopifyPlan: "enterprise",
-            appPlan: nil # this gets reset to default
+            appPlan: nil, # this gets reset to default
+            monthlyUsd: 0 # this gets reset to 0
           }
         }
 

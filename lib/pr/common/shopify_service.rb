@@ -244,7 +244,8 @@ module PR
           traits: {
             status: :active,
             shopifyPlan: shopify_plan,
-            appPlan: @shop.app_plan
+            appPlan: @shop.app_plan,
+            monthlyUsd: 0 # always reset to 0 on reinstall
           }
         )
 
