@@ -103,7 +103,7 @@ namespace 'common' do
             traits: {
               currentPeriodsPaid: current_periods_paid,
               totalPeriodsPaid: total_periods_paid,
-              monthlyUsd: current_monthly_usd,
+              monthlyUsd: monthly_usd,
               currentUsdPaid: current_usd_paid,
               totalUsdPaid: total_usd_paid
             }
@@ -116,7 +116,7 @@ namespace 'common' do
               email: shop.user.email,
               current_periods_paid: current_periods_paid,
               total_periods_paid: total_periods_paid,
-              monthly_usd: current_monthly_usd,
+              monthly_usd: monthly_usd,
               current_usd_paid: current_usd_paid,
               total_usd_paid: total_usd_paid
             }
