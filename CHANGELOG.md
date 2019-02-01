@@ -1,3 +1,8 @@
+## 1 February 2019 (d13c348a8b78eefa2229db36245259e6a04f9f55)
+- When a shop reinstalls, its identify analytic will now include `monthlyUsd`.
+  Since it is not copied from a previous time period, it is always 0.
+- ! Apps require no changes
+
 ## 29 January 2019 (9387396b1692d49eb4f499e9fabf9a3734bc15ce)
 - When a new time period is created automatically in a shop,
   copy over some attributes of the previous one conditionally.
