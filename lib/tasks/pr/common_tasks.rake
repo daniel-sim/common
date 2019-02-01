@@ -92,6 +92,8 @@ namespace 'common' do
         else
           puts "[#{domain}]: Sending analytics\n\n"
 
+          shop.reload
+
           current_periods_paid = current_time_period.periods_paid
           total_periods_paid = shop.total_periods_paid
           monthly_usd = current_time_period.monthly_usd.to_f
