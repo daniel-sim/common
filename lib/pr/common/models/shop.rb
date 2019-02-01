@@ -31,6 +31,12 @@ module PR
           has_many :time_periods, dependent: :destroy, class_name: "PR::Common::Models::TimePeriod"
 
           before_validation :reconcile_time_periods
+
+          # TODO:
+          # This ensures that every pre-existing shop has a time period before it is
+          # operated on.
+          # This should be removed once all existing shops in all apps already have a time period.
+          after_find -> { reconcile_time_periods && save }, if: -> { time_periods.blank? }
         end
 
         def status
