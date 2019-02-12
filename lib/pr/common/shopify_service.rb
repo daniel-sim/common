@@ -26,7 +26,7 @@ module PR
           @shop.app_plan = nil
           track_reinstalled(shopify_plan)
 
-          @user&.charged_at = nil
+          @user.charged_at = nil
         elsif newly_uninstalled?(uninstall)
           track_uninstalled
 
@@ -38,7 +38,7 @@ module PR
         return unless newly_reopened?(shopify_plan)
 
         track_reopened(shopify_plan)
-        @user&.charged_at = Time.current
+        @user.charged_at = Time.current
       end
 
       def maybe_update_shopify_plan(shopify_plan)
@@ -49,8 +49,6 @@ module PR
       end
 
       def track_shopify_plan_updated(shopify_plan)
-        return if @user.blank?
-
         Analytics.identify(
           user_id: @user.id,
           traits: {
@@ -73,7 +71,7 @@ module PR
         if handed_off?(shopify_plan)
           track_handed_off(shopify_plan)
 
-          @user&.active_charge = true
+          @user.active_charge = true
         elsif cancelled?(shopify_plan)
           track_cancelled
         end
@@ -103,8 +101,6 @@ module PR
       end
 
       def track_cancelled
-        return if @user.blank?
-
         shop = @user.shop
         current_time_period = shop.current_time_period
 
@@ -141,8 +137,6 @@ module PR
       end
 
       def track_installed
-        return if @user.blank?
-
         Analytics.identify(
           user_id: @user.id,
           traits: {
@@ -205,8 +199,6 @@ module PR
       end
 
       def track_handed_off(shopify_plan)
-        return if @user.blank?
-
         Analytics.identify(
           user_id: @user.id,
           traits: {
@@ -227,8 +219,6 @@ module PR
       private
 
       def track_reopened(shopify_plan)
-        return if @user.blank?
-
         Analytics.identify(
           user_id: @user.id,
           traits: {
@@ -249,8 +239,6 @@ module PR
       end
 
       def track_reinstalled(shopify_plan)
-        return if @user.blank?
-
         Analytics.identify(
           user_id: @user.id,
           traits: {
