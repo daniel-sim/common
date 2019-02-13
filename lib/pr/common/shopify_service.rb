@@ -49,6 +49,8 @@ module PR
       end
 
       def track_shopify_plan_updated(shopify_plan)
+        Rails.logger.info "track_shopify_plan_updated for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         Analytics.identify(
@@ -103,6 +105,8 @@ module PR
       end
 
       def track_cancelled
+        Rails.logger.info "track_cancelled for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         shop = @user.shop
@@ -141,6 +145,8 @@ module PR
       end
 
       def track_installed
+        Rails.logger.info "track_installed for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         Analytics.identify(
@@ -205,6 +211,8 @@ module PR
       end
 
       def track_handed_off(shopify_plan)
+        Rails.logger.info "track_handed_off for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         Analytics.identify(
@@ -227,6 +235,8 @@ module PR
       private
 
       def track_reopened(shopify_plan)
+        Rails.logger.info "track_reopened for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         Analytics.identify(
@@ -249,6 +259,8 @@ module PR
       end
 
       def track_reinstalled(shopify_plan)
+        Rails.logger.info "track_reinstalled for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         Analytics.identify(
@@ -273,6 +285,8 @@ module PR
       end
 
       def track_uninstalled
+        Rails.logger.info "track_uninstalled for user #{@user&.id}, shop #{@shop&.id}"
+
         return if @user.blank?
 
         shop = @user.shop
