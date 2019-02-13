@@ -11,7 +11,7 @@ module PR
       def create_shopify_user(email:, shop:, referrer:)
         Rails.logger.info("create_shopify_user for email #{email}, shop #{shop.id}")
 
-        user = User.create(
+        user = User.create!(
           username: "shopify-#{shop.shopify_domain}",
           password: SecureRandom.hex,
           provider: "shopify",
@@ -22,8 +22,6 @@ module PR
         )
 
         Rails.logger.info("create_shopify_user created: #{user.present?}, id: #{user&.id}")
-
-        user.reload
 
         identify(user, referrer)
         track_install(user)
