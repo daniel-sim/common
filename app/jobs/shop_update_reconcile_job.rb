@@ -2,7 +2,7 @@ class ShopUpdateReconcileJob < PR::Common::ApplicationJob
   queue_as :low_priority
 
   def self.enqueue
-    Shop.where(uninstalled: false).pluck(:id).each(&method(:perform_later))
+    Shop.installed.with_active_plan.pluck(:id).each(&method(:perform_later))
   end
 
   def perform(shop_id)
