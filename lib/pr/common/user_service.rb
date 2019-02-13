@@ -23,6 +23,8 @@ module PR
 
         Rails.logger.info("create_shopify_user created: #{user.present?}, id: #{user&.id}")
 
+        user.reload
+
         identify(user, referrer)
         track_install(user)
 
