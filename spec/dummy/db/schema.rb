@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_22_124356) do
+ActiveRecord::Schema.define(version: 2019_02_13_214625) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,14 +22,15 @@ ActiveRecord::Schema.define(version: 2019_01_22_124356) do
     t.boolean "uninstalled", default: false, null: false
     t.string "app_plan"
     t.index ["app_plan"], name: "index_shops_on_app_plan"
+    t.index ["shopify_domain"], name: "index_shops_on_shopify_domain"
   end
 
-  create_table "time_periods", id: :serial, force: :cascade do |t|
+  create_table "time_periods", force: :cascade do |t|
     t.datetime "start_time", default: -> { "now()" }, null: false
     t.datetime "end_time"
     t.integer "kind", default: 0, null: false
     t.datetime "shop_retained_analytic_sent_at"
-    t.integer "shop_id"
+    t.bigint "shop_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "converted_to_paid_at"
@@ -69,7 +70,9 @@ ActiveRecord::Schema.define(version: 2019_01_22_124356) do
     t.string "username", null: false
     t.string "website", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["provider"], name: "index_users_on_provider"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["username"], name: "index_users_on_username"
   end
 
 end
