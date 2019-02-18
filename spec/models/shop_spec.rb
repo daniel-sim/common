@@ -13,18 +13,18 @@ RSpec.describe Shop, type: :model do
   end
 
   describe ".with_active_plan" do
-    it "includes only shops whose plan is not cancelled, frozen, 🌲, or locked" do
+    it "includes only shops whose plan is not cancelled, frozen, locked, or fraudulent" do
       active_plan_shop = create(:shop)
       cancelled_plan_shop = create(:shop, shopify_plan: "cancelled")
       locked_plan_shop = create(:shop, shopify_plan: "locked")
-      tree_plan_shop = create(:shop, shopify_plan: "🌲")
       frozen_plan_shop = create(:shop, shopify_plan: "frozen")
+      fraudulent_plan_shop = create(:shop, shopify_plan: "frozen")
 
       shops = Shop.with_active_plan
       expect(shops).to include active_plan_shop
       expect(shops).not_to include cancelled_plan_shop
       expect(shops).not_to include locked_plan_shop
-      expect(shops).not_to include tree_plan_shop
+      expect(shops).not_to include fraudulent_plan_shop
       expect(shops).not_to include frozen_plan_shop
     end
   end
@@ -69,6 +69,10 @@ RSpec.describe Shop, type: :model do
 
     it "is :inactive when shop is closed" do
       expect(build(:shop, shopify_plan: Shop::PLAN_CANCELLED).status).to eq :inactive
+    end
+
+    it "is :inactive when shop is fraudulent" do
+      expect(build(:shop, shopify_plan: Shop::PLAN_FRAUDULENT).status).to eq :inactive
     end
 
     it "is :locked when shop is locked" do
