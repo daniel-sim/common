@@ -15,10 +15,10 @@ RSpec.describe Shop, type: :model do
   describe ".with_active_plan" do
     it "includes only shops whose plan is not cancelled, frozen, locked, or fraudulent" do
       active_plan_shop = create(:shop)
-      cancelled_plan_shop = create(:shop, shopify_plan: "cancelled")
-      locked_plan_shop = create(:shop, shopify_plan: "locked")
-      frozen_plan_shop = create(:shop, shopify_plan: "frozen")
-      fraudulent_plan_shop = create(:shop, shopify_plan: "frozen")
+      cancelled_plan_shop = create(:shop, plan_name: "cancelled")
+      locked_plan_shop = create(:shop, plan_name: "locked")
+      frozen_plan_shop = create(:shop, plan_name: "frozen")
+      fraudulent_plan_shop = create(:shop, plan_name: "frozen")
 
       shops = Shop.with_active_plan
       expect(shops).to include active_plan_shop

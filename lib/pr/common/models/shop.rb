@@ -20,7 +20,7 @@ module PR
         included do
           delegate :charged_at, to: :user
           delegate :charged_at=, to: :user
-          scope :with_active_plan, -> { where.not(shopify_plan: INACTIVE_PLANS) }
+          scope :with_active_plan, -> { where.not(plan_name: INACTIVE_PLANS) }
           scope :with_active_charge, -> { joins(:user).where(users: { active_charge: true }) }
           scope :installed, -> { where(uninstalled: false) }
 
