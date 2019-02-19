@@ -38,6 +38,8 @@ class PR::Common::SustainedAnalyticsService
   end
 
   def send_shop_retained_analytics
+    return if @user.blank?
+
     current_days_installed = @current_time_period.lapsed_days
     total_days_installed = @shop.total_days_installed
 
@@ -77,6 +79,8 @@ class PR::Common::SustainedAnalyticsService
   end
 
   def send_converted_to_paid_analytics
+    return if @user.blank?
+
     Analytics.identify(
       user_id: @user.id,
       traits: {
@@ -116,6 +120,8 @@ class PR::Common::SustainedAnalyticsService
   end
 
   def send_payment_charged_analytics
+    return if @user.blank?
+
     current_periods_paid = @current_time_period.periods_paid
     total_periods_paid = @shop.total_periods_paid
     monthly_usd = @current_time_period.monthly_usd.to_f
