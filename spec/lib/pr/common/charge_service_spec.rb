@@ -80,7 +80,6 @@ describe PR::Common::ChargeService do
     end
   end
 
-
   describe "#create_charge" do
     subject { service.create_charge(price, base_url) }
 
@@ -184,7 +183,7 @@ describe PR::Common::ChargeService do
 
       expect(fake_service)
         .to receive(:determine_price)
-        .with(shopify_plan: "foo")
+        .with(api_shop: api_shop)
 
       described_class.new(shop).up_to_date_price
     end

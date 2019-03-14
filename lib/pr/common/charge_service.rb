@@ -27,7 +27,7 @@ module PR
       def up_to_date_price
         PR::Common::ShopifyService
           .new(shop: @shop)
-          .determine_price(shopify_plan: api_shop.plan_name)
+          .determine_price(api_shop: api_shop)
       end
 
       private
@@ -50,7 +50,7 @@ module PR
       def charge_params(base_url)
         PR::Common::ShopifyService
           .new(shop: @shop)
-          .determine_price(shopify_plan: api_shop.plan_name)
+          .determine_price(api_shop: api_shop)
           .merge(test: !Rails.env.production?,
                  return_url: return_url(base_url))
           .except(:key)

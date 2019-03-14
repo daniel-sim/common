@@ -7,6 +7,25 @@ describe PR::Common::ShopifyService do
   let(:shop) { create(:shop, app_plan: "foobar", user: user) }
 
   describe "#determine_price" do
+    context "when the config's price method is set to a lambda" do
+      let(:pricing_method) { -> (shop, args) { [shop, args] } }
+
+      around do |example|
+        old_config = PR::Common.config
+        new_config = PR::Common::Configuration.new
+        new_config.pricing_method = pricing_method
+
+        PR::Common.config = new_config
+        example.run
+
+        PR::Common.config = old_config
+      end
+
+      it "calls the lambda with the shop and any other args" do
+        expect(service.determine_price(foo: :bar)).to eq [shop, foo: :bar]
+      end
+    end
+
     context "when shop has a plan whose pricing is defined" do
       before { shop.update!(shopify_plan: "affiliate") }
 

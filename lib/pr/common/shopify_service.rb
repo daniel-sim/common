@@ -169,17 +169,17 @@ module PR
         )
       end
 
-      def determine_price(shopify_plan: @shop.shopify_plan)
-        # List prices in ascending order in config
-        pricing = PR::Common.config.pricing
+      # Set the `pricing_method` in PR::Common::Configuration.
+      # If it's a symbol, it will be called on this service.
+      # If it's callable (e.g. a lambda) then it'll be called with @shop and the args.
+      # If not configured (by default) it will call `:determine_price_by_plan_name`.
+      def determine_price(args = {})
+        pricing_method = PR::Common.config.pricing_method
 
-        best_price = pricing.last
+        return send(pricing_method, args) if pricing_method.is_a?(Symbol)
+        return pricing_method.call(@shop, args) if pricing_method.respond_to?(:call)
 
-        pricing.each do |price|
-          best_price = price if price[:shopify_plan] == shopify_plan
-        end
-
-        best_price
+        raise "Pricing method is not valid."
       end
 
       def reconcile_with_shopify
@@ -233,6 +233,21 @@ module PR
       end
 
       private
+
+      def determine_price_by_plan_name(args = {})
+        plan = args[:api_shop] ? args[:api_shop].plan_name : @shop.shopify_plan
+
+        # List prices in ascending order in config
+        pricing = PR::Common.config.pricing
+
+        best_price = pricing.last
+
+        pricing.each do |price|
+          best_price = price if price[:shopify_plan] == plan
+        end
+
+        best_price
+      end
 
       def track_reopened(shopify_plan)
         Rails.logger.info "track_reopened for user #{@user&.id}, shop #{@shop&.id}"
