@@ -1,3 +1,9 @@
+## 14 March 2019 (095e523892605552f40c9a03c25b5f0188761cda)
+- Add `pricing_method` to PR::Common::Configuration.
+  By setting it to a lambda, apps can have their own pricing rules,
+  independent of plan names.
+- ! Apps require no changes
+
 ## 1 February 2019 (a4be13cb19baef8391dfce4e00ecafcd6ca99335)
 - When a shop is retrieved from the DB, reconcile its time periods if
   no time periods exist.
@@ -186,7 +192,6 @@
 - Slightly refactored of `UserService`
 - Added "App Reinstalled" analytic to `UserService`
 - Added specs for `UserService`
-
 
 - ! Apps require no changes, but should do the following:
 
