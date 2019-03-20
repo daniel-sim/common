@@ -129,7 +129,7 @@ module PR
         end
 
         def maybe_build_installed_time_period
-          return if current_time_period&.installed?
+          return if current_time_period
 
           build_new_time_period(:installed)
           true
