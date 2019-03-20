@@ -1,3 +1,8 @@
+## 20 March 2019 (147ffe023e6772a4a49d7c081f75a2dc9568bfcd)
+- Fix callback on shops creating an additional `installed` time period.
+  This will only happen now if no other time period exists.
+- ! Apps require no changes
+
 ## 14 March 2019 (095e523892605552f40c9a03c25b5f0188761cda)
 - Add `pricing_method` to PR::Common::Configuration.
   By setting it to a lambda, apps can have their own pricing rules,
