@@ -42,6 +42,7 @@ namespace 'common' do
       shops = Hash.new { |h, k| h[k] = [] }
 
       CSV.foreach(Rails.root.join(args[:csv_file]), col_sep: ";", headers: :first_row) do |row|
+        next if row["Billing Period End"].blank?
         shop_domain = row["Shop Domain"]
         period_end = Time.zone.parse(row["Billing Period End"])
         shops[shop_domain] << period_end
