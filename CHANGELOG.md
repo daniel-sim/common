@@ -1,3 +1,8 @@
+## 21 March 2019 (0b1327a97ad41bb996a91bfbf00dc3f5423ca16e)
+- Fix issue with the price history importer failing if a "Billing Period End"
+  cell is empty.
+- ! Apps require no changes
+
 ## 20 March 2019 (147ffe023e6772a4a49d7c081f75a2dc9568bfcd)
 - Fix callback on shops creating an additional `installed` time period.
   This will only happen now if no other time period exists.
