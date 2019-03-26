@@ -1,3 +1,7 @@
+## 26 March 2019 (9480dfe787564f8dd49940897e4f03f9909ee91b)
+- Shop reconciliation now handles 403 errors as fraudulent
+- ! Apps require no changes
+
 ## 26 March 2019 (dd7607310e56dd7d16c174d216e1d71630d2cfdf)
 - Shop reconciliation will now create a user if one does not exist.
   There are edge cases in which users never get created for shops.
