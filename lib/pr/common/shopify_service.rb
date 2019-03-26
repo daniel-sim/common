@@ -3,7 +3,7 @@ module PR
     class ShopifyService
       def initialize(shop:)
         @shop = shop
-        @user = User.shopify.find_by(shop_id: @shop.id)
+        @user = @shop.user
       end
 
       def update_user(email:)
@@ -17,7 +17,7 @@ module PR
         maybe_hand_off_or_cancel(shopify_plan)
 
         @shop.assign_attributes(shopify_plan: shopify_plan, uninstalled: uninstalled)
-        @user.save! if @user.present?
+        @user.save!
         @shop.save!
       end
 
@@ -26,11 +26,11 @@ module PR
           @shop.app_plan = nil
           track_reinstalled(shopify_plan)
 
-          @user&.charged_at = nil
+          @user.charged_at = nil
         elsif newly_uninstalled?(uninstall)
           track_uninstalled
 
-          @user&.active_charge = false
+          @user.active_charge = false
         end
       end
 
@@ -38,7 +38,7 @@ module PR
         return unless newly_reopened?(shopify_plan)
 
         track_reopened(shopify_plan)
-        @user&.charged_at = Time.current
+        @user.charged_at = Time.current
       end
 
       def maybe_update_shopify_plan(shopify_plan)
@@ -49,7 +49,7 @@ module PR
       end
 
       def track_shopify_plan_updated(shopify_plan)
-        Rails.logger.info "track_shopify_plan_updated for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_shopify_plan_updated for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -75,7 +75,7 @@ module PR
         if handed_off?(shopify_plan)
           track_handed_off(shopify_plan)
 
-          @user&.active_charge = true
+          @user.active_charge = true
         elsif cancelled?(shopify_plan)
           track_cancelled
         end
@@ -105,7 +105,7 @@ module PR
       end
 
       def track_cancelled
-        Rails.logger.info "track_cancelled for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_cancelled for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -145,7 +145,7 @@ module PR
       end
 
       def track_installed
-        Rails.logger.info "track_installed for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_installed for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -188,6 +188,7 @@ module PR
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           begin
             shopify_shop = ShopifyAPI::Shop.current
+            ensure_user_exists(shopify_shop.email)
             update_shop(shopify_plan: shopify_shop.plan_name, uninstalled: false)
           rescue ActiveResource::UnauthorizedAccess => e
             # we no longer have access to the shop- app uninstalled
@@ -211,7 +212,7 @@ module PR
       end
 
       def track_handed_off(shopify_plan)
-        Rails.logger.info "track_handed_off for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_handed_off for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -234,6 +235,12 @@ module PR
 
       private
 
+      # This is here to deal with edge cases in which a user was never created
+      def ensure_user_exists(email)
+        @user ||= PR::Common::UserService.new.find_or_create_user_by_shopify(email: email, shop: @shop)
+        @shop.reload
+      end
+
       def determine_price_by_plan_name(args = {})
         plan = args[:api_shop] ? args[:api_shop].plan_name : @shop.shopify_plan
 
@@ -250,7 +257,7 @@ module PR
       end
 
       def track_reopened(shopify_plan)
-        Rails.logger.info "track_reopened for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_reopened for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -274,7 +281,7 @@ module PR
       end
 
       def track_reinstalled(shopify_plan)
-        Rails.logger.info "track_reinstalled for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_reinstalled for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 
@@ -300,7 +307,7 @@ module PR
       end
 
       def track_uninstalled
-        Rails.logger.info "track_uninstalled for user #{@user&.id}, shop #{@shop&.id}"
+        Rails.logger.info "track_uninstalled for user #{@user.id}, shop #{@shop.id}"
 
         return if @user.blank?
 

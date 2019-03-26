@@ -108,14 +108,12 @@ describe ShopUpdateReconcileJob do
       described_class.perform_now(shop.id)
     end
 
-
     it "calls out to SustainedAnalyticsService" do
       expect(sustained_analytics_service).to receive(:perform)
 
       described_class.perform_now(shop.id)
     end
   end
-
 
   context "when shopify_plan does not change" do
     before do

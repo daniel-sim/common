@@ -61,6 +61,26 @@ describe PR::Common::ShopifyService do
   end
 
   describe "#reconcile_with_shopify" do
+    context "when shop has no user" do
+      let(:shop) { create(:shop, app_plan: "foobar") }
+
+      before do
+        allow(ShopifyAPI::Shop)
+          .to receive(:current)
+          .and_return(ShopifyAPI::Shop.new(plan_name: "basic",
+                                           email: "jamie@pluginuseful.com"))
+      end
+
+      it "creates a user for it" do
+        expect(shop.user).not_to be_present
+
+        service.reconcile_with_shopify
+
+        expect(shop.user).to be_persisted
+        expect(shop.user.email).to eq "jamie@pluginuseful.com"
+      end
+    end
+
     context "when shop response has an error" do
       before do
         allow(ShopifyAPI::Shop)
