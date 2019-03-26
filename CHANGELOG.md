@@ -1,3 +1,10 @@
+## 26 March 2019 (dd7607310e56dd7d16c174d216e1d71630d2cfdf)
+- Shop reconciliation will now create a user if one does not exist.
+  There are edge cases in which users never get created for shops.
+  Since a user can only be created with an email, it first needs to be able
+  to retrieve the shop from Shopify.
+- ! Apps require no changes
+
 ## 21 March 2019 (0b1327a97ad41bb996a91bfbf00dc3f5423ca16e)
 - Fix issue with the price history importer failing if a "Billing Period End"
   cell is empty.
