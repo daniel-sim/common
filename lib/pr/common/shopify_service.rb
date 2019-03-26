@@ -195,14 +195,12 @@ module PR
             update_shop(shopify_plan: @shop.shopify_plan, uninstalled: true)
             success = false
           rescue ActiveResource::ClientError => e
-            if e.response.code.to_s == '402'
-              update_shop(shopify_plan: Shop::PLAN_FROZEN, uninstalled: false)
-            elsif e.response.code.to_s == '404'
-              update_shop(shopify_plan: Shop::PLAN_CANCELLED, uninstalled: false)
-            elsif e.response.code.to_s == '420'
-              update_shop(shopify_plan: '🌲', uninstalled: false)
-            elsif e.response.code.to_s == '423'
-              update_shop(shopify_plan: Shop::PLAN_LOCKED, uninstalled: false)
+            case e.response.code.to_s
+            when "401" then update_shop(shopify_plan: @shop.shopify_plan, uninstalled: true)
+            when "402" then update_shop(shopify_plan: Shop::PLAN_FROZEN, uninstalled: false)
+            when "403" then update_shop(shopify_plan: Shop::PLAN_FRAUDULENT, uninstalled: false)
+            when "404" then update_shop(shopify_plan: Shop::PLAN_CANCELLED, uninstalled: false)
+            when "423" then update_shop(shopify_plan: Shop::PLAN_LOCKED, uninstalled: false)
             end
           end
           ShopifyAPI::Base.clear_session

@@ -89,6 +89,23 @@ describe PR::Common::ShopifyService do
         allow(Analytics).to receive(:track)
       end
 
+      context "where error is a 401" do
+        let(:code) { 401 }
+
+        it "does not change the shopify_plan" do
+          expect(shop.shopify_plan).to eq "affiliate"
+          service.reconcile_with_shopify
+          expect(shop.reload.shopify_plan).to eq "affiliate"
+        end
+
+        it "sets the shop to uninstalled" do
+          expect { service.reconcile_with_shopify }
+            .to change(shop, :uninstalled)
+            .from(false)
+            .to(true)
+        end
+      end
+
       context "where error is a 402" do
         let(:code) { 402 }
 
@@ -96,6 +113,17 @@ describe PR::Common::ShopifyService do
           expect(shop.shopify_plan).to eq "affiliate"
           service.reconcile_with_shopify
           expect(shop.reload.shopify_plan).to eq "frozen"
+        end
+      end
+
+      context "where error is a 403" do
+        let(:code) { 403 }
+
+        it "sets shopify_plan to frozen" do
+          expect { service.reconcile_with_shopify }
+            .to change { shop.reload.shopify_plan }
+            .from("affiliate")
+            .to("fraudulent")
         end
       end
 
@@ -123,16 +151,6 @@ describe PR::Common::ShopifyService do
 
             service.reconcile_with_shopify
           end
-        end
-      end
-
-      context "when error is a 420" do
-        let(:code) { 420 }
-
-        it "sets shopify_plan to 🌲" do
-          expect(shop.shopify_plan).to eq "affiliate"
-          service.reconcile_with_shopify
-          expect(shop.reload.shopify_plan).to eq "🌲"
         end
       end
 
