@@ -1,3 +1,7 @@
+## 27 March 2019 (efe6f6c2f92fc696d3924f1494b374c487d7097e)
+- activeCharge and trial are now sent in the `identify` analytics call after reinstall
+- ! Apps require no changes
+
 ## 26 March 2019 (9480dfe787564f8dd49940897e4f03f9909ee91b)
 - Shop reconciliation now handles 403 errors as fraudulent
 - ! Apps require no changes
