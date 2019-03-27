@@ -1,3 +1,7 @@
+## 27 March 2019 (96fbd14a777f0ec91e12bed39082e9dcd5122bdf)
+- `active_charge` is no longer set to true on shop handoff
+- ! Apps require no changes
+
 ## 27 March 2019 (efe6f6c2f92fc696d3924f1494b374c487d7097e)
 - activeCharge and trial are now sent in the `identify` analytics call after reinstall
 - ! Apps require no changes
