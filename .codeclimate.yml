@@ -2,10 +2,12 @@ prepare:
   fetch:
   - url: "https://raw.githubusercontent.com/pemberton-rank/configs/master/rubocop.yml"
     path: ".rubocop.yml"
+  fetch:
+  - url: "https://raw.githubusercontent.com/pemberton-rank/configs/master/reek.yml"
+    path: ".reek.yml"
 plugins:
   rubocop:
     enabled: true
-    channel: rubocop-0-62
   reek:
     enabled: true
   brakeman:
@@ -14,4 +16,3 @@ plugins:
     enabled: true
   fixme:
     enabled: true
-
