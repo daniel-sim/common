@@ -74,8 +74,6 @@ module PR
       def maybe_hand_off_or_cancel(shopify_plan)
         if handed_off?(shopify_plan)
           track_handed_off(shopify_plan)
-
-          @user.active_charge = true
         elsif cancelled?(shopify_plan)
           track_cancelled
         end
