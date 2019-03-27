@@ -17,7 +17,7 @@ module PR
         maybe_hand_off_or_cancel(shopify_plan)
 
         @shop.assign_attributes(shopify_plan: shopify_plan, uninstalled: uninstalled)
-        @user.save!
+        @user&.save! # the check is legacy; some shops do not have a user, and we can't always create one.
         @shop.save!
       end
 
