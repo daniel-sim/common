@@ -24,9 +24,9 @@ module PR
       def maybe_reinstall_or_uninstall(shopify_plan, uninstall)
         if newly_reinstalled?(uninstall)
           @shop.app_plan = nil
-          track_reinstalled(shopify_plan)
-
           @user.charged_at = nil
+
+          track_reinstalled(shopify_plan)
         elsif newly_uninstalled?(uninstall)
           track_uninstalled
 
@@ -289,7 +289,9 @@ module PR
             status: :active,
             shopifyPlan: shopify_plan,
             appPlan: @shop.app_plan,
-            monthlyUsd: 0 # always reset to 0 on reinstall
+            monthlyUsd: 0, # always reset to 0 on reinstall
+            activeCharge: @user.active_charge,
+            trial: false
           }
         )
 

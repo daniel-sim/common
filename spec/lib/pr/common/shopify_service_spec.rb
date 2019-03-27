@@ -278,7 +278,9 @@ describe PR::Common::ShopifyService do
             status: :active,
             shopifyPlan: "enterprise",
             appPlan: nil, # this gets reset to default
-            monthlyUsd: 0 # this gets reset to 0
+            monthlyUsd: 0, # this gets reset to 0
+            trial: false,
+            activeCharge: false
           }
         }
 
