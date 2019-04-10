@@ -1,3 +1,15 @@
+## 10 April 2019 (cb8e5ec7204a04b5d0570f7eda67c0c2e20d7ad4)
+- ShopifyService#update_shop can now update any of Shop's attributes.
+- ! Apps require no changes
+
+## 10 April 2019 (59b4ebdd2c5783ea8e1f460a291cf779187f0f39)
+- `Shop` now has the following new methods:
+  - active?
+  - inactive?
+  - active_plan?
+  - inactive_plan?
+- ! Apps require no changes
+
 ## 27 March 2019 (96fbd14a777f0ec91e12bed39082e9dcd5122bdf)
 - `active_charge` is no longer set to true on shop handoff
 - ! Apps require no changes
