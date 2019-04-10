@@ -47,6 +47,22 @@ module PR
           :active
         end
 
+        def inactive?
+          !active?
+        end
+
+        def active?
+          active_shopify_plan? && user&.active_charge && !uninstalled
+        end
+
+        def active_shopify_plan?
+          shopify_plan && !inactive_shopify_plan?
+        end
+
+        def inactive_shopify_plan?
+          INACTIVE_PLANS.include? shopify_plan
+        end
+
         def frozen?
           shopify_plan == PLAN_FROZEN
         end
