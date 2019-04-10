@@ -10,13 +10,17 @@ module PR
         @user.update(email: email)
       end
 
-      def update_shop(shopify_plan:, uninstalled:)
+      def update_shop(options = {})
+        # This method used to explicitly require "shopify_plan" and "uninstalled" only as params
+        shopify_plan = options[:shopify_plan] = options.fetch(:shopify_plan, @shop.shopify_plan)
+        uninstalled = options[:uninstalled] = options.fetch(:uninstalled, @shop.uninstalled)
+
         maybe_update_shopify_plan(shopify_plan)
         maybe_reinstall_or_uninstall(shopify_plan, uninstalled)
         maybe_reopen(shopify_plan)
         maybe_hand_off_or_cancel(shopify_plan)
 
-        @shop.assign_attributes(shopify_plan: shopify_plan, uninstalled: uninstalled)
+        @shop.assign_attributes(options)
         @user&.save! # the check is legacy; some shops do not have a user, and we can't always create one.
         @shop.save!
       end
