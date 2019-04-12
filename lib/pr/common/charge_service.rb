@@ -74,6 +74,7 @@ module PR
         Analytics.identify(
           user_id: @user.id,
           traits: {
+            email: @user.email,
             appPlan: app_plan,
             monthlyUsd: price,
             trial: price.to_f.positive?

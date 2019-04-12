@@ -46,6 +46,7 @@ class PR::Common::SustainedAnalyticsService
     Analytics.identify(
       user_id: @user.id,
       traits: {
+        email: @user.email,
         currentDaysInstalled: current_days_installed,
         totalDaysInstalled: total_days_installed
       }
@@ -84,6 +85,7 @@ class PR::Common::SustainedAnalyticsService
     Analytics.identify(
       user_id: @user.id,
       traits: {
+        email: @user.email,
         trial: false,
         monthlyUsd: @current_time_period.monthly_usd,
         appPlan: @shop.app_plan
@@ -131,6 +133,7 @@ class PR::Common::SustainedAnalyticsService
     Analytics.identify(
       user_id: @user.id,
       traits: {
+        email: @user.email,
         currentPeriodsPaid: current_periods_paid,
         totalPeriodsPaid: total_periods_paid,
         monthlyUsd: monthly_usd,
