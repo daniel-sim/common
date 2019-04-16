@@ -1,3 +1,7 @@
+## 12 April 2019 (35837fcaab5cbeb6a2bbe6228d68e604d006b580)
+- Add "email" trait to all identify analytics. This is required by Drip.
+- ! Apps require no changes
+
 ## 10 April 2019 (cb8e5ec7204a04b5d0570f7eda67c0c2e20d7ad4)
 - ShopifyService#update_shop can now update any of Shop's attributes.
 - ! Apps require no changes

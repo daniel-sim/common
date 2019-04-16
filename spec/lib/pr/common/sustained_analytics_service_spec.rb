@@ -42,6 +42,7 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                email: shop.user.email,
                 currentPeriodsPaid: 1,
                 totalPeriodsPaid: 1,
                 monthlyUsd: 10.0,
@@ -107,6 +108,7 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                email: shop.user.email,
                 trial: false,
                 monthlyUsd: 10.0,
                 appPlan: "generic"
@@ -117,6 +119,7 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                email: shop.user.email,
                 monthlyUsd: 10.0,
                 currentPeriodsPaid: 1,
                 currentUsdPaid: 10.0,
@@ -129,6 +132,7 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                email: shop.user.email,
                 currentDaysInstalled: 8,
                 totalDaysInstalled: 8
               }
@@ -162,7 +166,6 @@ describe PR::Common::SustainedAnalyticsService do
                 total_usd_paid: 10.0
               }
             )
-
 
           expect(Analytics).to receive(:track)
             .with(
@@ -221,6 +224,7 @@ describe PR::Common::SustainedAnalyticsService do
             .with(
               user_id: shop.user.id,
               traits: {
+                email: shop.user.email,
                 currentDaysInstalled: 14,
                 totalDaysInstalled: 14
               }

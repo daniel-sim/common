@@ -37,6 +37,7 @@ describe PR::Common::ChargeService do
         .with(
           user_id: user.id,
           traits: {
+            email: user.email,
             monthlyUsd: charge.price,
             appPlan: described_class.determine_app_plan_from_charge(charge),
             trial: price.positive?

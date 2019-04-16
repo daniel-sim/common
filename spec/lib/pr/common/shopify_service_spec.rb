@@ -217,6 +217,7 @@ describe PR::Common::ShopifyService do
         analytic_params = {
           user_id: shop.user.id,
           traits: {
+            email: shop.user.email,
             status: :active,
             shopifyPlan: "enterprise"
           }
@@ -232,6 +233,7 @@ describe PR::Common::ShopifyService do
           user_id: shop.user.id,
           event: "Shop Reopened",
           properties: {
+            email: shop.user.email,
             "registration method": "shopify",
             email: shop.user.email,
             shopify_plan: "enterprise"
@@ -275,6 +277,7 @@ describe PR::Common::ShopifyService do
         analytic_params = {
           user_id: shop.user.id,
           traits: {
+            email: shop.user.email,
             status: :active,
             shopifyPlan: "enterprise",
             appPlan: nil, # this gets reset to default
@@ -311,6 +314,7 @@ describe PR::Common::ShopifyService do
         analytic_params = {
           user_id: shop.user.id,
           traits: {
+            email: shop.user.email,
             status: :uninstalled,
             subscriptionLength: nil,
             currentDaysInstalled: shop.current_time_period.lapsed_days,
@@ -365,6 +369,7 @@ describe PR::Common::ShopifyService do
       expect(Analytics).to receive(:identify).with(
         user_id: shop.user.id,
         traits: {
+          email: shop.user.email,
           shopifyPlan: "enterprise"
         }
       )
@@ -390,6 +395,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          email: shop.user.email,
           shopifyPlan: "enterprise"
         }
       }
@@ -420,6 +426,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          email: shop.user.email,
           status: :inactive,
           subscriptionLength: shop.user.subscription_length,
           currentDaysInstalled: shop.current_time_period.lapsed_days,
@@ -465,6 +472,7 @@ describe PR::Common::ShopifyService do
       analytic_params = {
         user_id: shop.user.id,
         traits: {
+          email: shop.user.email,
           status: :active,
           shopifyPlan: "affiliate",
           appPlan: "foobar"

@@ -104,6 +104,7 @@ namespace 'common' do
           Analytics.identify(
             user_id: shop.user.id,
             traits: {
+              email: shop.user.email,
               currentPeriodsPaid: current_periods_paid,
               totalPeriodsPaid: total_periods_paid,
               monthlyUsd: monthly_usd,
