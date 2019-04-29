@@ -20,6 +20,9 @@ require "pr/common/session_promo_code_service"
 require "pr/common/charge_service"
 require "pr/common/sign_in_service"
 require "pr/common/controller_concerns/promo_codes"
+require "pr/common/controllers/sessions_controller"
+require "pr/common/controllers/webhooks_controller"
+require "pr/common/controllers/callback_controller"
 
 module PR
   module Common
@@ -33,6 +36,14 @@ module PR
 
     def self.config=(config)
       @config = config
+    end
+
+    def self.client_url
+      Settings.client_url
+    end
+
+    def self.api_url
+      Settings.api_url
     end
   end
 end

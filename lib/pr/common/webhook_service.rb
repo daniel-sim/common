@@ -68,7 +68,9 @@ module PR
       end
 
       def with_shop
-        ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
+        ShopifyAPI::Session.temp(domain: @shop.shopify_domain,
+                                 token: @shop.shopify_token,
+                                 api_version: @shop.api_version) do
           return yield
         end
       end

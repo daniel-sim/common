@@ -207,7 +207,9 @@ module PR
       def reconcile_with_shopify
         success = true
 
-        ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
+        ShopifyAPI::Session.temp(domain: @shop.shopify_domain,
+                                 token: @shop.shopify_token,
+                                 api_version: @shop.api_version) do
           begin
             shopify_shop = ShopifyAPI::Shop.current
             ensure_user_exists(shopify_shop.email)
