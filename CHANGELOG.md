@@ -3,6 +3,21 @@
 - Bring in ShopifyErrors for error handling
 - ! Apps require no changes
 
+## 29 April 2019 (7309f04307b743b20d43126b947b79122ec4e3c7)
+- Upgrade Shopify App from 7.0.2 to 9.0.1
+- ! Apps require a lot of changes!
+  - Various code was moved around to work with 9.0.1. See commit.
+  - Breaking changes since, according to Shopify changelog:
+    - Removed the shopify_session_repository initializer. The SessionRepository is now configured through the main ShopifyApp configuration object and the generated initializer
+    - Moved InMemorySessionStore into the ShopifyApp namespace
+    - Remove ShopifySession concern. This module made the code internal to this engine harder to follow and we want to discourage over-writing the auth code now that we have generic hooks for all extra tasks during install.
+    - Removed the ShopifyApp::Shop concern and added its methods to ShopifyApp::SessionStorage. To update for this change just remove this concern anywhere it is being used in your application.
+    - Pass the shop param in the session for authentication instead of a url param (prevents csrf). If you are upgrading from an older version of the gem you will need to update your omniauth.rb initializer file. Check the example app for what it what it should look like.
+    - Add CSRF protection through protect_from_forgery with: :exception on ShopifyApp::AuthenticatedController
+    - Sanitize the shop query param to include .myshopify.com if no domain was provided
+    - https://github.com/Shopify/shopify_app/blob/master/README.md#upgrading-from-86-to-900
+    - https://github.com/Shopify/shopify_api/blob/master/README.md#-breaking-change-notice-for-version-700-
+
 ## 25 April 2019 (4c46f1ce1870dc5c62f6665bcaed8a530daf7c5e)
 - Fix bug in which recreating webhooks for existing shops would delete any existing webhooks that should be there.
 - ! Apps require no changes
