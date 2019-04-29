@@ -14,6 +14,9 @@ require "pr/common/shopify_service"
 require "pr/common/webhook_service"
 require "pr/common/sustained_analytics_service"
 require "pr/common/charge_service"
+require "pr/common/controllers/sessions_controller"
+require "pr/common/controllers/webhooks_controller"
+require "pr/common/controllers/callback_controller"
 
 module PR
   module Common
@@ -27,6 +30,14 @@ module PR
 
     def self.config=(config)
       @config = config
+    end
+
+    def self.client_url
+      Settings.client_url
+    end
+
+    def self.api_url
+      Settings.api_url
     end
   end
 end

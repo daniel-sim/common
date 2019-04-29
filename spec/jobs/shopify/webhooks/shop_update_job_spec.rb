@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe ShopUpdateJob do
+describe Shopify::Webhooks::ShopUpdateJob do
   let(:shopify_domain) { "the_domain" }
   let(:shop) { create(:shop, shopify_domain: shopify_domain, user: build(:user)) }
   let(:service) { PR::Common::ShopifyService.new(shop: shop) }

@@ -1,5 +1,5 @@
-require "shopify_app/shop"
-require "shopify_app/session_storage"
+require "shopify_app"
+
 module PR
   module Common
     module Models
@@ -14,7 +14,6 @@ module PR
 
         extend ActiveSupport::Concern
 
-        include ::ShopifyApp::Shop
         include ::ShopifyApp::SessionStorage
 
         included do
@@ -26,7 +25,6 @@ module PR
 
           has_one :user
           has_many :time_periods, dependent: :destroy, class_name: "PR::Common::Models::TimePeriod"
-
           before_validation :reconcile_time_periods
 
           # TODO:
@@ -34,6 +32,22 @@ module PR
           # operated on.
           # This should be removed once all existing shops in all apps already have a time period.
           after_find -> { reconcile_time_periods && save }, if: -> { time_periods.blank? }
+        end
+
+        def api_session
+          ShopifyAPI::Session.new(
+            domain: shopify_domain,
+            token: shopify_token,
+            api_version: api_version
+          )
+        end
+
+        def activate_session
+          ShopifyAPI::Base.activate_session(api_session)
+        end
+
+        def api_version
+          ShopifyApp.configuration.api_version
         end
 
         def status

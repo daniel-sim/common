@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-describe AppUninstalledJob do
+describe Shopify::Webhooks::AppUninstalledJob do
   let(:shop) { create(:shop, user: build(:user)) }
 
   before { allow(Analytics).to receive(:flush) }
 
   describe "#perform" do
     it "set the shop to uninstalled" do
-      expect { described_class.perform_now(shop_domain: shop.shopify_domain) }
+      expect { described_class.perform_now(shop_domain: shop.shopify_domain, webhook: nil) }
         .to change { shop.reload.uninstalled }
         .from(false)
         .to(true)
