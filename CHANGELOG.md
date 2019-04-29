@@ -1,3 +1,7 @@
+## 25 April 2019 (4c46f1ce1870dc5c62f6665bcaed8a530daf7c5e)
+- Fix bug in which recreating webhooks for existing shops would delete any existing webhooks that should be there.
+- ! Apps require no changes
+
 ## 12 April 2019 (35837fcaab5cbeb6a2bbe6228d68e604d006b580)
 - Add "email" trait to all identify analytics. This is required by Drip.
 - ! Apps require no changes

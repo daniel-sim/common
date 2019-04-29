@@ -24,9 +24,9 @@ module PR
             # ensure that any new webhooks are installed first.
             # that way, if something goes wrong, at least we haven't removed
             # anything.
-            install_from_config
+            maybe_install_from_config(existing_webhooks)
 
-            destroy(existing_webhooks)
+            maybe_destroy(existing_webhooks)
 
             true
           end
@@ -39,18 +39,42 @@ module PR
         ShopifyAPI::Webhook.all
       end
 
-      def install_from_config
-        ShopifyApp.configuration.webhooks.each(&(ShopifyAPI::Webhook.method(:create)))
+      def maybe_install_from_config(api_webhooks)
+        configured_webhooks
+          .reject { |configured_webhook| api_webhook_exists?(configured_webhook, api_webhooks) }
+          .each(&(ShopifyAPI::Webhook.method(:create)))
       end
 
-      def destroy(webhooks)
-        Array.wrap(webhooks).each { |webhook| ShopifyAPI::Webhook.delete(webhook.id) }
+      def maybe_destroy(api_webhooks)
+        Array.wrap(api_webhooks)
+          .reject(&method(:configured_webhook_exists?))
+          .each { |api_webhook| ShopifyAPI::Webhook.delete(api_webhook.id) }
+      end
+
+      def api_webhook_exists?(configured_webhook, api_webhooks)
+        api_webhooks.detect do |api_webhook|
+          configured_webhook[:topic] == api_webhook.topic &&
+            configured_webhook[:address] == api_webhook.address &&
+            configured_webhook[:format] == api_webhook.format
+        end
+      end
+
+      def configured_webhook_exists?(api_webhook)
+        configured_webhooks.include?(
+          topic: api_webhook.topic,
+          address: api_webhook.address,
+          format: api_webhook.format
+        )
       end
 
       def with_shop
         ShopifyAPI::Session.temp(@shop.shopify_domain, @shop.shopify_token) do
           return yield
         end
+      end
+
+      def configured_webhooks
+        ShopifyApp.configuration.webhooks
       end
 
       # We don't want things to explode if something goes wrong, but we do want to
