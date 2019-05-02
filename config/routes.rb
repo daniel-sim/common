@@ -22,8 +22,8 @@ Rails.application.routes.draw do
   get 'user_admin/search'
   post 'user_admin/refunds', to: 'user_admin#make_refund'
 
-  post 'webhooks', to: 'webhooks#receive'
-  post 'webhooks/:topic', to: 'webhooks#receive'
+  post 'webhooks', to: 'shopify_app/webhooks#receive'
+  post 'webhooks/:topic', to: 'shopify_app/webhooks#receive'
 
   resources :charges,      only: [:create] do
     collection do
