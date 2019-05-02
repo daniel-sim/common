@@ -30,8 +30,8 @@ Rails.application.routes.draw do
     resources :promo_codes
   end
 
-  post 'webhooks', to: 'webhooks#receive'
-  post 'webhooks/:topic', to: 'webhooks#receive'
+  post 'webhooks', to: 'shopify_app/webhooks#receive'
+  post 'webhooks/:topic', to: 'shopify_app/webhooks#receive'
 
   resources :charges,      only: [:create] do
     collection do
