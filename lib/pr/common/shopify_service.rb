@@ -214,6 +214,14 @@ module PR
         return success
       end
 
+      def remote_shop
+        begin
+          ShopifyAPI::Shop.current
+        rescue StandardError => exception
+          raise ShopifyErrors.convert(exception, @shop.shopify_domain)
+        end
+      end
+
       def track_handed_off(shopify_plan)
         Rails.logger.info "track_handed_off for user #{@user.id}, shop #{@shop.id}"
 
