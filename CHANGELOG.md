@@ -1,3 +1,8 @@
+## 13 May 2019 (c2156c5ab37efab4e2b18434652b67450e4387a6)
+- Add ShopifyService#remote_shop
+- Bring in ShopifyErrors for error handling
+- ! Apps require no changes
+
 ## 25 April 2019 (4c46f1ce1870dc5c62f6665bcaed8a530daf7c5e)
 - Fix bug in which recreating webhooks for existing shops would delete any existing webhooks that should be there.
 - ! Apps require no changes
