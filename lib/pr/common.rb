@@ -1,6 +1,7 @@
 require "pr/common/version"
 require "pr/common/engine"
 require "pr/common/configuration"
+require "pr/common/shopify_errors"
 require "pr/common/tokenable"
 require "pr/common/token_authenticable"
 require "pr/common/affiliate_redirect"
