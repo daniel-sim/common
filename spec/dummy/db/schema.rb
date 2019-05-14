@@ -48,12 +48,12 @@ ActiveRecord::Schema.define(version: 2019_05_14_130737) do
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain"
   end
 
-  create_table "time_periods", id: :serial, force: :cascade do |t|
+  create_table "time_periods", force: :cascade do |t|
     t.datetime "start_time", default: -> { "now()" }, null: false
     t.datetime "end_time"
     t.integer "kind", default: 0, null: false
     t.datetime "shop_retained_analytic_sent_at"
-    t.integer "shop_id"
+    t.bigint "shop_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "converted_to_paid_at"

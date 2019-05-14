@@ -18,8 +18,6 @@ module Admin
 
     private
 
-    def promo_code_params
-      params.require(:promo_code).permit(:code, :value, :description)
     end
   end
 end
