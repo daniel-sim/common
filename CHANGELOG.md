@@ -1,3 +1,7 @@
+## 14 May 2019 (ab4ec6090886cc889304dd498ee98c73a5d53379)
+- Implement new /admin namespace with Admin model
+- ! Apps require no changes
+
 ## 14 May 2019 (7a44cd86659884b8c61f757e8316b38c7ebc48a6)
 - Add promo codes model
 - ! Apps require no changes
