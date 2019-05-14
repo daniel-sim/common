@@ -1,6 +1,8 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
-  devise_for :users, only: []
+  devise_for :admins,
+             class_name: "PR::Common::Models::Admin",
+             controllers: { sessions: "admins/sessions" }
 
   mount Sidekiq::Web => '/sidekiq'
 
@@ -8,6 +10,10 @@ Rails.application.routes.draw do
   resources :signups,  only: :create
   resources :forgotten_password_requests, only: :create
   resources :passwords, only: [:create, :update]
+
+  namespace "admin" do
+    # TODO
+  end
 
   post 'shops/callback'
 
