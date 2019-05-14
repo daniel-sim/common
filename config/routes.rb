@@ -1,6 +1,8 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
-  devise_for :users, only: []
+  devise_for :admins,
+             class_name: "PR::Common::Models::Admin",
+             controllers: { sessions: "admins/sessions" }
 
   mount Sidekiq::Web => '/sidekiq'
 
@@ -11,6 +13,10 @@ Rails.application.routes.draw do
 
   get 'user_admin/search'
   post 'user_admin/refunds', to: 'user_admin#make_refund'
+  
+  namespace "admin" do
+    # TODO
+  end
 
   post 'shops/callback'
 
