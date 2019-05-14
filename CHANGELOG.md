@@ -1,3 +1,7 @@
+## 14 May 2019 (a08789e536fce7f5754216976a6fb34f893ebd84)
+- Remove old admin routes
+- ! Apps require no changes
+
 ## 13 May 2019 (c2156c5ab37efab4e2b18434652b67450e4387a6)
 - Add ShopifyService#remote_shop
 - Bring in ShopifyErrors for error handling
