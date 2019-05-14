@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Shop, type: :model do
+  it { is_expected.to belong_to(:promo_code).optional }
   describe ".with_active_charge" do
     it "includes only shops with a user whose active charge is true" do
       active_charge_shop = create(:shop, user: build(:user, active_charge: true))

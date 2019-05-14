@@ -10,10 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_13_214625) do
+ActiveRecord::Schema.define(version: 2019_05_14_090704) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "promo_codes", id: :serial, force: :cascade do |t|
+    t.string "code", null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_promo_codes_on_code"
+  end
 
   create_table "shops", force: :cascade do |t|
     t.string "shopify_plan"
@@ -21,7 +29,9 @@ ActiveRecord::Schema.define(version: 2019_02_13_214625) do
     t.string "shopify_token", null: false
     t.boolean "uninstalled", default: false, null: false
     t.string "app_plan"
+    t.integer "promo_code_id"
     t.index ["app_plan"], name: "index_shops_on_app_plan"
+    t.index ["promo_code_id"], name: "index_shops_on_promo_code_id"
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain"
   end
 

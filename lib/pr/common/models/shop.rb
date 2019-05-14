@@ -24,6 +24,7 @@ module PR
           scope :with_active_charge, -> { joins(:user).where(users: { active_charge: true }) }
           scope :installed, -> { where(uninstalled: false) }
 
+          belongs_to :promo_code, required: false, class_name: "PR::Common::Models::PromoCode"
           has_one :user
           has_many :time_periods, dependent: :destroy, class_name: "PR::Common::Models::TimePeriod"
 
