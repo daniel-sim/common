@@ -1,5 +1,9 @@
-<% if flash[:alert].present? %>
+<% if flash[:notice].present? %>
+  <div class="toast toast-success">
+    <%= flash[:notice].html_safe %>
+  </div>
+<% elsif flash[:alert].present? %>
   <div class="toast toast-error">
-    <%= flash[:alert] %>
+    <%= flash[:alert].html_safe %>
   </div>
 <% end %>
