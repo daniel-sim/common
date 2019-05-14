@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   
   namespace "admin" do
     # TODO
+    resources :promo_codes
   end
 
   post 'shops/callback'

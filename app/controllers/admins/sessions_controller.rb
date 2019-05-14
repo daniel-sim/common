@@ -30,6 +30,6 @@ class Admins::SessionsController < Devise::SessionsController
   private
 
   def after_sign_in_path_for(resource)
-    raise "TODO"
+    new_admin_promo_code_path
   end
 end

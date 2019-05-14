@@ -1,0 +1,19 @@
+<%= form_for @promo_code, url: :admin_promo_codes do |f| %>
+
+  <%= form_group @promo_code, :code do %>
+    <%= f.label :code, class: "form-label" %>
+    <%= f.text_field :code, autofocus: true, class: "form-input" %>
+  <% end %>
+
+  <%= form_group @promo_code, :value do %>
+    <%= f.label :value, class: "form-label" %>
+    <%= f.number_field :value, min: 0, step: 1, class: "form-input" %>
+  <% end %>
+
+  <%= form_group @promo_code, :description do %>
+    <%= f.label :description, class: "form-label" %>
+    <%= f.text_field :description, class: "form-input" %>
+  <% end %>
+
+  <%= f.submit "Create Promo Code", class: "btn btn-primary" %>
+<% end %>
