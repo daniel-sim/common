@@ -9,9 +9,6 @@ Rails.application.routes.draw do
   resources :forgotten_password_requests, only: :create
   resources :passwords, only: [:create, :update]
 
-  get 'user_admin/search'
-  post 'user_admin/refunds', to: 'user_admin#make_refund'
-
   post 'shops/callback'
 
   post 'webhooks', to: 'webhooks#receive'
