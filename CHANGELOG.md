@@ -1,3 +1,7 @@
+## 14 May 2019 (c9ed3b00f72aa2ad01bd4b1fb237ee8cac82c519)
+- Add basic admin form for creating promo codes
+- ! Apps require no changes
+
 ## 14 May 2019 (ab4ec6090886cc889304dd498ee98c73a5d53379)
 - Implement new /admin namespace with Admin model
 - ! Apps require no changes
