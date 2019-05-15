@@ -6,6 +6,7 @@ describe PR::Common::Models::PromoCode do
   it { is_expected.to have_many :shops }
   it { is_expected.to validate_presence_of :code }
   it { is_expected.to validate_numericality_of(:value).is_greater_than_or_equal_to(0) }
+  it { is_expected.to belong_to(:created_by).class_name("PR::Common::Models::Admin") }
 
   it "upcases the code on save" do
     expect { promo_code.save! }
