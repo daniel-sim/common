@@ -1,3 +1,7 @@
+## 16 May 2019 (511ada3661a09a932278ba2e5a109f7968a6dcb8 )
+- Use promo code attached to shop when sending user to charges
+- ! Apps require no changes
+
 ## 14 May 2019 (c9ed3b00f72aa2ad01bd4b1fb237ee8cac82c519)
 - Add basic admin form for creating promo codes
 - ! Apps require no changes
