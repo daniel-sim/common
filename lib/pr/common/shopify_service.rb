@@ -181,10 +181,25 @@ module PR
       def determine_price(args = {})
         pricing_method = PR::Common.config.pricing_method
 
-        return send(pricing_method, args) if pricing_method.is_a?(Symbol)
-        return pricing_method.call(@shop, args) if pricing_method.respond_to?(:call)
+        price = if pricing_method.is_a?(Symbol)
+                  send(pricing_method, args)
+                elsif pricing_method.respond_to?(:call)
+                  pricing_method.call(@shop, args)
+                else
+                  raise "Pricing method is not valid."
+                end
 
-        raise "Pricing method is not valid."
+        maybe_apply_promo_code_to_price(price)
+      end
+
+      def maybe_apply_promo_code_to_price(price)
+        return price if @shop.promo_code.blank?
+
+        # promo code is a "percentage" of the total. By default it's 100.0.
+        # 200.0 = double price
+        # 50.0 = half price
+        # 0.0 = free
+        price.merge(price: ((@shop.promo_code.value / 100) * price[:price]).ceil(2))
       end
 
       def reconcile_with_shopify
