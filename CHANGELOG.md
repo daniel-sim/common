@@ -1,3 +1,21 @@
+## 16 May 2019 (abcbd00c7216d9029473ce4b442e43a3fe87fd5e)
+- Apply promo codes entered at login to a shop
+- Display promo code errors at login if given
+
+- ! Apps require changes:
+
+- In the `shopify_app/sessions_controller.rb`:
+  - add `include PR::Common::PromoCodes`
+  - in the `callback` method, after we have the `model_shop`, add:`maybe_apply_promo_code(model_shop)`
+  - add a `create` method if one doesn't exist / modify with this contnet:
+    ```
+    def create
+      maybe_store_promo_code
+
+      super unless performed?
+    end
+    ```
+
 ## 15 May 2019 (6d038bee4905e197060aa7c34e2649fe9f47321c)
 - Copy newest ShopifyApp login page into common
 - Add promo_code field to login page
