@@ -50,6 +50,15 @@ To:
 maybe_reconcile_promo_codes(model_shop)
 ```
 
+## 17 May 2019 (f5a6827e142208adfe44f1d97bb895a7b74a32fa)
+- Replace ShopifyApp case-insensitive uniqueness validation on Shop#shopify_domain
+with case sensitive validation:
+This was done because a case insensitive validation queries with `LOWER` which was causes a
+seqscan (i.e. slow). The functionality is the same, though, in that we now always downcase the shopify_domain
+before validation.
+
+- ! Apps require no changes
+
 ## 16 May 2019 (511ada3661a09a932278ba2e5a109f7968a6dcb8 )
 - Use promo code attached to shop when sending user to charges
 - ! Apps require no changes
