@@ -20,7 +20,7 @@ module PR
         end
 
         def webhook_job_klass
-          webhook_job_klass_name.safe_constantize or raise ShopifyApp::MissingWebhookJobError
+          webhook_job_klass_name.safe_constantize or raise ShopifyApp::MissingWebhookJobError, webhook_job_klass_name
         end
 
         def webhook_job_klass_name(type = webhook_type)
@@ -28,7 +28,16 @@ module PR
         end
 
         def webhook_type
+          webhook_type_from_param || webhook_type_from_header
+        end
+
+        def webhook_type_from_param
           params[:type]
+        end
+
+        # e.g. 'app/uninstalled"
+        def webhook_type_from_header
+          request.headers['X-Shopify-Topic']&.tr("/", "_")
         end
 
         def webhook_namespace
