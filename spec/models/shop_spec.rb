@@ -2,6 +2,30 @@ require "rails_helper"
 
 RSpec.describe Shop, type: :model do
   it { is_expected.to belong_to(:promo_code).optional }
+
+  describe "#valid?" do
+    let(:shop) { build(:shop) }
+
+    it "downcases the shopify_domain before validation" do
+      shop.shopify_domain = "UPCASE"
+
+      expect { shop.valid? }
+        .to change(shop, :shopify_domain)
+        .from("UPCASE")
+        .to("upcase")
+    end
+
+    it "validates uniqueness even when case is different" do
+      shop.save!
+      invalid_shop = build(:shop, shopify_domain: shop.shopify_domain.upcase)
+
+      expect { invalid_shop.valid? }
+        .to change { invalid_shop.errors.details[:shopify_domain].first&.[](:error) }
+        .from(nil)
+        .to(:taken)
+    end
+  end
+
   describe ".with_active_charge" do
     it "includes only shops with a user whose active charge is true" do
       active_charge_shop = create(:shop, user: build(:user, active_charge: true))

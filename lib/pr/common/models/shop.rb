@@ -27,12 +27,26 @@ module PR
           has_one :user
           has_many :time_periods, dependent: :destroy, class_name: "PR::Common::Models::TimePeriod"
           before_validation :reconcile_time_periods
+          before_validation :ensure_shopify_domain_downcased
 
           # TODO:
           # This ensures that every pre-existing shop has a time period before it is
           # operated on.
           # This should be removed once all existing shops in all apps already have a time period.
           after_find -> { reconcile_time_periods && save }, if: -> { time_periods.blank? }
+
+          # ShopifyApp uses a case insensitive validation which is slow (uses LOWER()).
+          # Apply a case sensitive one and remove the original.
+          validates :shopify_domain, uniqueness: { case_sensitive: true }
+
+          _validators[:shopify_domain].reject! { |validator| validator.options[:case_sensitive] == false }
+
+          case_insensitive_validation_callback = _validate_callbacks.detect do |validate_callback|
+            raw_filter = validate_callback.raw_filter
+            raw_filter.attributes == [:shopify_domain] && raw_filter.options[:case_sensitive] == false
+          end
+
+          _validate_callbacks.delete(case_insensitive_validation_callback) if case_insensitive_validation_callback
         end
 
         def api_session
@@ -195,6 +209,10 @@ module PR
           end
 
           time_periods.build(new_params)
+        end
+
+        def ensure_shopify_domain_downcased
+          shopify_domain&.downcase!
         end
       end
     end
