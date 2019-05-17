@@ -1,3 +1,7 @@
+## 17 May 2019 (81a47c66552b06a1c79d70b0737766e83d5130f6)
+- Support for older webhooks which have the type in the header ("X-Shopify-Topic")
+- ! Apps require no changes
+
 ## 13 May 2019 (c2156c5ab37efab4e2b18434652b67450e4387a6)
 - Add ShopifyService#remote_shop
 - Bring in ShopifyErrors for error handling
