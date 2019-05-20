@@ -1,3 +1,12 @@
+## 17 May 2019 (f5a6827e142208adfe44f1d97bb895a7b74a32fa)
+- Replace ShopifyApp case-insensitive uniqueness validation on Shop#shopify_domain
+  with case sensitive validation:
+    This was done because a case insensitive validation queries with `LOWER` which was causes a
+    seqscan (i.e. slow). The functionality is the same, though, in that we now always downcase the shopify_domain
+    before validation.
+
+- ! Apps require no changes
+
 ## 13 May 2019 (c2156c5ab37efab4e2b18434652b67450e4387a6)
 - Add ShopifyService#remote_shop
 - Bring in ShopifyErrors for error handling
