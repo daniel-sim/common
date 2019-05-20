@@ -3,7 +3,19 @@ module PR
     module PromoCodes
       extend ActiveSupport
 
+      def maybe_reconcile_promo_codes(shop)
+        maybe_remove_existing_promo_code(shop)
+        maybe_apply_promo_code(shop)
+      end
+
       private
+
+      # We only want to remove promo codes for shops that are reinstalling
+      def maybe_remove_existing_promo_code(shop)
+        return if shop.installed?
+
+        shop.update!(promo_code: nil)
+      end
 
       def maybe_apply_promo_code(shop)
         session_service = SessionPromoCodeService.new(session)

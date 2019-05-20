@@ -48,6 +48,10 @@ module PR
           :active
         end
 
+        def installed?
+          !uninstalled?
+        end
+
         def inactive?
           !active?
         end
