@@ -1,3 +1,7 @@
+## 14 May 2019 (a08789e536fce7f5754216976a6fb34f893ebd84)
+- Remove old admin routes
+- ! Apps require no changes
+
 ## 14 May 2019 (7a44cd86659884b8c61f757e8316b38c7ebc48a6)
 - Add promo codes model
 - ! Apps require no changes
