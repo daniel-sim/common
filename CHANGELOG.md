@@ -2,6 +2,10 @@
 - Remove old admin routes
 - ! Apps require no changes
 
+## 14 May 2019 (7a44cd86659884b8c61f757e8316b38c7ebc48a6)
+- Add promo codes model
+- ! Apps require no changes
+
 ## 13 May 2019 (c2156c5ab37efab4e2b18434652b67450e4387a6)
 - Add ShopifyService#remote_shop
 - Bring in ShopifyErrors for error handling
