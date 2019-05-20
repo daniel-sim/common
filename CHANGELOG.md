@@ -1,3 +1,7 @@
+## 15 May 2019 (e38b32d9238b02a1554b91399aa31f3c6903fc14)
+- Add `created_by` for promo codes, which links to the admin that created it.
+- ! Apps require no changes
+
 ## 14 May 2019 (c9ed3b00f72aa2ad01bd4b1fb237ee8cac82c519)
 - Add basic admin form for creating promo codes
 - ! Apps require no changes

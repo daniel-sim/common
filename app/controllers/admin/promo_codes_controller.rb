@@ -6,6 +6,7 @@ module Admin
 
     def create
       @promo_code = PR::Common::Models::PromoCode.new(promo_code_params)
+      @promo_code.created_by = current_admin
 
       if @promo_code.save
         redirect_to new_admin_promo_code_path, notice: "Promo code <code>#{@promo_code.code}</code> saved!"

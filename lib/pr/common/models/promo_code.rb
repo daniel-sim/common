@@ -9,6 +9,9 @@ module PR
         end
 
         has_many :shops, class_name: "::Shop"
+        belongs_to :created_by,
+                   class_name: "PR::Common::Models::Admin",
+                   inverse_of: :promo_codes
 
         validates :code, uniqueness: true, presence: true
         validates :value, numericality: { greater_than_or_equal_to: 0 }
