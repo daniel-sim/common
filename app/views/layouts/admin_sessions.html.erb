@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= stylesheet_link_tag "admin/style" %>
+    <title>Admin</title>
+  </head>
+  <body>
+    <div class="sessions-container container grid-xs">
+      <%= render "shared/admin_flash" %>
+
+      <div class="columns">
+        <div class="column">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

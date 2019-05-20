@@ -6,6 +6,7 @@ gem 'activeresource'
 gem 'shopify_app', '~> 7.2.0'
 
 group :development, :test do
+  gem "better_errors"
   gem 'pg'
   gem 'factory_bot_rails'
   gem 'pry-byebug', group: [:development, :test]

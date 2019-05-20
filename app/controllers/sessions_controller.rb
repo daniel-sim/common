@@ -14,6 +14,8 @@ class SessionsController < ApiBaseController
     end
   end
 
+  protected
+
   private
 
   def signin_params

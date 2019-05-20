@@ -73,6 +73,10 @@ GEM
     analytics-ruby (2.0.13)
     arel (9.0.0)
     bcrypt (3.1.12)
+    better_errors (2.5.1)
+      coderay (>= 1.0.0)
+      erubi (>= 1.0.0)
+      rack (>= 0.9.0)
     builder (3.2.3)
     byebug (10.0.2)
     capistrano (3.11.0)
@@ -299,6 +303,7 @@ PLATFORMS
 DEPENDENCIES
   activeresource
   analytics-ruby (~> 2.0.0)
+  better_errors
   capistrano-sidekiq
   config
   devise

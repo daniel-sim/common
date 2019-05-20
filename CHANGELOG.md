@@ -1,3 +1,7 @@
+## 14 May 2019 (ab4ec6090886cc889304dd498ee98c73a5d53379)
+- Implement new /admin namespace with Admin model
+- ! Apps require no changes
+
 ## 14 May 2019 (a08789e536fce7f5754216976a6fb34f893ebd84)
 - Remove old admin routes
 - ! Apps require no changes
