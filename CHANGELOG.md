@@ -1,3 +1,20 @@
+## 20 May 2019 (9afaf30c719e2dca94a15673e66760cdbd377fae)
+- Add `Shop#installed?` as inverse of `#uninstalled?`
+- Promo codes are now removed from a shop if it's re-installing.
+  New, valid promo codes are still applied.
+
+- ! Apps require changes:
+
+- In `shopify_app/sessions_controller.rb` in the `#callback` method, change: 
+    ```
+    maybe_apply_promo_code(model_shop)
+    ```
+  To:
+
+    ```
+    maybe_reconcile_promo_codes(model_shop)
+    ```
+
 ## 16 May 2019 (abcbd00c7216d9029473ce4b442e43a3fe87fd5e)
 - Apply promo codes entered at login to a shop
 - Display promo code errors at login if given
