@@ -1,3 +1,22 @@
+## 20 May 2019 (9de6705ada466a187fada8a4da53eb6c52268ad1)
+- Add tracking against promo codes
+- Add new SignInService with #track method for sending tracking analytics at sign in
+
+- ! Apps require changes:
+
+- In `app/controllers/shopify_app/sessions_controller.rb` add this to `#callback` just before
+  the redirect:
+
+  ```
+  PR::Common::SignInService.track(model_shop)
+  ```
+
+- In `app/controllers/shopify_app/sessions_controller.rb` change the `@user =...` line in `#callback`:
+
+  ```
+  @user = model_shop.user || model_shop.reload.user
+  ```
+
 ## 14 May 2019 (7a44cd86659884b8c61f757e8316b38c7ebc48a6)
 - Add promo codes model
 - ! Apps require no changes
