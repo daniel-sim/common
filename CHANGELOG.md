@@ -1,3 +1,7 @@
+## 21 May 2019 (b115021b804916fee346680c1817a186d7ab69be)
+- Add expires_at to promo codes
+- ! Apps require no changes
+
 ## 16 May 2019 (abcbd00c7216d9029473ce4b442e43a3fe87fd5e)
 - Apply promo codes entered at login to a shop
 - Display promo code errors at login if given
