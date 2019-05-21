@@ -23,6 +23,12 @@ module PR
           # TODO: extend with what makes promo codes valid later (e.g. expiry)
         end
 
+        def redeemable?
+          return true
+
+          # TODO: extend with what makes promo codes valid later (e.g. expiry)
+        end
+
         private
 
         def upcase_code

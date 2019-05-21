@@ -17,6 +17,23 @@ PR::Common::SignInService.track(model_shop)
 @user = model_shop.user || model_shop.reload.user
 ```
 
+## 20 May 2019 (9afaf30c719e2dca94a15673e66760cdbd377fae)
+- Add `Shop#installed?` as inverse of `#uninstalled?`
+- Promo codes are now removed from a shop if it's re-installing.
+New, valid promo codes are still applied.
+
+- ! Apps require changes:
+
+- In `shopify_app/sessions_controller.rb` in the `#callback` method, change: 
+```
+maybe_apply_promo_code(model_shop)
+```
+To:
+
+```
+maybe_reconcile_promo_codes(model_shop)
+```
+
 ## 16 May 2019 (511ada3661a09a932278ba2e5a109f7968a6dcb8 )
 - Use promo code attached to shop when sending user to charges
 - ! Apps require no changes

@@ -41,6 +41,22 @@ RSpec.describe Shop, type: :model do
     end
   end
 
+  describe "#installed?" do
+    subject { shop.installed? }
+
+    context "when not uninstalled" do
+      let(:shop) { build(:shop) }
+
+      it { is_expected.to eq true }
+    end
+
+    context "when uninstalled" do
+      let(:shop) { build(:shop, :uninstalled) }
+
+      it { is_expected.to eq false }
+    end
+  end
+
   describe "#app_plan" do
     context "when it is not set to anything" do
       it "returns nil" do
