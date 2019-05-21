@@ -97,6 +97,23 @@ button.marketing-button:focus {
   background-color: #223274;
   color: #fff;
 }
+
+button.disabled {
+  opacity: 0.3
+}
+
+.hidden {
+  display: none;
+}
+
+.succeeded {
+  color: green;
+}
+
+.failed {
+  color: red;
+}
+
     </style>
   </head>
   <body>
@@ -110,15 +127,17 @@ button.marketing-button:focus {
       <label for="shop">Enter your shop domain to log in or install this app.</label>
     </p>
 
-    <%= form_tag login_path do %>
+    <%= form_tag login_path, id: "login-form" do %>
       <% if flash[:error] %>
         <div class="error"><%= flash[:error] %></div>
       <% end %>
       <input id="shop" name="shop" type="text" autofocus="autofocus" placeholder="example.myshopify.com" class="marketing-input", value="<%= params[:shop] %>">
-      <input id="promo_code" name="promo_code" type="text" placeholder="promo code (optional)" class="marketing-input" value="<%= params[:promo_code] %>">
-      <button type="submit" class="marketing-button">Install</button>
+      <input id="promo_code" name="promo_code" type="text" placeholder="promo code (optional)" class="marketing-input" id="login-form__promo-code" value="<%= params[:promo_code] %>">
+      <button type="submit" class="marketing-button" id="login-form__submit">Install</button>
+      <p class="hidden" id="login-form__promo-code-info"></p>
     <% end %>
     </main>
 
   </body>
+  <%= javascript_include_tag "sessions/script" %>
 </html>

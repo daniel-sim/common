@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   resources :forgotten_password_requests, only: :create
   resources :passwords, only: [:create, :update]
 
+  namespace :promo_codes do
+    get 'check/:promo_code', action: :check
+  end
+
   namespace "admin" do
     resources :promo_codes
   end
