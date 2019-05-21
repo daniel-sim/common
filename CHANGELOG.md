@@ -1,3 +1,7 @@
+## 21 May 2019 (020285bc8d03a4467d297772c52f0ce6679d0505)
+- Add `promo_code` support to ref links; e.g. "https://api.pluginseo.com?ref=REFERRER&promo_code=THE_CODE"
+- ! Apps require no changes
+
 ## 21 May 2019 (b115021b804916fee346680c1817a186d7ab69be)
 - Add expires_at to promo codes
 - ! Apps require no changes
