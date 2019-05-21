@@ -1,3 +1,87 @@
+## 21 May 2019 (bd44a509e0a2f37e56f968078dff4c149568e163)
+- Add validation to promo codes at login screen
+- ! Apps require no changes
+
+## 21 May 2019 (020285bc8d03a4467d297772c52f0ce6679d0505)
+- Add `promo_code` support to ref links; e.g. "https://api.pluginseo.com?ref=REFERRER&promo_code=THE_CODE"
+- ! Apps require no changes
+
+## 21 May 2019 (b115021b804916fee346680c1817a186d7ab69be)
+- Add expires_at to promo codes
+- ! Apps require no changes
+
+## 20 May 2019 (9de6705ada466a187fada8a4da53eb6c52268ad1)
+- Add tracking against promo codes
+- Add new SignInService with #track method for sending tracking analytics at sign in
+
+- ! Apps require changes:
+
+- In `app/controllers/shopify_app/sessions_controller.rb` add this to `#callback` just before
+the redirect:
+
+```
+PR::Common::SignInService.track(model_shop)
+```
+
+- In `app/controllers/shopify_app/sessions_controller.rb` change the `@user =...` line in `#callback`:
+
+```
+@user = model_shop.user || model_shop.reload.user
+```
+
+## 20 May 2019 (9afaf30c719e2dca94a15673e66760cdbd377fae)
+- Add `Shop#installed?` as inverse of `#uninstalled?`
+- Promo codes are now removed from a shop if it's re-installing.
+New, valid promo codes are still applied.
+
+- ! Apps require changes:
+
+- In `shopify_app/sessions_controller.rb` in the `#callback` method, change: 
+```
+maybe_apply_promo_code(model_shop)
+```
+To:
+
+```
+maybe_reconcile_promo_codes(model_shop)
+```
+
+## 16 May 2019 (511ada3661a09a932278ba2e5a109f7968a6dcb8 )
+- Use promo code attached to shop when sending user to charges
+- ! Apps require no changes
+
+## 16 May 2019 (abcbd00c7216d9029473ce4b442e43a3fe87fd5e)
+- Apply promo codes entered at login to a shop
+- Display promo code errors at login if given
+
+- ! Apps require changes:
+
+- In the `shopify_app/sessions_controller.rb`:
+  - add `include PR::Common::PromoCodes`
+  - in the `callback` method, after we have the `model_shop`, add:`maybe_apply_promo_code(model_shop)`
+  - add a `create` method if one doesn't exist / modify with this contnet:
+    ```
+    def create
+      maybe_store_promo_code
+
+      super unless performed?
+    end
+    ```
+
+## 15 May 2019 (6d038bee4905e197060aa7c34e2649fe9f47321c)
+- Copy newest ShopifyApp login page into common
+- Add promo_code field to login page
+
+- ! Apps require changes:
+- Add this into  config/application.rb so that apps will pick up ShopifyApp overrides in
+common before loading the ShopifyApp fallback:
+
+```
+# Load PR::Common::Engine just after main app and before other engines,
+# so that we can override other engines as a priority in common
+config.railties_order = [:main_app, PR::Common::Engine, :all]
+```
+
 ## 15 May 2019 (e38b32d9238b02a1554b91399aa31f3c6903fc14)
 - Add `created_by` for promo codes, which links to the admin that created it.
 - ! Apps require no changes

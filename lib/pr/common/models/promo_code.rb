@@ -17,6 +17,12 @@ module PR
         validates :value, numericality: { greater_than_or_equal_to: 0 }
         before_validation :upcase_code
 
+        def redeemable?
+          return true unless expires_at
+
+          expires_at > Time.current
+        end
+
         private
 
         def upcase_code

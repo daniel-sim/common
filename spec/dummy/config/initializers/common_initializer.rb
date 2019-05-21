@@ -22,6 +22,14 @@ PR::Common.configure do |config|
       terms: "Affiliate terms"
     },
     {
+      key: :plus,
+      price: 25.99,
+      trial_days: 0,
+      shopify_plan: "plus",
+      name: "Plus",
+      terms: "Plus terms"
+    },
+    {
       key: :generic,
       price: 10.0,
       trial_days: 7,

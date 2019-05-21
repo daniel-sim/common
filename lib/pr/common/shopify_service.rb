@@ -159,7 +159,8 @@ module PR
             email: @user.email,
             status: :active,
             shopifyPlan: @shop.shopify_plan,
-            appPlan: @shop.app_plan
+            appPlan: @shop.app_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -169,7 +170,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: @user.shop.shopify_plan
+            shopify_plan: @user.shop.shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -181,10 +183,25 @@ module PR
       def determine_price(args = {})
         pricing_method = PR::Common.config.pricing_method
 
-        return send(pricing_method, args) if pricing_method.is_a?(Symbol)
-        return pricing_method.call(@shop, args) if pricing_method.respond_to?(:call)
+        price = if pricing_method.is_a?(Symbol)
+                  send(pricing_method, args)
+                elsif pricing_method.respond_to?(:call)
+                  pricing_method.call(@shop, args)
+                else
+                  raise "Pricing method is not valid."
+                end
 
-        raise "Pricing method is not valid."
+        maybe_apply_promo_code_to_price(price)
+      end
+
+      def maybe_apply_promo_code_to_price(price)
+        return price if @shop.promo_code.blank?
+
+        # promo code is a "percentage" of the total. By default it's 100.0.
+        # 200.0 = double price
+        # 50.0 = half price
+        # 0.0 = free
+        price.merge(price: ((@shop.promo_code.value / 100) * price[:price]).ceil(2))
       end
 
       def reconcile_with_shopify
@@ -278,7 +295,8 @@ module PR
           traits: {
             email: @user.email,
             status: :active,
-            shopifyPlan: shopify_plan
+            shopifyPlan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -288,7 +306,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: shopify_plan
+            shopify_plan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -307,7 +326,8 @@ module PR
             appPlan: @shop.app_plan,
             monthlyUsd: 0, # always reset to 0 on reinstall
             activeCharge: @user.active_charge,
-            trial: false
+            trial: false,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -317,7 +337,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: shopify_plan
+            shopify_plan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -342,7 +363,7 @@ module PR
             totalPeriodsPaid: shop.total_periods_paid,
             monthlyUsd: current_time_period.monthly_usd.to_f,
             currentUsdPaid: current_time_period.usd_paid.to_f,
-            totalUsdPaid: shop.total_usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
           }
         )
 

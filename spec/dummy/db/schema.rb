@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_14_142223) do
+ActiveRecord::Schema.define(version: 2019_05_20_170125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "admins", id: :serial, force: :cascade do |t|
+  create_table "admins", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 2019_05_14_142223) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "expires_at"
     t.decimal "value", precision: 5, scale: 2, default: "100.0", null: false
     t.integer "created_by_id"
     t.index ["code"], name: "index_promo_codes_on_code"
@@ -50,12 +51,12 @@ ActiveRecord::Schema.define(version: 2019_05_14_142223) do
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain"
   end
 
-  create_table "time_periods", id: :serial, force: :cascade do |t|
+  create_table "time_periods", force: :cascade do |t|
     t.datetime "start_time", default: -> { "now()" }, null: false
     t.datetime "end_time"
     t.integer "kind", default: 0, null: false
     t.datetime "shop_retained_analytic_sent_at"
-    t.integer "shop_id"
+    t.bigint "shop_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "converted_to_paid_at"
