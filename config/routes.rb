@@ -12,7 +12,6 @@ Rails.application.routes.draw do
   resources :passwords, only: [:create, :update]
 
   namespace "admin" do
-    # TODO
     resources :promo_codes
   end
 

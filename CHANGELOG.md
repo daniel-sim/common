@@ -1,3 +1,7 @@
+## 16 May 2019 (511ada3661a09a932278ba2e5a109f7968a6dcb8 )
+- Use promo code attached to shop when sending user to charges
+- ! Apps require no changes
+
 ## 16 May 2019 (abcbd00c7216d9029473ce4b442e43a3fe87fd5e)
 - Apply promo codes entered at login to a shop
 - Display promo code errors at login if given

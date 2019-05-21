@@ -5,6 +5,7 @@ describe PR::Common::ShopifyService do
 
   let(:user) { build(:user) }
   let(:shop) { create(:shop, app_plan: "foobar", user: user) }
+  let(:promo_code) { PR::Common::Models::PromoCode.create(code: "THE_CODE", value: 50.0) }
 
   describe "#determine_price" do
     context "when the config's price method is set to a lambda" do
@@ -27,19 +28,25 @@ describe PR::Common::ShopifyService do
     end
 
     context "when shop has a plan whose pricing is defined" do
-      before { shop.update!(shopify_plan: "affiliate") }
+      before { shop.update!(shopify_plan: "plus") }
 
       it "returns the defined price" do
         expected_price = {
-          key: :affiliate_free,
-          price: 0,
+          key: :plus,
+          price: 25.99,
           trial_days: 0,
-          shopify_plan: "affiliate",
-          name: "Affiliate",
-          terms: "Affiliate terms"
+          shopify_plan: "plus",
+          name: "Plus",
+          terms: "Plus terms"
         }
 
         expect(service.determine_price).to eq expected_price
+      end
+
+      it "applies promo codes" do
+        shop.update!(promo_code: promo_code)
+        # half price
+        expect(service.determine_price[:price]).to eq 13.00
       end
     end
 
@@ -56,6 +63,12 @@ describe PR::Common::ShopifyService do
         }
 
         expect(service.determine_price).to eq expected_price
+      end
+
+      it "applies promo codes" do
+        shop.update!(promo_code: promo_code)
+        # half price
+        expect(service.determine_price[:price]).to eq 5.00
       end
     end
   end
