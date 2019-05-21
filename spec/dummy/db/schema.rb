@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 2019_05_14_142223) do
     t.datetime "updated_at", null: false
     t.decimal "value", precision: 5, scale: 2, default: "100.0", null: false
     t.integer "created_by_id"
+    t.datetime "expires_at"
     t.index ["code"], name: "index_promo_codes_on_code"
     t.index ["created_by_id"], name: "index_promo_codes_on_created_by_id"
   end

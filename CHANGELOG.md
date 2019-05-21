@@ -1,3 +1,7 @@
+## 21 May 2019 (b115021b804916fee346680c1817a186d7ab69be)
+- Add expires_at to promo codes
+- ! Apps require no changes
+
 ## 20 May 2019 (9de6705ada466a187fada8a4da53eb6c52268ad1)
 - Add tracking against promo codes
 - Add new SignInService with #track method for sending tracking analytics at sign in

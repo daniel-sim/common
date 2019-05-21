@@ -24,6 +24,19 @@ describe ParamsPromoCodeService do
       end
     end
 
+    context "when the promo code is expired" do
+      around do |example|
+        Timecop.freeze do
+          promo_code.update!(expires_at: Time.current)
+          example.run
+        end
+      end
+
+      it "returns promo code expired text" do
+        expect(service.error).to eq "Promo code expired."
+      end
+    end
+
     context "when the promo code does not exist" do
       it "returns invalid promo code text" do
         expect(service.error).to eq "Invalid promo code."

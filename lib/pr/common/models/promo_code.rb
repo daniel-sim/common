@@ -18,15 +18,9 @@ module PR
         before_validation :upcase_code
 
         def redeemable?
-          return true
+          return true unless expires_at
 
-          # TODO: extend with what makes promo codes valid later (e.g. expiry)
-        end
-
-        def redeemable?
-          return true
-
-          # TODO: extend with what makes promo codes valid later (e.g. expiry)
+          expires_at > Time.current
         end
 
         private
