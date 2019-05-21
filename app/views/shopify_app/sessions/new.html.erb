@@ -114,8 +114,8 @@ button.marketing-button:focus {
       <% if flash[:error] %>
         <div class="error"><%= flash[:error] %></div>
       <% end %>
-      <input id="shop" name="shop" type="text" autofocus="autofocus" placeholder="example.myshopify.com" class="marketing-input">
-      <input id="promo_code" name="promo_code" type="text" placeholder="promo code (optional)" class="marketing-input">
+      <input id="shop" name="shop" type="text" autofocus="autofocus" placeholder="example.myshopify.com" class="marketing-input", value="<%= params[:shop] %>">
+      <input id="promo_code" name="promo_code" type="text" placeholder="promo code (optional)" class="marketing-input" value="<%= params[:promo_code] %>">
       <button type="submit" class="marketing-button">Install</button>
     <% end %>
     </main>
