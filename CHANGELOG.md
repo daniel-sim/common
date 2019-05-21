@@ -1,3 +1,17 @@
+## 15 May 2019 (6d038bee4905e197060aa7c34e2649fe9f47321c)
+- Copy newest ShopifyApp login page into common
+- Add promo_code field to login page
+
+- ! Apps require changes:
+- Add this into  config/application.rb so that apps will pick up ShopifyApp overrides in
+  common before loading the ShopifyApp fallback:
+
+  ```
+  # Load PR::Common::Engine just after main app and before other engines,
+  # so that we can override other engines as a priority in common
+  config.railties_order = [:main_app, PR::Common::Engine, :all]
+  ```
+
 ## 15 May 2019 (e38b32d9238b02a1554b91399aa31f3c6903fc14)
 - Add `created_by` for promo codes, which links to the admin that created it.
 - ! Apps require no changes
