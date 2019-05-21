@@ -1,3 +1,7 @@
+## 21 May 2019 (bd44a509e0a2f37e56f968078dff4c149568e163)
+- Add validation to promo codes at login screen
+- ! Apps require no changes
+
 ## 21 May 2019 (020285bc8d03a4467d297772c52f0ce6679d0505)
 - Add `promo_code` support to ref links; e.g. "https://api.pluginseo.com?ref=REFERRER&promo_code=THE_CODE"
 - ! Apps require no changes
