@@ -20,7 +20,7 @@ module Admin
     private
 
     def promo_code_params
-      params.require(:promo_code).permit(:code, :value, :description)
+      params.require(:promo_code).permit(:code, :value, :description, :expires_at)
     end
   end
 end

@@ -22,4 +22,45 @@ describe PR::Common::Models::PromoCode do
     duplicate_code.valid?
     expect(duplicate_code.errors.details[:code].first[:error]).to eq :taken
   end
+
+  describe "#redeemable?" do
+    subject { promo_code.redeemable? }
+
+    context "when there is no expiry time" do
+      it { is_expected.to eq true }
+    end
+
+    context "when the expiry time is in the future" do
+      around do |example|
+        Timecop.freeze do
+          promo_code.update!(expires_at: Time.current + 1.second)
+          example.run
+        end
+      end
+
+      it { is_expected.to eq true }
+    end
+
+    context "when the expiry time is now" do
+      around do |example|
+        Timecop.freeze do
+          promo_code.update!(expires_at: Time.current)
+          example.run
+        end
+      end
+
+      it { is_expected.to eq false }
+    end
+
+    context "when the expiry time is in the past" do
+      around do |example|
+        Timecop.freeze do
+          promo_code.update!(expires_at: Time.current - 1.second)
+          example.run
+        end
+      end
+
+      it { is_expected.to eq false }
+    end
+  end
 end

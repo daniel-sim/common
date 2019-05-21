@@ -28,6 +28,21 @@ describe SessionPromoCodeService do
     context "when the promo code in session does exist" do
       before { session[:promo_code] = code }
 
+      context "when the promo code is expired" do
+        around do |example|
+          Timecop.freeze do
+            promo_code.update!(expires_at: Time.current)
+            example.run
+          end
+        end
+
+        it "does not apply the code" do
+          expect { service.maybe_apply_to_shop(shop) }
+            .not_to change(shop, :promo_code)
+            .from(nil)
+        end
+      end
+
       context "when the shop has no promo code" do
         it "applies the code" do
           expect { service.maybe_apply_to_shop(shop) }
