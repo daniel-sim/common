@@ -18,6 +18,7 @@ require "pr/common/sustained_analytics_service"
 require "pr/common/params_promo_code_service"
 require "pr/common/session_promo_code_service"
 require "pr/common/charge_service"
+require "pr/common/sign_in_service"
 require "pr/common/controller_concerns/promo_codes"
 
 module PR

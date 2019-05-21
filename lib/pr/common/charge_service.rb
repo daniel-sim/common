@@ -77,7 +77,8 @@ module PR
             email: @user.email,
             appPlan: app_plan,
             monthlyUsd: price,
-            trial: price.to_f.positive?
+            trial: price.to_f.positive?,
+            promo_code: @user.shop.promo_code&.code
           }
         )
 
@@ -87,7 +88,8 @@ module PR
           properties: {
             email: @user.email,
             monthly_usd: price,
-            app_plan: app_plan
+            app_plan: app_plan,
+            promo_code: @user.shop.promo_code&.code
           }
         )
       end

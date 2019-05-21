@@ -159,7 +159,8 @@ module PR
             email: @user.email,
             status: :active,
             shopifyPlan: @shop.shopify_plan,
-            appPlan: @shop.app_plan
+            appPlan: @shop.app_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -169,7 +170,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: @user.shop.shopify_plan
+            shopify_plan: @user.shop.shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -293,7 +295,8 @@ module PR
           traits: {
             email: @user.email,
             status: :active,
-            shopifyPlan: shopify_plan
+            shopifyPlan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -303,7 +306,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: shopify_plan
+            shopify_plan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -322,7 +326,8 @@ module PR
             appPlan: @shop.app_plan,
             monthlyUsd: 0, # always reset to 0 on reinstall
             activeCharge: @user.active_charge,
-            trial: false
+            trial: false,
+            promo_code: @shop.promo_code&.code
           }
         )
 
@@ -332,7 +337,8 @@ module PR
           properties: {
             "registration method": "shopify",
             email: @user.email,
-            shopify_plan: shopify_plan
+            shopify_plan: shopify_plan,
+            promo_code: @shop.promo_code&.code
           }
         )
       end
@@ -357,7 +363,7 @@ module PR
             totalPeriodsPaid: shop.total_periods_paid,
             monthlyUsd: current_time_period.monthly_usd.to_f,
             currentUsdPaid: current_time_period.usd_paid.to_f,
-            totalUsdPaid: shop.total_usd_paid.to_f,
+            totalUsdPaid: shop.total_usd_paid.to_f
           }
         )
 
