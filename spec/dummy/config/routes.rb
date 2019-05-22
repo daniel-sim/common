@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount ShopifyApp::Engine, at: '/'
+  mount PR::Common::Engine, at: '/'
 end
