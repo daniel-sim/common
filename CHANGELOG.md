@@ -1,3 +1,13 @@
+## 22 May 2019 (88630db71d5e0dd0f824d50bea03856b154a7f45)
+- Upgraded ShopifyApp 9.x branch to include PromoCodes
+- Added sassc-rails
+- Included module inside Admins controllers to override LoginProtection inside Devise
+- Apps require changes:
+  - Most of the promo code related changes below in the changelog do not apply, as
+    they're now contained inside common.
+  - `sass-rails` should be removed from apps, as we now have `sassc-rails` included
+    in common
+
 ## 22 May 2019 (293e809c519eea37411334d7c99e963731a6da23)
 - Fix devise bug in signing in
 - ! Apps require no changes
