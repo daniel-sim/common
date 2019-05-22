@@ -1,5 +1,6 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
+  devise_for :users, only: :none # see https://github.com/plataformatec/devise/issues/4580
   devise_for :admins,
              class_name: "PR::Common::Models::Admin",
              controllers: { sessions: "admins/sessions" }
