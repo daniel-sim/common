@@ -1,3 +1,7 @@
+## 22 May 2019 (293e809c519eea37411334d7c99e963731a6da23)
+- Fix devise bug in signing in
+- ! Apps require no changes
+
 ## 21 May 2019 (bd44a509e0a2f37e56f968078dff4c149568e163)
 - Add validation to promo codes at login screen
 - ! Apps require no changes
