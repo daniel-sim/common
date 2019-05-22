@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admins::ConfirmationsController < Devise::ConfirmationsController
+  # Needed because Devise now extends ApplicationController which may include Shopify App gunk
+  include PR::Common::SkipShopifyAuthentication
   layout "admin_sessions"
 
   # GET /resource/confirmation/new

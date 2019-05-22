@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
+  s.add_dependency "sassc-rails"
   s.add_dependency 'rails'
   s.add_dependency 'shopify_app'
   s.add_dependency 'active_model_serializers'

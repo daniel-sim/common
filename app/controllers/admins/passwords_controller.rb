@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admins::PasswordsController < Devise::PasswordsController
+  # Needed because Devise now extends ApplicationController which may include Shopify App gunk
+  include PR::Common::SkipShopifyAuthentication
   layout "admin_sessions"
 
   # GET /resource/password/new

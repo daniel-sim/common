@@ -11,7 +11,7 @@ module Shopify
 
           ensure_shop_has_user(api_shop, shop, options)
           ensure_shop_installed(shop, api_shop.plan_name)
-          track_login(shop.user)
+          track_login(shop)
         end
       end
     end
@@ -35,15 +35,8 @@ module Shopify
       shopify_service.update_shop(shopify_plan: shopify_plan, uninstalled: false)
     end
 
-    def track_login(user)
-      Analytics.track({
-        user_id: user.id,
-        event: "Logged in",
-        properties: {
-          "logon method": "shopify",
-          "email": user.email
-        }
-      })
+    def track_login(shop)
+      PR::Common::SignInService.track(shop)
     end
   end
 end

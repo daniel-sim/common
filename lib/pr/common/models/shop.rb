@@ -85,7 +85,7 @@ module PR
         end
 
         def active?
-          active_shopify_plan? && user&.active_charge && !uninstalled
+          active_shopify_plan? && user&.active_charge && installed?
         end
 
         def active_shopify_plan?
@@ -141,7 +141,7 @@ module PR
         end
 
         def maybe_build_uninstalled_time_period
-          return unless uninstalled?
+          return if installed?
           return true if current_time_period&.uninstalled? # current time period is already uninstalled
 
           reconcile_time_period(:uninstalled)

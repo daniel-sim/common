@@ -3,6 +3,7 @@ module PR
     module Controllers
       class SessionsController < ActionController::Base # rubocop:disable Metrics/ClassLength
         include ShopifyApp::LoginProtection
+        include PR::Common::PromoCodes
 
         layout false, only: :new
         after_action only: [:new, :create] do |controller|
@@ -14,6 +15,9 @@ module PR
         end
 
         def create
+          maybe_store_promo_code
+          return if performed?
+
           authenticate
         end
 

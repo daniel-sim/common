@@ -3,6 +3,7 @@ module PR
     module Controllers
       class CallbackController < ActionController::Base
         include ShopifyApp::LoginProtection
+        include PR::Common::PromoCodes
 
         # Sign in callback
         def callback
@@ -13,6 +14,8 @@ module PR
             perform_after_authenticate_job
 
             shop = Shop.find_by(shopify_domain: shop_name)
+            maybe_reconcile_promo_codes(shop)
+
             redirect_to "#{PR::Common.client_url}/users/sign_in/shopify/#{shop.user.access_token}"
           else
             flash[:error] = I18n.t('could_not_log_in')

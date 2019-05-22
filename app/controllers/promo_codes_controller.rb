@@ -1,4 +1,4 @@
-class PromoCodesController < ApplicationController
+class PromoCodesController < ActionController::Base
   STATUS_VALID = "valid".freeze
   STATUS_ERROR = "error".freeze
 

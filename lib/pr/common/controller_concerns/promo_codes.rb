@@ -1,7 +1,7 @@
 module PR
   module Common
     module PromoCodes
-      extend ActiveSupport
+      extend ActiveSupport::Concern
 
       def maybe_reconcile_promo_codes(shop)
         maybe_remove_existing_promo_code(shop)

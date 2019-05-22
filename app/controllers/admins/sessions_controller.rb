@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admins::SessionsController < Devise::SessionsController
+  # Needed because Devise now extends ApplicationController which may include Shopify App gunk
+  include PR::Common::SkipShopifyAuthentication
   layout "admin_sessions"
 
   # before_action :configure_sign_in_params, only: [:create]

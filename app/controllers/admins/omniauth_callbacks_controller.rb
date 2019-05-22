@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admins::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  # Needed because Devise now extends ApplicationController which may include Shopify App gunk
+  include PR::Common::SkipShopifyAuthentication
   layout "admin_sessions"
 
   # You should configure your model like this:

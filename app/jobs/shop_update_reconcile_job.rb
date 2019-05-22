@@ -22,9 +22,9 @@ class ShopUpdateReconcileJob < PR::Common::ApplicationJob
 
         logger.info "Reconciling shop #{shop.shopify_domain} found it uninstalled; "\
                     "will not proceed"
-      end
 
-      return if shop.uninstalled
+        return
+      end
 
       logger.info "Recording sustained analytics for shop #{shop.shopify_domain}"
 

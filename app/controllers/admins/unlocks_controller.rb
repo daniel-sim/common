@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admins::UnlocksController < Devise::UnlocksController
+  # Needed because Devise now extends ApplicationController which may include Shopify App gunk
+  include PR::Common::SkipShopifyAuthentication
   layout "admin_sessions"
 
   # GET /resource/unlock/new

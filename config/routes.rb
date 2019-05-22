@@ -1,18 +1,17 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
-  devise_for :users, only: :none # see https://github.com/plataformatec/devise/issues/4580
+  mount ShopifyApp::Engine, at: '/'
+
+  devise_for :users,
+             path: "users",
+             only: :none,
+             controllers: { sessions: "users/sessions"}
   devise_for :admins,
+             path: "admins",
              class_name: "PR::Common::Models::Admin",
              controllers: { sessions: "admins/sessions" }
 
   mount Sidekiq::Web => '/sidekiq'
-
-  controller :sessions do
-    get 'login' => :new, :as => :login
-    post 'login' => :create, :as => :authenticate
-    get 'auth/shopify/callback' => :callback
-    get 'logout' => :destroy, :as => :logout
-  end
 
   namespace :webhooks do
     post ':type' => :receive

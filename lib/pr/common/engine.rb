@@ -1,5 +1,7 @@
 require 'rack-affiliates'
 require 'sidekiq'
+require 'sassc-rails'
+
 module PR
   module Common
     class Engine < ::Rails::Engine
