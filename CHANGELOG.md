@@ -1,3 +1,7 @@
+## 29 May 2019 (7d01e826d5cc5b1ea9c732cfe22211bfd5ea18d8)
+- Fix amplitude rejecting a null promo code
+- ! Apps require no changes
+
 ## 22 May 2019 (293e809c519eea37411334d7c99e963731a6da23)
 - Fix devise bug in signing in
 - ! Apps require no changes
