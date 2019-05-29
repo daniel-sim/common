@@ -1,3 +1,7 @@
+## 29 May 2019 (08f02c7e48069a8ce891f9adb08b1f4eb26e7412)
+- Fix amplitude rejecting a null promo code
+- ! Apps require no changes
+
 ## 22 May 2019 (88630db71d5e0dd0f824d50bea03856b154a7f45)
 - Upgraded ShopifyApp 9.x branch to include PromoCodes
 - Added sassc-rails
