@@ -71,6 +71,8 @@ module PR
 
       def send_charge_activated_analytics(app_plan, price)
         # This currently assumes that all paying users have a trial first.
+        # We use `false` if there is no promo code because amplitude doesn't
+        # accept nil values.
         Analytics.identify(
           user_id: @user.id,
           traits: {
@@ -78,7 +80,7 @@ module PR
             appPlan: app_plan,
             monthlyUsd: price,
             trial: price.to_f.positive?,
-            promo_code: @user.shop.promo_code&.code
+            promo_code: @user.shop.promo_code&.code || false
           }
         )
 
@@ -89,7 +91,7 @@ module PR
             email: @user.email,
             monthly_usd: price,
             app_plan: app_plan,
-            promo_code: @user.shop.promo_code&.code
+            promo_code: @user.shop.promo_code&.code || false
           }
         )
       end
