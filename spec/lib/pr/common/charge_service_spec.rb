@@ -41,7 +41,7 @@ describe PR::Common::ChargeService do
             monthlyUsd: charge.price,
             appPlan: described_class.determine_app_plan_from_charge(charge),
             trial: price.positive?,
-            promo_code: nil
+            promo_code: false
           }
         )
 
@@ -57,7 +57,7 @@ describe PR::Common::ChargeService do
             email: user.email,
             monthly_usd: charge.price,
             app_plan: described_class.determine_app_plan_from_charge(charge),
-            promo_code: nil
+            promo_code: false
           }
         )
 
