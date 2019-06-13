@@ -1,3 +1,7 @@
+## 13 Jun 2019 (7595cdf3739aa43c1721660434e85f2a6d888790)
+- Change text shown after applying a promo code
+- ! Apps require no changes
+
 ## 29 May 2019 (7d01e826d5cc5b1ea9c732cfe22211bfd5ea18d8)
 - Fix amplitude rejecting a null promo code
 - ! Apps require no changes
