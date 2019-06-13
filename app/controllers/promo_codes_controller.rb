@@ -16,7 +16,7 @@ class PromoCodesController < ActionController::Base
     else
       {
         status: STATUS_VALID,
-        message: "Promo code applied: you pay #{service.record.value}% of the normal price."
+        message: "Success: Promotion applied!"
       }
     end
   end
