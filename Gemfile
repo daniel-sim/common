@@ -21,7 +21,7 @@ group :test do
   gem "shoulda-matchers", "4.0.0.rc1" # recommended for Rails 5+
 end
 
-gem 'devise'
+gem 'devise', '~> 4.6'
 gem 'rack-affiliates'
 gem 'sidekiq'
 gem 'config'
