@@ -98,10 +98,3 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 end
-
-def load_files
-  require File.expand_path('../dummy/app/serializers/user_base_serializer', __FILE__)
-  require File.expand_path('../dummy/app/serializers/session_serializer', __FILE__)
-  require File.expand_path('../dummy/app/mailers/new_user_mailer', __FILE__)
-end
-

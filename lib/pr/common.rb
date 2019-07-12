@@ -23,6 +23,7 @@ require "pr/common/controller_concerns/skip_shopify_authentication"
 require "pr/common/controllers/sessions_controller"
 require "pr/common/controllers/webhooks_controller"
 require "pr/common/controllers/callback_controller"
+require "pr/common/workers/base"
 require "exceptions/shopify"
 require "exceptions/ignored_wrapper"
 
