@@ -1,3 +1,9 @@
+## 12 Jul 2019 (c84984ada815488f4619715b732e8fad22c961e3)
+- Add `PR::Common::Workers::Base`
+
+- ! Apps require no changes, but should do the following:
+  - Replace base Sidekiq worker with `PR::Common::Workers::Base`
+
 ## 12 Jul 2019 (41388702760f8ddc13118f3e251a22188d567057)
 - Remove shopify-errors
 - Add Exceptions::Shopify
