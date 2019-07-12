@@ -1,7 +1,6 @@
 require "pr/common/version"
 require "pr/common/engine"
 require "pr/common/configuration"
-require "pr/common/shopify_errors"
 require "pr/common/tokenable"
 require "pr/common/token_authenticable"
 require "pr/common/affiliate_redirect"
@@ -24,6 +23,8 @@ require "pr/common/controller_concerns/skip_shopify_authentication"
 require "pr/common/controllers/sessions_controller"
 require "pr/common/controllers/webhooks_controller"
 require "pr/common/controllers/callback_controller"
+require "exceptions/shopify"
+require "exceptions/ignored_wrapper"
 
 module PR
   module Common
