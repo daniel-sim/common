@@ -1,3 +1,13 @@
+## 12 Jul 2019 (41388702760f8ddc13118f3e251a22188d567057)
+- Remove shopify-errors
+- Add Exceptions::Shopify
+
+- ! Apps may require changes
+
+- If the app uses `ShopifyErrors`, port them over to `Exceptions::Shopify` submodules.
+- If the app is manually catching and raising `ShopifyErrors`, use `Exceptions::Shopify.intercept`. instead.
+- If the app implements an `IgnoredWrapper` error, use `Exceptions::IgnoredWrapper` instead.
+
 ## 13 Jun 2019 (7595cdf3739aa43c1721660434e85f2a6d888790)
 - Change text shown after applying a promo code
 - ! Apps require no changes
