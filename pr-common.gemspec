@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency 'rails'
+  s.add_dependency 'rails', '~> 5.2'
   s.add_dependency 'shopify_app', '~> 7.2.0'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'nokogiri', '>= 1.8.2'
