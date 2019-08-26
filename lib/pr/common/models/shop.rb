@@ -29,12 +29,6 @@ module PR
           before_validation :reconcile_time_periods
           before_validation :ensure_shopify_domain_downcased
 
-          # TODO:
-          # This ensures that every pre-existing shop has a time period before it is
-          # operated on.
-          # This should be removed once all existing shops in all apps already have a time period.
-          after_find -> { reconcile_time_periods && save }, if: -> { time_periods.blank? }
-
           # ShopifyApp uses a case insensitive validation which is slow (uses LOWER()).
           # Apply a case sensitive one and remove the original.
           validates :shopify_domain, uniqueness: { case_sensitive: true }
