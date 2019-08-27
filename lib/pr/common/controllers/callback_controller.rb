@@ -16,7 +16,12 @@ module PR
             shop = Shop.find_by(shopify_domain: shop_name)
             maybe_reconcile_promo_codes(shop)
 
-            redirect_to "#{PR::Common.client_url}/users/sign_in/shopify/#{shop.user.access_token}"
+            redirect_uri = "#{PR::Common.client_url}/users/sign_in/shopify/#{shop.user.access_token}"
+
+            origin = request.env["omniauth.origin"]
+            redirect_uri = [redirect_uri, "origin=#{origin}"].join("?") if origin.present?
+
+            redirect_to redirect_uri
           else
             flash[:error] = I18n.t('could_not_log_in')
             redirect_to [PR::Common.api_url, ShopifyApp.configuration.login_url].join
@@ -86,6 +91,7 @@ module PR
           config[:job].send(
             method,
             shop_domain: session[:shopify_domain],
+            session: session,
             referrer: request.env["affiliate.tag"]
           )
         end
