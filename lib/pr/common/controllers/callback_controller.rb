@@ -4,6 +4,7 @@ module PR
       class CallbackController < ActionController::Base
         include ShopifyApp::LoginProtection
         include PR::Common::PromoCodes
+        SHOPIFY_APP_STORE_DOMAIN = "apps.shopify.com".freeze
 
         # Sign in callback
         def callback
@@ -19,7 +20,7 @@ module PR
             redirect_uri = "#{PR::Common.client_url}/users/sign_in/shopify/#{shop.user.access_token}"
 
             origin = request.env["omniauth.origin"]
-            redirect_uri = [redirect_uri, "origin=#{origin}"].join("?") if origin.present?
+            redirect_uri = [redirect_uri, "origin=#{origin}"].join("?") if origin.present? && !origin.include?(SHOPIFY_APP_STORE_DOMAIN)
 
             redirect_to redirect_uri
           else
