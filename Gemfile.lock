@@ -7,7 +7,7 @@ PATH
       config
       nokogiri (>= 1.8.2)
       rack-affiliates
-      rails (~> 5.2)
+      rails (>= 5.0)
       shopify_app (~> 7.2.0)
 
 GEM
@@ -36,9 +36,9 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_model_serializers (0.10.9)
-      actionpack (>= 4.1, < 6)
-      activemodel (>= 4.1, < 6)
+    active_model_serializers (0.10.10)
+      actionpack (>= 4.1, < 6.1)
+      activemodel (>= 4.1, < 6.1)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (5.2.3)
@@ -323,4 +323,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.0.1
+   2.0.2
