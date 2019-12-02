@@ -1,4 +1,5 @@
-ShopifyApp.configure do |config|
+# Non-Shopify apps can use Common so just try to configure here and fail gracefully if no ShopifyApp configuration provided
+ShopifyApp.try (:configure) do |config|
   # For non-common, application specific webhooks be sure to do config.webhooks.push() rather than overwriting those here
   # TODO: Check and document what happens when adding/removing webhooks from here for existing shops?
   # https://pluginseo.ngrok.io
