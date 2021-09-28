@@ -61,7 +61,6 @@ module PR
       end
 
       def activate_user(app_plan, charge = nil)
-        charge&.activate
         @user.update(active_charge: true, charged_at: Time.current)
         @shop.update(app_plan: app_plan)
         @shop.current_time_period.update(monthly_usd: charge&.price || 0)
